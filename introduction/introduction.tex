@@ -1,19 +1,19 @@
 \chapter{Introduction}
 \label{chp:introduction}
-Tribler is peer-to-peer file sharing software developed at the Delft University of Technology for research purposes.
-Tribler was started in 2001.
-Tribler expands the BitTorrent protocol and has added multiple improvements on this protocol.
-The focus of Tribler is two fold:
+Tribler is a peer-to-peer BitTorrent client that attempts to fully decentralize downloading, uploading and streaming of content.
+
+Tribler focusses on the goals:
 \begin{itemize}
-    \item Make secure and private use of the Internet the default for every user.
-    \item Make it impossible to shut Tribler down without shutting down the infrastructure of the Internet itself down.
+    \item Allow for secure and private communication and sharing of data.
+    \item Enforce user contribution in the network
+    \item Make it impossible to shut Tribler down, unless the Internet itself as a whole gets taken down.
 \end{itemize}
 
-A fully distributed program, without relying on any central component, is only able to achieve these goals.
+A fully decentralized ecosystem i.e. no central components present, is Tribler's approach to achieve these goals.
 Tribler has been designed and build with this focus~\cite{Pouwelse-tribler,Bakker-tribler}.
-A distributed network requires collaboration of it participants, called peers, to achieve success.
-A screenshot of Tribler can be seen in Figure \ref{fig:tribler-screenshot}.
-This master's thesis was conducted as part of the research mission to improve the collaboration of peers within Tribler.
+A distributed network requires both the presence and collaboration of participants, called peers, to be able to achieve this.
+
+This thesis was conducted to improve the connectability and overall performance of Tribler, by identifying and removing bottlenecks present in the system.
 
 \begin{figure}
 	\centerline{\includegraphics[scale=0.6]{introduction/figs/tribler-screenshot.png}}
@@ -21,37 +21,32 @@ This master's thesis was conducted as part of the research mission to improve th
 	\label{fig:tribler-screenshot}
 \end{figure}
 
-\section{Tribler}
-In peer-to-peer file sharing a node called a seeder uploads parts
-of a file to another node, the downloader.
-The seeders and downloaders constantly change
-and a node can be both at the same time for different, parallel connections.
-A seeder can become a downloader when he wishes to download other files
-and downloaders can become seeders,
-when they posses a different file someone else wants.
+\section{BitTorrent protocol}
+When sharing files by using the BitTorrent protocol, a peer that uploads parts of a file to another peer, is called a seeder.
+A peer that is downloading a file of a seeder is called a leecher.
+Any peer can be both a seeder and leecher at the same time, and join the network at any given time.
+
 The ratio between the total data downloaded and uploaded is called the seeding ratio~\cite{Cohen-bittorrent}.
-The seeding ratio can be seen as an indication of the level of collaboration.
+The seeding ratio can be seen as an indication of the level of collaboration i.e. giving back resources to the network.
 
-Uploading can be seen as an interaction of one node helping another node.
-Such interactions come at the cost of consuming bandwidth for both parties.
-However, there is only direct benefit for the downloader.
-The downloader receives a file he wants.
-There is no direct barter between the seeder and downloader.
-Because the seeder does not get anything in return for uploading the file.
-With only a very small chance, can a downloader also be a seeder for the original seeder~\cite{Lai-Incentives}.
+Seeding can be seen as an interaction between peers, where the seeder aids the leeching peer.
+By utilizing the seeders upload bandwith, the leeching peer can use his download bandwidth to download a file.
+While there is a clear incentive for the leecher by downloading the desired file, there is none for the seeder.
+Especially since the leecher has a little chance of becoming also be a seeder for the original seeder~\cite{Lai-Incentives}.
 
-Both high availability and high download speeds result in a higher utility for the downloaders.
-If everyone contributes, files become more available and are downloaded at higher speed.
-This claim is supported by measurements taken in private communities~\cite{meulpolder-privatecommunities}.
-In private communities, high seeding ratios are enforced by a tracker.
-Trackers are servers where nodes in a peer-to-peer network are introduced to each other,
-so that they can upload and download from each other~\cite{cohen-titfortat}.
-This tracker can be seen as a central, third party.
+Having peers actively and persistently contribute to the network will increase the network's health which in turn provides several benefits for all peers.
+A more healthy network results in a higher availability of seeders and results in high download speeds.
+It has been shown that private communities where the seeding ratio is high, provides better download conditions \cite{meulpolder-privatecommunities}.
+In these private communities, trackers i.e. central components introduce peers to each other using the Tit-for_tat approach \cite{cohen-titfortat}.
+The Tit-for-Tat approach is aiding peers who have aided you in the past, 
 
-But currently freeriding takes places in high quantities in public networks~\cite{Adar-Freeriding}.
-BitTorrent uses a Tit-for-Tat strategy~\cite{cohen-titfortat} to stop freeriding,
-but this strategy does not effectively stop abuse~\cite{Pouwelse-tribler}.
+The absence of trackers, which is often the case in public networks, results in free-riding \cite{Adar-Freeriding}.
+A free-riding peer does not or gives little back to the network while receiving all benefits i.e. download without any restriction.
+BitTorrent applies the Tit-for_tat strategy to combat this problem, yet it has been shown that this approach is not effective \cite{Pouwelse-tribler}.
 The Tit-for-Tat strategy is to only provide help to peers to peers that return this help.
+% TODO explain the optimistic chocking approach
+
+\section{Tribler}
 
 Tribler wants to achieve a high global seeding ratio by making it beneficial to have such a ratio.
 Nodes can award each other with higher cooperation if a node has a reputation of being cooperative,
@@ -73,10 +68,5 @@ Functionality was added to Dispersy during the thesis.
 The additions are described in chapter \ref{chapt:design}.
 
 \section{Document structure}
-In chapter 1 we give an overview of Tribler and the organization that develops Tribler.
-Chapter 2 gives a description of what the problem is with collaboration in peer-to-peer networks.
-Chapter 3 provides an overview of work related to solving the described problem.
-The design of the thesis work is described in chapter 4.
-The design is implemented, tested and experiments are run with the implementation in chapter 5.
-The design has known vulnerabillities and these are explained in chapter 6.
-Finally, we discuss the results of our work in chapter 7.
+Chapter \ref{chp:introduction} provides information on Tribler.
+Chapter \ref{chp:problem-description} presents an overview of some of the problems Tribler is currently facing.

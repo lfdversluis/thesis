@@ -1,19 +1,19 @@
 \chapter{Problem description}
-In many areas of the world, freedom of speech is not self-evident.
-Those who wish to discuss and critique e.g. governments in these areas may turn to technologies such as Tor.
-These technologies often employ strong encryption schemes and random routes to hide the user and ensure anonymity.
-Most of these technologies use a centralized or semi-centralized structure.
-Scalability and connectability are often problems that come with these technologies.
-
-Tribler is a peer-to-peer BitTorrent client that attempts to fully decentralize downloading, uploading and streaming of content.
-Being fully decentralized, Tribler scales well [CITE], however some problems reside.
-In this chapter, several problems are described that Tribler is currently facing.
-
+\label{chp:problem-description}
+In this chapter the problems Tribler is currently facing are described.
+Decentralized systems often have characteristics problems and Tribler is no exception.
+One of the advantages of being decentralized is that Tribler scales well [CITE].
+However, connectability, (anonymous) downloading speeds and CPU consumption are hampering Tribler's adoption.
 
 \section{Connectability}
 One of the problems Tribler faces is the connectability of its users.
 Users can be behind e.g. firewalls that prevent incoming or outgoing connections.
 Currently, Tribler employs NAT and Firewall Traversal [CITE], yet the success of this method is limited.
+The Tribler team has implemented their own DHT in python while existing libraries such as Libtorrent also offer these.
+These implementations should be tested to see if changing to a library offers a significant boost in terms of exchange or speed.
+
+Also, peers that are not connectable should be penalized in some way because they do not contribute to the network.
+This penalty can be e.g. prevent the user from downloading anonymously or receiving less credits when relaying data when being part of a tunnel.
 
 \section{Anonymous download speed}
 To allow for anonymous downloading, Tribler uses a Tor-like technique to create `anon tunnels'.
@@ -24,15 +24,18 @@ On top of that, Tribler is written in the python language, which only utilizes o
 This interpreter lock prevents threads running separately to actually perform work concurrently.
 As a result, the CPU core on which Tribler is running is usually at full capacity and thus being a bottleneck.
 By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running reduces.
-This should yield an increased download speed and better spread of workload overall.
+This should yield an increased download speed and better spread of workload overall as more packets can be processed per time unit.
 
 \section{Package serialization}
 One of the core components of Tribler is Dispersy. Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
 Both Dispersy and Tribler make use of python' built-in serialization function.
-The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources are spent on serializing data when sending or receiving UDP packets.
+The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources is spent on serializing data when sending or receiving UDP packets.
 As previously explained, running multiple threads at once does not result in code being executed concurrently.
-Cap'n Proto is a serialization framework that offloads the serialization code to C++, which bypasses the global interpreter lock.
-This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released on offloading it to C++.
+Cap'n Proto is a serialization framework that offloads the serialization of packets to a C++ process, which bypasses the global interpreter lock.
+This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released once the offloading to the C++ code base is done.
 
-\section{Scalability}
-TBD.
+\section{Swarming}
+Users in hidden swarm are not in the Distributed Hash Table (DHT) so exchanging peers through regular channels are not possible.
+Tribler has experimental, non-tested unit tested code in its code base that allows for anonymous peer exchange (PEX).
+This PEX is made possible by using Dispersy to route connect with people using a rendezvous point.
+One of the goals is to test if this implementation is functioning and fix it where needed, add unit or application tests to ensure its functionality, test it's performance with performance tests and improve the PEX where possible.
