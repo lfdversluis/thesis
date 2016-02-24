@@ -1,6 +1,6 @@
 \chapter{Problem description}
 \label{chp:problem-description}
-In this chapter the problems Tribler is currently facing are described.
+In this chapter the problems that this thesis address are described.
 Decentralized systems often have characteristics problems and Tribler is no exception.
 One of the advantages of being decentralized is that Tribler scales well [CITE].
 However, connectability, (anonymous) downloading speeds and CPU consumption are hampering Tribler's adoption.
@@ -16,7 +16,7 @@ Also, peers that are not connectable should be penalized in some way because the
 This penalty can be e.g. prevent the user from downloading anonymously or receiving less credits when relaying data when being part of a tunnel.
 
 \section{Anonymous download speed}
-To allow for anonymous downloading, Tribler uses a Tor-like technique to create `anon tunnels'.
+To allow for anonymous downloading, Tribler uses a Tor-like technique to create so called `anon tunnels'.
 To increase download speed and prevent a bottleneck in the network hampering the overall download speed, several tunnels are built to download simultaneously from [CITE?].
 Since this Tor-like technique includes cryptographic functions, having multiple tunnels running concurrently results in a lot of cryptographic calls being executed.
 Stok et al. profiled Tribler using a gumby experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE].
