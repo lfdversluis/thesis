@@ -1,41 +1,68 @@
 \chapter{Problem description}
 \label{chp:problem-description}
-In this chapter the problems that this thesis address are described.
 Decentralized systems often have characteristics problems and Tribler is no exception.
 One of the advantages of being decentralized is that Tribler scales well [CITE].
-However, connectability, (anonymous) downloading speeds and CPU consumption are hampering Tribler's adoption.
+However, connectability, (anonymous) downloading speeds, responsiveness and CPU consumption are hampering Tribler's adoption.
+Furthermore, Tribler's current code base has a severe lack of unit tests, structure and documentation.
+In this chapter we describe the problems related to connectability, responsiveness, anonymity and performance.
 
 \section{Connectability}
 One of the problems Tribler faces is the connectability of its users.
 Users can be behind e.g. firewalls that prevent incoming or outgoing connections.
 Currently, Tribler employs NAT and Firewall Traversal [CITE], yet the success of this method is limited.
-The Tribler team has implemented their own DHT in python while existing libraries such as Libtorrent also offer these.
+The Tribler team has implemented their own Distributed Hash Table (DHT) in python while existing libraries such as LibTorrent also offer these.
 These implementations should be tested to see if changing to a library offers a significant boost in terms of exchange or speed.
 
-Also, peers that are not connectable should be penalized in some way because they do not contribute to the network.
-This penalty can be e.g. prevent the user from downloading anonymously or receiving less credits when relaying data when being part of a tunnel.
+When users are downloading anonymously, they are inside so-called `hidden swarms'.
+These hidden swarms are not present in e.g. LibTorrent's DHT and therefore information from peers has to be exchanged between peers themselves by means of introducing peers to each other (PEX).
+By making use of Dispersy, Tribler creates rendezvous points to introduce peers to each other.
+If these rendezvous points are not connectible, PEX cannot take place.
+Solving this may be done by always connecting to the same port (chosen by the user or a default) and ask the user to forward that port.
+If users are not willing to do so, they can be penalized.
+This penalty can be for example not able to download anonymously at all, receive half the amount of credits when credit mining (see [CITE]) or limited download speed.
 
 \section{Anonymous download speed}
 To allow for anonymous downloading, Tribler uses a Tor-like technique to create so called `anon tunnels'.
 To increase download speed and prevent a bottleneck in the network hampering the overall download speed, several tunnels are built to download simultaneously from [CITE?].
 Since this Tor-like technique includes cryptographic functions, having multiple tunnels running concurrently results in a lot of cryptographic calls being executed.
-Stok et al. profiled Tribler using a gumby experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE].
-On top of that, Tribler is written in the python language, which only utilizes one CPU core and features a global interpreter lock.
-This interpreter lock prevents threads running separately to actually perform work concurrently.
-As a result, the CPU core on which Tribler is running is usually at full capacity and thus being a bottleneck.
-By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running reduces.
+Stok et al. profiled Tribler using a gumby\footnote{Gumby is Tribler's experiment running framework.} experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE] as well as serializing and deserializing data.
+Currently, the CPU power is a bottleneck when downloading using the anonymous tunnels.
+By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running can be reduced.
 This should yield an increased download speed and better spread of workload overall as more packets can be processed per time unit.
 
 \section{Package serialization}
-One of the core components of Tribler is Dispersy. Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
+One of the core components of Tribler is Dispersy. 
+Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
 Both Dispersy and Tribler make use of python' built-in serialization function.
 The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources is spent on serializing data when sending or receiving UDP packets.
 As previously explained, running multiple threads at once does not result in code being executed concurrently.
 Cap'n Proto is a serialization framework that offloads the serialization of packets to a C++ process, which bypasses the global interpreter lock.
 This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released once the offloading to the C++ code base is done.
 
-\section{Swarming}
-Users in hidden swarm are not in the Distributed Hash Table (DHT) so exchanging peers through regular channels are not possible.
-Tribler has experimental, non-tested unit tested code in its code base that allows for anonymous peer exchange (PEX).
-This PEX is made possible by using Dispersy to route connect with people using a rendezvous point.
-One of the goals is to test if this implementation is functioning and fix it where needed, add unit or application tests to ensure its functionality, test it's performance with performance tests and improve the PEX where possible.
+\section{Responsiveness}
+Since Tribler is written in the python language, calls on any thread will cause other threads to halt their execution.
+Normally two separate threads can run code in parallel as they generally do not touch each other's state.
+The cause of this is the Global Interpreter Lock (GIL) which states that only one function can be executed at a time.
+In its current state, the Graphical User Interface (GUI) of Tribler will block if it's doing some CPU or IO intensive work.
+This yields a scenario in which the user is unable to perform any action, which is not user friendly.
+In some cases the operating system itself will show e.g. a warning or visualisation that the process is not responding.
+To solve this issue, heavy operations should be done on separate threads or processes which are not monitored by the GIL.
+Several libraries that are written in C/C++ are a good example of this.
+Once the code of such a library is invoked and the execution is offloaded to the C/C++ code, the GIl is released, allowing other python code to ran in parallel.
+Another approach is using the python framework Twisted.
+Twisted has implemented a thread pool that also bypasses this GIL.
+By rewriting CPU or IO intensive code to make use of this thread pool in an asynchronous way, the responsiveness of Tribler can be improved.
+
+\section{Code quality and testing}
+Tribler's current code base is in a bare state.
+The current version that has been in development for over nine months now is plagued with bugs and non-functioning.
+Furthermore, there is a severe lack of unit tests, a lot of the code is undocumented and unnecessary complex and structure and flow are missing.
+This results in long and complex debugging processes when bugs are found and raise the bar for new contributors to get familiar with the code base.
+
+As of writing, the code is only tested on a single Unix operating system.
+Tribler, however, is available for all three major operating systems: Windows, Mac OS and Unix distributions.
+As users are reporting platform specific bugs, it is evidently important that automated testing on all three platforms are realized.
+
+Refactoring the code is necessary in order to regain the structure and lower the code complexity.
+Furthermore, proper unit tests are required to ensure Tribler's stability now and in the future.
+These tests have to be executed on build machines that run different operating systems, preferably with various configurations e.g. 32 and 64 bit architectures or different library versions.
