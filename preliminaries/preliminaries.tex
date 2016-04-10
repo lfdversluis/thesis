@@ -1,0 +1,43 @@
+\chapter{Preliminaries}
+
+This chapter introduces the BitTorrent protocol and general concepts and notation that is used throughout this thesis.
+
+\section{BitTorrent protocol}
+BitTorrent is one of the most popular protocols for peer-to-peer file sharing, generating between 43\% and 70\% of internet traffic per country \todo{cite to support this statement}.
+Downloading files is done in a decentralized way, that means no central component i.e. server is needed.
+By obtaining a torrent file, users can download files associated with this torrent using a program that is compatible with the BitTorrent protocol.\\
+
+A torrent is a file that contains information about the files and \todo{add how a torrent file works, what it contains and how you are downloading e.g. connecting to peers.}\\
+ 
+When sharing files by using the BitTorrent protocol, a user (or peer) that uploads i.e. provides a file to the BitTorrent network, is called a seeder.
+A peer that is downloading a file of a seeder is called a leecher.
+Any peer can be both a seeder and leecher at the same time, and join the network at any given time.\\
+
+The ratio between the total data downloaded and uploaded is called the seeding ratio \cite{Cohen-bittorrent}.
+The seeding ratio can be seen as an indication of the level of collaboration i.e. giving back resources to the network.\\
+
+\iffalse
+Seeding can be seen as an interaction between peers, where the seeder aids the leeching peer.
+By utilizing the seeders upload bandwidth, the leeching peer can use his download bandwidth to download a file.
+While there is a clear incentive for the leecher by downloading the desired file, there is none for the seeder.
+Especially since the leecher has a little chance of becoming also be a seeder for the original seeder \cite{Lai-Incentives}.\\
+
+Having peers actively and persistently contribute to the network will increase the network's health which in turn provides several benefits for all peers.
+A more healthy network results in a higher availability of seeders and results in high download speeds.
+It has been shown that private communities i.e. "darknets" where the seeding ratio is high, provides better download conditions \cite{meulpolder-privatecommunities}.
+In these private communities, trackers i.e. central components introduce peers to each other using the Tit-for-tat approach \cite{cohen-titfortat}.
+The Tit-for-Tat approach is aiding peers who have aided you in the past,
+The absence of trackers, which is often the case in public networks, results in free-riding \cite{Adar-Freeriding}.
+A free-riding peer does not or gives little back to the network while receiving all benefits i.e. download without any restriction.
+\todo{Explain the optimistic chocking approach.}
+BitTorrent applies a variation of the Tit-for-tat strategy, optimistic chocking, to combat this problem.
+The Tit-for-Tat strategy is to only provide help to peers that return this help.
+However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
+\fi
+
+\section{Dispersy}
+Dispersy is a middleware system for data dissemination in a network.
+In Dispersy one can define communities which can send messages to each other.
+Dispersy does not rely on a central component with the exception of bootstrap servers.
+Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
+The main use of Dispersy is the possibility of sending and receiving data to and from peers in the network \cite{zeilemaker-dispersy}.

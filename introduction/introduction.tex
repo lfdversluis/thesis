@@ -5,7 +5,7 @@ Tribler is a peer-to-peer BitTorrent client that attempts to fully decentralize 
 Tribler focusses on the following goals:
 \begin{itemize}
     \item Allow for secure and private communication and sharing of data.
-    \item Enforce user contribution in the network
+    \item Enforce user contribution in the network by making use of the multichain and credit mining.
     \item Make it impossible to shut Tribler down, unless the Internet itself as a whole gets taken down.
 \end{itemize}
 
@@ -13,42 +13,15 @@ A fully decentralized ecosystem i.e. no central components present, is Tribler's
 Tribler has been designed and build with this focus~\cite{Pouwelse-tribler,Bakker-tribler}.
 A distributed network requires both the presence and collaboration of participants, called peers, to be able to achieve this.
 
-This thesis was conducted to improve the connectability and overall performance of Tribler, by identifying and removing bottlenecks present in the system.
-
 % \begin{figure}
 %	\centerline{\includegraphics[scale=0.6]{introduction/figs/tribler-screenshot.png}}
 %	\caption{Screenshot of Tribler v6.4.3.}
 %	\label{fig:tribler-screenshot}
 %\end{figure}
 
-\section{BitTorrent protocol}
-When sharing files by using the BitTorrent protocol, a peer that uploads parts of a file to another peer, is called a seeder.
-A peer that is downloading a file of a seeder is called a leecher.
-Any peer can be both a seeder and leecher at the same time, and join the network at any given time.
-
-The ratio between the total data downloaded and uploaded is called the seeding ratio \cite{Cohen-bittorrent}.
-The seeding ratio can be seen as an indication of the level of collaboration i.e. giving back resources to the network.
-
-Seeding can be seen as an interaction between peers, where the seeder aids the leeching peer.
-By utilizing the seeders upload bandwidth, the leeching peer can use his download bandwidth to download a file.
-While there is a clear incentive for the leecher by downloading the desired file, there is none for the seeder.
-Especially since the leecher has a little chance of becoming also be a seeder for the original seeder \cite{Lai-Incentives}.
-
-Having peers actively and persistently contribute to the network will increase the network's health which in turn provides several benefits for all peers.
-A more healthy network results in a higher availability of seeders and results in high download speeds.
-It has been shown that private communities where the seeding ratio is high, provides better download conditions \cite{meulpolder-privatecommunities}.
-In these private communities, trackers i.e. central components introduce peers to each other using the Tit-for-tat approach \cite{cohen-titfortat}.
-The Tit-for-Tat approach is aiding peers who have aided you in the past,
-The absence of trackers, which is often the case in public networks, results in free-riding \cite{Adar-Freeriding}.
-A free-riding peer does not or gives little back to the network while receiving all benefits i.e. download without any restriction.
-\todo{Explain the optimistic chocking approach.}BitTorrent applies a variation of the Tit-for-tat strategy, optimistic chocking, to combat this problem.
-The Tit-for-Tat strategy is to only provide help to peers that return this help.
-However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
-
-\section{Tribler}
 Tribler wants to achieve a high global seeding ratio by making it beneficial to have such a ratio.
 Nodes can award each other with higher cooperation if a node has a reputation of being cooperative,
-while malicious nodes are prevented from tampering and freeriding.
+while malicious nodes are prevented from tampering and free-riding.
 Within Tribler anonymous connections have been implemented recently using onion routing~\cite{Plak-anonymous,ruigrok-anonymous,tanaskoski-anonymous}.
 This feature allows downloaders to become indistinguishable from other users in the network save guarding their privacy.
 Every data packet has to be forwarded
@@ -57,13 +30,6 @@ The total cost of bandwidth per file is increased,
 because it has to be forwarded by multiple nodes.
 but also the number of nodes helping a single node downloading a file increases.
 The increase in nodes working together increases the necessity of an incentive system to reward collaboration.
-
-Dispersy is middleware for data dissemination in a network.
-Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
-Our work is build upon Dispersy.
-Dispersy is used to exchange data between two specific nodes~\cite{zeilemaker-dispersy}.
-Functionality was added to Dispersy during the thesis.
-The additions are described in chapter \ref{chapt:design}.
 
 \section{Objective and research questions}
 \label{chp1:sct:objectives-research-questions}
@@ -77,12 +43,10 @@ Both staff and students have been working for years on Tribler and know parts of
 Using this knowledge resulted in a shorter learning trajectory to understand Tribler's code base and identify problem areas related to the objective of this thesis.
 Based on the objectives of Tribler, this thesis aims to answer the main research question formulated below.\\
 
-\noindent
-\textbf{Main Research Question:} How can we improve Tribler's performance and code base by means of asynchronous programming and refactoring?\\
+\textbf{Main Research Question:} How can we improve Tribler's performance and code base by means of asynchronous programming, automated testing and refactoring?\\
 
 To answer the main research question, we have defined three research questions below. Each of these research questions will be justified as why they contribute to the main research question.\\
 
-\noindent
 \textbf{Research Question 1:} How can we identify bottlenecks in a complex system such as Tribler?\\
 
 Software projects such as Tribler have many lines of code (LOC). 
@@ -91,7 +55,6 @@ To improve such an entity, one needs to be able to identify bottlenecks that are
 Such limitations may manifest themselves in the form of e.g. poor performance or bad responsiveness.
 Identifying these bottlenecks is the first step to resolve them.\\
 
-\noindent
 \textbf{Research Question 2:} Can a system such as Tribler benefit from asynchronous programming?\\
 
 Asynchronous programming can improve the performance and responsiveness of a system, but it has its drawbacks. Identifying these drawbacks and deciding if the benefits outweigh the costs is necessary to prevent the current state from worsening. \\
