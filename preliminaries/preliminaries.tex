@@ -1,6 +1,7 @@
 \chapter{Preliminaries}
+\label{chp:preliminaries}
 
-This chapter introduces the BitTorrent protocol and general concepts and notation that is used throughout this thesis.
+This chapter introduces the BitTorrent protocol and general concepts and terminology that is used throughout this thesis.
 
 \section{BitTorrent protocol}
 BitTorrent is one of the most popular protocols for peer-to-peer file sharing, generating between 43\% and 70\% of internet traffic per country \todo{cite to support this statement}.
@@ -16,28 +17,42 @@ Any peer can be both a seeder and leecher at the same time, and join the network
 The ratio between the total data downloaded and uploaded is called the seeding ratio \cite{Cohen-bittorrent}.
 The seeding ratio can be seen as an indication of the level of collaboration i.e. giving back resources to the network.\\
 
-\iffalse
-Seeding can be seen as an interaction between peers, where the seeder aids the leeching peer.
-By utilizing the seeders upload bandwidth, the leeching peer can use his download bandwidth to download a file.
-While there is a clear incentive for the leecher by downloading the desired file, there is none for the seeder.
-Especially since the leecher has a little chance of becoming also be a seeder for the original seeder \cite{Lai-Incentives}.\\
+%Seeding can be seen as an interaction between peers, where the seeder aids the leeching peer.
+%By utilizing the seeders upload bandwidth, the leeching peer can use his download bandwidth to download a file.
+%While there is a clear incentive for the leecher by downloading the desired file, there is none for the seeder.
+%Especially since the leecher has a little chance of becoming also be a seeder for the original seeder \cite{Lai-Incentives}.\\
 
-Having peers actively and persistently contribute to the network will increase the network's health which in turn provides several benefits for all peers.
-A more healthy network results in a higher availability of seeders and results in high download speeds.
-It has been shown that private communities i.e. "darknets" where the seeding ratio is high, provides better download conditions \cite{meulpolder-privatecommunities}.
-In these private communities, trackers i.e. central components introduce peers to each other using the Tit-for-tat approach \cite{cohen-titfortat}.
-The Tit-for-Tat approach is aiding peers who have aided you in the past,
-The absence of trackers, which is often the case in public networks, results in free-riding \cite{Adar-Freeriding}.
-A free-riding peer does not or gives little back to the network while receiving all benefits i.e. download without any restriction.
-\todo{Explain the optimistic chocking approach.}
-BitTorrent applies a variation of the Tit-for-tat strategy, optimistic chocking, to combat this problem.
-The Tit-for-Tat strategy is to only provide help to peers that return this help.
-However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
-\fi
+%Having peers actively and persistently contribute to the network will increase the network's health which in turn provides several benefits for all peers.
+%A more healthy network results in a higher availability of seeders and results in high download speeds.
+%It has been shown that private communities i.e. "darknets" where the seeding ratio is high, provides better download conditions \cite{meulpolder-privatecommunities}.
+%In these private communities, trackers i.e. central components introduce peers to each other using the Tit-for-tat approach \cite{cohen-titfortat}.
+%The Tit-for-Tat approach is aiding peers who have aided you in the past,
+%The absence of trackers, which is often the case in public networks, results in free-riding \cite{Adar-Freeriding}.
+%A free-riding peer does not or gives little back to the network while receiving all benefits i.e. download without any restriction.
+%\todo{Explain the optimistic chocking approach.}
+%BitTorrent applies a variation of the Tit-for-tat strategy, optimistic chocking, to combat this problem.
+%The Tit-for-Tat strategy is to only provide help to peers that return this help.
+%However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
 
-\section{Dispersy}
-Dispersy is a middleware system for data dissemination in a network.
-In Dispersy one can define communities which can send messages to each other.
-Dispersy does not rely on a central component with the exception of bootstrap servers.
-Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
-The main use of Dispersy is the possibility of sending and receiving data to and from peers in the network \cite{zeilemaker-dispersy}.
+\section{Asynchronous programming}
+\label{sec:async-programming}
+
+When programming asynchronously the function that is being called (callee) by a caller returns a so-called Deferred in the Python programming language.
+The Deferred is a place holder for the actual value that this function will return once the callee has computed it.
+In normal (synchronous) programming, when calling a function the caller is waiting for the callee to provide an answer. 
+Making a synchronous call in a multi-threaded environment where one thread calls the function of another may not be efficient.
+If the callee takes a long time to compute the return value, the caller thread will be idle for that duration.
+When using Deferreds, the callee will simply return a Deferred and starts the computation.
+The caller will resume its other operations and when the callee is done, it will fire a callback event, notifying that the Deferred has either resolved into an answer or an error.
+By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.\\
+
+One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue.
+This may result in the caller changing values, the callee is dependant on.
+When programming asynchronously, 
+
+% \section{Dispersy}
+% Dispersy is a middleware system for data dissemination in a network.
+% In Dispersy one can define communities which can send messages to each other.
+% Dispersy does not rely on a central component with the exception of bootstrap servers.
+% Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
+% The main use of Dispersy is the possibility of sending and receiving data to and from peers in the network \cite{zeilemaker-dispersy}.
