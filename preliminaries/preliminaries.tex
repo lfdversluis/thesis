@@ -5,7 +5,7 @@ This chapter introduces the BitTorrent protocol and general concepts and termino
 
 \section{BitTorrent protocol}
 BitTorrent is one of the most popular protocols for peer-to-peer file sharing, generating between 43\% and 70\% of internet traffic per country \todo{cite to support this statement}.
-Downloading files is done in a decentralized way, that means no central component i.e. server is needed.
+Downloading files is done in a decentralized way, that means no central entity such as a server is needed.
 By obtaining a torrent file, users can download files associated with this torrent using a program that is compatible with the BitTorrent protocol.\\
 
 A torrent is a file that contains information about the files and \todo{add how a torrent file works, what it contains and how you are downloading e.g. connecting to peers.}\\
@@ -37,22 +37,23 @@ The seeding ratio can be seen as an indication of the level of collaboration i.e
 \section{Asynchronous programming}
 \label{sec:async-programming}
 
-When programming asynchronously the function that is being called (callee) by a caller returns a so-called Deferred in the Python programming language.
-The Deferred is a place holder for the actual value that this function will return once the callee has computed it.
+When programming asynchronously the function that is being called (callee) by a caller returns a so-called deferred.
+A deferred is a place holder for the actual value that this function will return once the callee has computed it.
 In normal (synchronous) programming, when calling a function the caller is waiting for the callee to provide an answer. 
-Making a synchronous call in a multi-threaded environment where one thread calls the function of another may not be efficient.
-If the callee takes a long time to compute the return value, the caller thread will be idle for that duration.
-When using Deferreds, the callee will simply return a Deferred and starts the computation.
-The caller will resume its other operations and when the callee is done, it will fire a callback event, notifying that the Deferred has either resolved into an answer or an error.
+Making a synchronous call in a single or multi-threaded environment may not be efficient.
+If the callee takes a long time to compute and return the answer, the caller thread will be idle for that duration.
+When using deferreds, the callee will simply return a Deferred and starts the computation.
+The caller will resume its other operations and when the callee is done, it will fire a callback event, notifying that the deferred has either resolved into an answer or an error.
 By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.\\
 
 One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue.
-This may result in the caller changing values, the callee is dependant on.
-When programming asynchronously, 
+This may result in the caller changing values, the callee is dependent on.
 
-% \section{Dispersy}
-% Dispersy is a middleware system for data dissemination in a network.
-% In Dispersy one can define communities which can send messages to each other.
-% Dispersy does not rely on a central component with the exception of bootstrap servers.
-% Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
-% The main use of Dispersy is the possibility of sending and receiving data to and from peers in the network \cite{zeilemaker-dispersy}.
+\todo{more stuff here}
+
+\section{Dispersy}
+Dispersy is a middleware system for data dissemination in  network.
+In Dispersy one can define communities which can send messages to each other.
+Dispersy does not rely on a central component with the exception of bootstrap servers.
+Dispersy is used heavily within Tribler and is maintained by the Tribler organisation.
+The main use of Dispersy is the possibility of sending and receiving data to and from peers in the network \cite{zeilemaker-dispersy}. \todo{more explanation needed.}

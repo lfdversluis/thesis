@@ -6,38 +6,40 @@ However, connectability, (anonymous) downloading speeds, responsiveness and CPU 
 Furthermore, Tribler's current code base has a severe lack of unit tests, structure and documentation.
 In this chapter we describe the problems related to connectability, responsiveness, anonymity and performance.
 
-\section{Connectability}
-One of the problems Tribler faces is the connectability of its users.
-Users can be behind e.g. firewalls that prevent incoming or outgoing connections.
-Currently, Tribler employs NAT and Firewall Traversal [CITE], yet the success of this method is limited.
-The Tribler team has implemented their own Distributed Hash Table (DHT) in python while existing libraries such as LibTorrent also offer these.
-These implementations should be tested to see if changing to a library offers a significant boost in terms of exchange or speed.
+% \section{Connectability}
+% One of the problems Tribler faces is the connectability of its users.
+% Users can be behind e.g. firewalls that prevent incoming or outgoing connections.
+% Currently, Tribler employs NAT and Firewall Traversal [CITE], yet the success of this method is limited.
+%The Tribler team has implemented their own Distributed Hash Table (DHT) in python while existing libraries such as LibTorrent also offer these.
+% These implementations should be tested to see if changing to a library offers a significant boost in terms of exchange or speed.
 
-When users are downloading anonymously, they are inside so-called `hidden swarms'.
-These hidden swarms are not present in e.g. LibTorrent's DHT and therefore information from peers has to be exchanged between peers themselves by means of introducing peers to each other (PEX).
-By making use of Dispersy, Tribler creates rendezvous points to introduce peers to each other.
-If these rendezvous points are not connectible, PEX cannot take place.
-Solving this may be done by always connecting to the same port (chosen by the user or a default) and ask the user to forward that port.
-If users are not willing to do so, they can be penalized.
-This penalty can be for example not able to download anonymously at all, receive half the amount of credits when credit mining (see [CITE]) or limited download speed.
+%When users are downloading anonymously, they are inside so-called `hidden swarms'.
+%These hidden swarms are not present in e.g. LibTorrent's DHT and therefore information from peers has to be exchanged between peers themselves by means of introducing peers to each other (PEX).
+%By making use of Dispersy, Tribler creates rendezvous points to introduce peers to each other.
+%If these rendezvous points are not connectible, PEX cannot take place.
+%Solving this may be done by always connecting to the same port (chosen by the user or a default) and ask the user to forward that port.
+%If users are not willing to do so, they can be penalized.
+%This penalty can be for example not able to download anonymously at all, receive half the amount of credits when credit mining (see [CITE]) or limited download speed.
 
-\section{Anonymous download speed}
-To allow for anonymous downloading, Tribler uses a Tor-like technique to create so called `anon tunnels'.
-To increase download speed and prevent a bottleneck in the network hampering the overall download speed, several tunnels are built to download simultaneously from [CITE?].
-Since this Tor-like technique includes cryptographic functions, having multiple tunnels running concurrently results in a lot of cryptographic calls being executed.
-Stok et al. profiled Tribler using a gumby\footnote{Gumby is Tribler's experiment running framework.} experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE] as well as serializing and deserializing data.
-Currently, the CPU power is a bottleneck when downloading using the anonymous tunnels.
-By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running can be reduced.
-This should yield an increased download speed and better spread of workload overall as more packets can be processed per time unit.
+% \section{Anonymous download speed}
+% To allow for anonymous downloading, Tribler uses a Tor-like technique to create so called `anon tunnels'.
+% To increase download speed and prevent a bottleneck in the network hampering the overall download speed, several tunnels are built to download simultaneously from [CITE?].
+% Since this Tor-like technique includes cryptographic functions, having multiple tunnels running concurrently results in a lot of cryptographic calls being executed.
+% Stok et al. profiled Tribler using a gumby\footnote{Gumby is Tribler's experiment running framework.} experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE] as well as serializing and deserializing data.
+% Currently, the CPU power is a bottleneck when downloading using the anonymous tunnels.
+% By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running can be reduced.
+% This should yield an increased download speed and better spread of workload overall as more packets can be processed per time unit.
 
-\section{Package serialization}
-One of the core components of Tribler is Dispersy. 
-Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
-Both Dispersy and Tribler make use of python' built-in serialization function.
-The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources is spent on serializing data when sending or receiving UDP packets.
-As previously explained, running multiple threads at once does not result in code being executed concurrently.
-Cap'n Proto is a serialization framework that offloads the serialization of packets to a C++ process, which bypasses the global interpreter lock.
-This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released once the offloading to the C++ code base is done.
+\section{IO Bound programs}
+Dispersy is IO bound, reports indicate tunnels are too. \todo{write about this.}
+% \section{Package serialization}
+% One of the core components of Tribler is Dispersy. 
+% Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
+% Both Dispersy and Tribler make use of python' built-in serialization function.
+% The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources is spent on serializing data when sending or receiving UDP packets.
+% As previously explained, running multiple threads at once does not result in code being executed concurrently.
+% Cap'n Proto is a serialization framework that offloads the serialization of packets to a C++ process, which bypasses the global interpreter lock.
+% This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released once the offloading to the C++ code base is done.
 
 \section{Responsiveness}
 Since Tribler is written in the python language, calls on any thread will cause other threads to halt their execution.
@@ -55,7 +57,7 @@ By rewriting CPU or IO intensive code to make use of this thread pool in an asyn
 
 \section{Code quality and testing}
 Tribler's current code base is in a bare state.
-The current version that has been in development for over nine months now is plagued with bugs and non-functioning.
+The current version that has been in development for over nine months now is plagued with bugs and is non-functioning.
 Furthermore, there is a severe lack of unit tests, a lot of the code is undocumented and unnecessary complex and structure and flow are missing.
 This results in long and complex debugging processes when bugs are found and raise the bar for new contributors to get familiar with the code base.
 
