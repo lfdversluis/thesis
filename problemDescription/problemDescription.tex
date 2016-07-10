@@ -1,11 +1,13 @@
 \chapter{Problem description}
 \label{chp:problem-description}
 When scaling a decentralized system up to thousands of users, it's essential that the system can keep up with the increasing amount of workload that comes with it.
-As every user is both a sever and a client at the same time, an arbitrarily number of peers may connect to this user requesting data.
-Tribler has been downloaded approximately 1.8 million times, having more than 2 thousand monthly active users and anticipating more growth in the near future.
+As every user is both a sever and a client at the same time, an arbitrarily number of peers may connect to the user requesting data.
+
+Tribler has been downloaded approximately 1.8 million times, has more than 2 thousand monthly active users and anticipating more growth in the near future.
 Moreover, recent additions to Tribler include our block-chain like structure called the Multi-Chain and credit mining, further increasing the workload.
 As Tribler keeps growing in both peers and features, performance bottlenecks are becoming more of an issue.
 This is even more the case when a user decides to become an exit-node, allowing users to anonymously download using the user as the last hop in the circuit.
+As exit nodes are scarce, many relays and leechers will connect to an exit node, significantly increasing the workload.
 
 \section{Resolving bottlenecks}
 To stay ahead of this problem and ensure Tribler's scalability, bottlenecks need to be addressed.
@@ -15,8 +17,8 @@ We address this problem by looking at the use of IO and blocking behavior presen
 Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
 Unfortunately, Tribler is written in the Python programming language.
 Python lacks this feature as only one thread can be ran in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
-However, the Python interpreter does release the GIL when a thread is performing an IO operation, allowing other threads to use the interpreter.
-Leveraging this trait to gain performance is key into solving bottlenecks Tribler is currently facing.
+However, a thread does release the GIL when it's performing a blocking IO operation, allowing other ``ready'' threads to get a hold of the GIL.
+Leveraging this trait to gain performance is key into solving the (IO) bottlenecks Tribler is currently facing.
 
 \section{Tribler's code base}
 At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
@@ -88,3 +90,49 @@ While it's not this thesis primary goal, refactoring the code involved with the 
 % Refactoring the code is necessary in order to regain the structure and lower the code complexity.
 % Furthermore, proper unit tests are required to ensure Tribler's stability now and in the future.
 % These tests have to be executed on build machines that run different operating systems, preferably with various configurations e.g. 32 and 64 bit architectures or different library versions.
+
+\section{Objective and research questions}
+\label{chp2:sct:objectives-research-questions}
+The objective of this thesis is to improve the performance and responsiveness of Tribler while improving its code base and stability. 
+This is done by focussing on removing bottlenecks present.
+These improvements will be applied by means of refactoring current code, which is largely undocumented, poorly tested and unnecessary complex.
+In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
+
+The research presented in this thesis was carried out in cooperation with the Tribler team. 
+The Tribler team consists of both staff members of the Technical University of Delft as well as Bachelor and Master students.
+In total Tribler has been in development for over 10 years and the project has received contributions from more than 40 contributors.
+Using the knowledge of senior developers still present, known problems of Tribler could be noted down immediately to which resulted in a set of diverse tasks to complete.
+Based on the objectives of Tribler, this thesis aims to answer the main research question formulated below.\\
+
+\textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and code base by means of refactoring?\\
+
+To answer this main research question, we have defined three research questions below. Each of these research questions will be justified as why they contribute to the main research question.\\
+
+\textbf{Research Question 1:} How can we identify bottlenecks in a complex system such as Tribler?\\
+
+Software projects such as Tribler are often dependent on libraries i.e. third party code and combine several components or modules to form a program.
+To improve the performance of such a system, one needs to be able to identify bottlenecks.
+Bottlenecks are parts of the code where often performance and responsiveness can be gained. 
+Sometimes by implementing a more efficient algorithm or by introducing parallelization these bottlenecks can be resolved.
+Identifying these bottlenecks is the first step to resolve them.\\
+
+\textbf{Research Question 2:} Can a system such as Tribler benefit from asynchronous programming?\\
+
+To improve performance and responsiveness, parts of Tribler can be rewritten to become asynchronous.
+By performing tasks asynchronously the performance and responsiveness of a program can improve. 
+An example of such a scenario was given in the previous section.
+However, an asynchronous approach can have its drawbacks. 
+One of these drawbacks is that it requires a different mindset for the programmers as the whole call chain and structure of a program becomes different.
+Identifying these drawbacks and deciding if the benefits outweigh the costs is necessary to prevent the current state from worsening. \\
+
+\noindent
+\textbf{Research Question 3:} How can a complex code base such as Tribler's be effectively refactored to reduce complexity while improving performance and stability?\\
+
+By refactoring complex code, we strive to make Tribler's code base less complex and easier for new contributors to get familiar with.
+This reduces effort required to start contributing to Tribler which hopefully acts as a motivating factor.
+Identifying complex structures and means to refactor them in such a way that it reduces the complexity is therefore needed.
+
+\section{Main contributions}
+The main contribution this thesis offers are as follows. We present methods to identify bottlenecks in a complex system such as Tribler. 
+We elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
+Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, code quality and performance.

@@ -1,9 +1,36 @@
-\chapter*{Related work}
+\chapter{Related work}
 
-This chapter provides related work in asynchronous and parallel programming in the python programming language, bottleneck detection and resolving and refactoring complex code base to improve both structure, performance and coverage.
+Many attempts have been made to remove the GIL from Python to fully benefit from multiple CPU's, yet no one has ever succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
+
+On of the most well-known alternative implementations of Python is Pypy.
+It makes use of a Just-in-Time compiler to offer increased speed, reduced memory usage and support for stackless mode while providing a highly compatibility with existing python code.
+Pypy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
+While it has many popular libraries ported to be used with Pypy, it still lacks some common used packages.
+Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian.
+
+Two other popular implementations are JPython and IronPython.
+Both of these projects have removed the GIL and can fully exploit multiprocessor systems \cite{python2015global}.
+
+JPython is a Python interpreter implemented in Java. It can be integrated in Java applications and allows python applications to be compiled into Java classes.
+Using JPython, Python after compiled to java bytecode will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
+
+IronPython does basically the same as JPython, compiling the source to in-memory bytecode and runs it on the Dynamic Language Runtime \cite{ironpython2014}.
+It allows developers to run Python using the .NET framework.
+
+To illustrate the attempts to remove the GIL are still on going, Larry Hastings presented ``The Gilectomy'' at PyCon 2016. He showed that removing the GIL is fairly easy, but has a huge negative impact on CPython's performance.
+Additionally, he explained the reason why this performance loss was observed and names some methods that may make ``The Gilectomy'' a viable alternative to CPython.\\
+
+Libraries and frameworks that introduce asynchrony are also available in large numbers.
+Decorated Concurrency (DECO) uses the multiprocessing package of Python to parallelize functions using a ``concurrent'' decorator \cite{sherman2016deco}.
+Similarly, the ``synchronized''  inserts synchronization events to automatically refactors assignments of the results of ``concurrent'' function calls to happen during synchronization events.
+
+Twisted is an event-driven networking engine written in Python.
+It allows for event-driven and asynchronous programming using deferreds.
+Twisted has a custom event-loop called the reactor, on which tasks can be scheduled.
+This reactor handles callbacks/errbacks fired by deferreds and contains many utility functions and classes to perform asynchronous and non-blocking calls.
+Unlike many libraries and frameworks available, Twisted is available on the official repositories of Ubuntu and Debian and is a well tested, mature framework.
+
 \todo{Describe asynchronous related work}
 \todo{Describe Bottle neck search/find related work}
-\todo{Describe connectable related work as in connectability in challeging peer to peer networks}
-\todo{Describe refactoring processes and how to properly write code and test}
-
-Many (open-source) libraries exist that attempt to parallelize python programs to increase performance.
+\todo{Describe connectable related work as in connectability in challenging peer to peer networks}
+\todo{Describe refactoring processes and how to properly write code and test?}
