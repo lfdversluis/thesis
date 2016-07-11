@@ -52,14 +52,23 @@ As handling packets involves encryption or decryption and message serialization,
 The result should be higher achievable download rates and a more responsive program.
 
 \section{Dispersy}
-Dispersy is an elastic database system written in the Python programming language and uses SQLite as its underlying database engine.
+The Distributed Permission System (Dispersy) is an elastic database system written in the Python programming language and uses SQLite as its underlying database engine.
 It is designed to still function when faced with challenging network conditions such as low internet speed, connection drops, package loss and even when hurdles such as firewalls are in place.
+Additionally, Dispersy is built to scale very well; over 100.000 bundles can be handled by Dispersy.
 It workings have been proven throughout the years as it's heavily used within the Tribler client and is maintained by the Tribler organisation.
 
-In Dispersy one can define communities which can send messages to each other.
+In Dispersy one can define communities in which peers can send messages to each other.
+Every community and peer is uniquely identified and secured by making use of elliptic curve cryptography.
 By performing peer exchanges (PEX) and by making use of Distributed Hash Tables (DHT's), peers receive continuously information about the network.
 
-On of Dispersy's unique points is that it does not rely on a central component with the exception of bootstrap servers.
+One of Dispersy's unique points is that it does not rely on a central component with the exception of bootstrap servers.
+Furthermore, Dispersy's main features are:
+\begin{itemize}
+	\item Stateless synchronization using Bloomfilters.
+	\item Decentralized NAT traversal.
+	\item Performance that can scale to over 100,000 bundles.
+\end{itemize}
+
 
 \todo{more explanation needed.}
 \section{Outline}
