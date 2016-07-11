@@ -1,10 +1,28 @@
 \chapter{Related work}
 
-Many attempts have been made to remove the GIL from Python to fully benefit from multiple CPU's, yet no one has ever succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
+Resolving bottlenecks using profilers has been applied for many years: \cite{pesterev2010locating, gorelick2014high, fan2013performance}.
+By default, Python ships three profilers:
 
-On of the most well-known alternative implementations of Python is Pypy.
-It makes use of a Just-in-Time compiler to offer increased speed, reduced memory usage and support for stackless mode while providing a highly compatibility with existing python code.
-Pypy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
+\begin{enumerate}
+	\item cProfile is a C extension that has reasonable overhead. It is the current recommended profiler. It provides the same interface as the ``profiler'' profiler.
+	\item profiler is a profiler written in pure Python. It adds a lot of overhead and its usage is discouraged. However, because it's written in Python, it does allow for easier extension than it's C counterpart cProfile.
+	\item hotshot was an experimental C module which is now deprecated as its no longer maintained. While it's still present, the module may be dropped in a future version of Python.
+\end{enumerate}
+
+Alternatively, profilers have been developed by the open-source community.
+Yappi is a profiler written in the C language that is thread-aware, allowing automatic profiling of multi-threaded applications [CITE].
+It provides options to measure CPU or wall time, sort the output by various parameters and support the callgrind and pstat output formats.
+
+Savrun-Yeni{\c{c}}eri et al. introduced an event-based profiler that performs better than the Python standard profilers which requires modest implementation effort \cite{savrun2015efficient}.
+Their profiler helps users find bottlenecks in programs, aids language implementers to improve the performance of their language implementation and allows the comparison and evaluation of different languages using cross-language benchmarks.\\
+
+To gain performance, many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPU's.
+To date, no one has ever succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
+
+On of the most well-known alternative implementations of Python is PyPy.
+It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
+By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a highly compatibility with existing python code \cite{pypy2016pypy}.
+PyPy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
 While it has many popular libraries ported to be used with Pypy, it still lacks some common used packages.
 Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian.
 

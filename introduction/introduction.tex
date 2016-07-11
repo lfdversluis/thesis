@@ -5,9 +5,11 @@ The BitTorrent protocol dates from 2001 \cite{Cohen2001BitTorrent} and been a hu
 Estimates as of 2009 indicate that 43\% to 70\% of all internet traffic world-wide is caused by peer-to-peer networks \cite{schulze2009internet}.
 As of February 2013, BitTorrent was responsible for 3.35\% of all worldwide bandwidth \cite{palo2013application}, having 15 - 27 million concurrent users at any time \cite{wang2013measuring} and more than 150 million users in total \cite{reuters2012bittorrent}.
 
+
+
 \todo{BitTorrent workings here}.
 
-\section{Tribler and its components}
+\section{Tribler}
 Tribler is a peer-to-peer BitTorrent client that attempts to fully decentralize downloading, uploading and streaming of content.
 
 Tribler focuses on the following goals:
@@ -29,6 +31,8 @@ A distributed network requires both the presence and collaboration of participan
 %\end{figure}
 
 For years Tribler has received many contributions from students, staff and the open-source community.
+However, adhering to one programming style and structure was never enforced.
+\todo{I think the text below is more or less problem description. Should be removed and write what Tribler is about and more details.}
 This led to the degradation of structure and code quality of the Tribler code base.
 Moreover, there has been done little profiling to detect bottlenecks in the code.
 Finding and resolving bottlenecks in a complex code base such as Tribler's are often non-trivial yet an excellent way to increase responsiveness and performance.
@@ -47,9 +51,20 @@ The anon-tunnels have been profiled by [stokkink et al.] \todo{cite to stok et a
 As handling packets involves encryption or decryption and message serialization, which are CPU intensive tasks, one wants to optimize this process.
 The result should be higher achievable download rates and a more responsive program.
 
+\section{Dispersy}
+Dispersy is an elastic database system written in the Python programming language and uses SQLite as its underlying database engine.
+It is designed to still function when faced with challenging network conditions such as low internet speed, connection drops, package loss and even when hurdles such as firewalls are in place.
+It workings have been proven throughout the years as it's heavily used within the Tribler client and is maintained by the Tribler organisation.
+
+In Dispersy one can define communities which can send messages to each other.
+By performing peer exchanges (PEX) and by making use of Distributed Hash Tables (DHT's), peers receive continuously information about the network.
+
+On of Dispersy's unique points is that it does not rely on a central component with the exception of bootstrap servers.
+
+\todo{more explanation needed.}
 \section{Outline}
 In this chapter we provided an introduction of this thesis and presented the research questions this thesis aims to answer. 
-This section describes the other chapters in this thesis and their relevance to the research questions provided in section \ref{chp2:sct:objectives-research-questions}.
+This section describes the other chapters in this thesis and their relevance to the research questions provided in section \ref{chp1:sct:objectives-research-questions}.
 Chapter \ref{chp:preliminaries} provides preliminaries and terminology used through this thesis.
 Chapter \ref{chp:problem-description} presents an overview of some of the problems Tribler is currently facing which this thesis addresses.
 Chapter 
