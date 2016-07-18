@@ -1,19 +1,20 @@
 \chapter{Problem description}
 \label{chp:problem-description}
-When scaling a decentralized system up to thousands of users, it's essential that the system can keep up with the increasing amount of workload that comes with it.
-As every user is both a sever and a client at the same time, an arbitrarily number of peers may connect to the user requesting data.
 
-Tribler has been downloaded approximately 1.8 million times, has more than 2 thousand monthly active users and anticipating more growth in the near future.
-Moreover, recent additions to Tribler include our block-chain like structure called the Multi-Chain and credit mining, further increasing the workload.
-As Tribler keeps growing in both peers and features, performance bottlenecks are becoming more of an issue.
-This is even more the case when a user decides to become an exit-node, allowing users to anonymously download using the user as the last hop in the circuit.
-As exit nodes are scarce, many relays and leechers will connect to an exit node, significantly increasing the workload.
+Performance regression and benchmarking are essential to gain insights into performance gain/loss when making changes.
+Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
+Most programs are IO bound [CITE TO PHYTHON SLIDES] and in Tribler's case it is also likely to be a bottleneck.
+Currently, Tribler does a lot of IO operations: more than 500 MB per hour [CITE].\todo{cite old ticket}.
+Recent additions to Tribler include the block-chain like structure called the Multi-Chain and credit mining.
+These two additions perform IO operation, so it is likely that the current number of MB/hour is higher than the number mentioned in the ticket.\\
+To be able to monitor and improve this situation, measurable statistics need to be provided for every change proposed by a pull request.
+Efforts can then be made to reduce the IO performed by Tribler.
 
 \section{Resolving bottlenecks}
-To stay ahead of this problem and ensure Tribler's scalability, bottlenecks need to be addressed.
+Next, we need to resolve the bottlenecks to increase performance.
 The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler?
 
-We address this problem by looking at the use of IO and blocking behavior present in Tribler and its components.
+We address this problem by looking at the use of IO and blocking behaviour present in Tribler and its components.
 Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
 Unfortunately, Tribler is written in the Python programming language.
 Python lacks this feature as only one thread can be ran in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
