@@ -1,0 +1,20 @@
+\chapter{IO in Tribler}
+
+Tribler's IO has been a problem for years \cite{pouwelse2014reduce}.
+In May 2013 Tribler read and wrote 660 Megabytes per hour to and from disk.
+Back in April 2014 this number was somewhat reduced to 623.
+In May 2014 efforts were made to reduce this enormous amount of IO and after batching several database statements the number further dropped to 538 Megabytes per hour.
+Since then there has not been any work on this topic any more.
+
+In the meantime, Tribler has seen several changes to its code base including the addition of the Multi-Chain: Tribler's own block-chain like structure.
+This feature will have it's own database, performing additional IO.
+Furthermore, a feature called ``credit mining'' is currently in development that will also interact with the databases of Tribler and its components.
+There are no metrics on the current situation of Tribler and it's hard if not impossible to estimate the impact of the additions to come.
+
+To observe the current situation, Tribler was activated and ran idle (i.e. no human interaction) for X hours.
+The results are visible in Figure X.
+From these results we observe that Tribler current has an IO of Y.
+To observe the individual components separately, we have created a breakdown the database queries performed by Tribler.
+This breakdown is visible in Table Z.
+As we can see, B is doing the most IO... \todo{Fill in the stuff when experiment done}
+

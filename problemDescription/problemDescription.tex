@@ -1,25 +1,30 @@
 \chapter{Problem description}
 \label{chp:problem-description}
 
-Performance regression and benchmarking are essential to gain insights into performance gain/loss when making changes.
+Only by comparing different builds can one gain insight into performance changes.
+Currently Tribler lacks this insight.
+As Tribler is heavy IO-based and likely IO-bound, it is crucial to have these numbers.
+A breakdown of database statements is needed, along with the number of times calls to these statements and the amount of IO that is generated.
+Recently a block-chain like structure called the Multi-Chain was added to Tribler and soon another feature called credit mining will be introduced as well.
+The impact and increase of IO caused by these additions are unknown.
+
 Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
-Most programs are IO bound [CITE TO PHYTHON SLIDES] and in Tribler's case it is also likely to be a bottleneck.
-Currently, Tribler does a lot of IO operations: more than 500 MB per hour [CITE].\todo{cite old ticket}.
-Recent additions to Tribler include the block-chain like structure called the Multi-Chain and credit mining.
-These two additions perform IO operation, so it is likely that the current number of MB/hour is higher than the number mentioned in the ticket.\\
-To be able to monitor and improve this situation, measurable statistics need to be provided for every change proposed by a pull request.
-Efforts can then be made to reduce the IO performed by Tribler.
+This regression test will feature average use cases and automatic graph generation to give developers a good overview of their changes.
+
+This system has to run automatically whenever a pull request is opened on GitHub.
+When it is down, a detailed breakdown of IO should be presented to the developer.
+Efforts can then be made to optimize the IO consumption and improve the performance of Tribler.
 
 \section{Resolving bottlenecks}
-Next, we need to resolve the bottlenecks to increase performance.
-The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler?
+To improve the performance of Tribler, (IO) bottlenecks to need to be removed.
+The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler.
 
-We address this problem by looking at the use of IO and blocking behaviour present in Tribler and its components.
+By careful inspection of the usage of IO, we identified that Tribler's IO is blocking.
 Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
 Unfortunately, Tribler is written in the Python programming language.
 Python lacks this feature as only one thread can be ran in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
 However, a thread does release the GIL when it's performing a blocking IO operation, allowing other ``ready'' threads to get a hold of the GIL.
-Leveraging this trait to gain performance is key into solving the (IO) bottlenecks Tribler is currently facing.
+Leveraging this trait to gain performance is a huge step forward towards solving the (IO) bottlenecks Tribler is currently facing.
 
 \section{Tribler's code base}
 At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
