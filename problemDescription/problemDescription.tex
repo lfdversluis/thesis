@@ -123,20 +123,24 @@ Identifying these bottlenecks is the first step to resolve them.\\
 \textbf{Research Question 2:} Can a system such as Tribler benefit from asynchronous programming?\\
 
 To improve performance and responsiveness, parts of Tribler can be rewritten to become asynchronous.
-By performing tasks asynchronously the performance and responsiveness of a program can improve. 
-An example of such a scenario was given in the previous section.
+By performing tasks asynchronously the performance and responsiveness of a program can improve.
 However, an asynchronous approach can have its drawbacks. 
 One of these drawbacks is that it requires a different mindset for the programmers as the whole call chain and structure of a program becomes different.
 Identifying these drawbacks and deciding if the benefits outweigh the costs is necessary to prevent the current state from worsening. \\
 
 \noindent
-\textbf{Research Question 3:} How can a complex code base such as Tribler's be effectively refactored to reduce complexity while improving performance and stability?\\
+\textbf{Research Question 3:} How do we incorporate benchmarking and regression testing into Tribler to gain insight into performance statistics?\\
 
-By refactoring complex code, we strive to make Tribler's code base less complex and easier for new contributors to get familiar with.
-This reduces effort required to start contributing to Tribler which hopefully acts as a motivating factor.
-Identifying complex structures and means to refactor them in such a way that it reduces the complexity is therefore needed.
+To be able to conclude performance has improved, we need to benchmark current and new code using a regression testing system.
+The key issue here is to define metrics and workloads to benchmark with.
+If the metrics do not represent a realistic use-case the benchmark may be flawed, rendering the outcome unreliable and inaccurate.
+
+Additionally, the regression testing system should not clog the throughput of the current test architecture.
+Running a one hour benchmark per change per pull request will hog the system and will severely strain the development speed.
 
 \section{Main contributions}
-The main contribution this thesis offers are as follows. We present methods to identify bottlenecks in a complex system such as Tribler. 
+The main contribution this thesis offers are as follows.
+We introduce a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk IO.
+Next, to present the working of said system, we present methods to identify bottlenecks in a complex system such as Tribler. 
 We elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, code quality and performance.
