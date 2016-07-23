@@ -1,2 +1,10 @@
-\chapter{Conclusion}
-TBD.
+\chapter{Conclusion and future work}
+
+
+Future work
+
+\begin{itemize}
+	\item Move storage to a per-community level. This will mean less flushing of data when sending items. In Tribler one only sends messages in the allchannel and to the channelcommunity (if you own a channel).
+	\item A threadpool with sqlite3 multithreaded enabled? 
+	\item Move database stuff into classes and use Storm's ORM. That auto-caches items, doesn't commit immediately.
+\end{itemize}

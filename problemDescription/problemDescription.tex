@@ -4,27 +4,25 @@
 Only by comparing different builds can one gain insight into performance changes.
 Currently Tribler lacks this insight.
 As Tribler is heavy IO-based and likely IO-bound, it is crucial to have these numbers.
-A breakdown of database statements is needed, along with the number of times calls to these statements and the amount of IO that is generated.
+A breakdown of database statements is needed and the amount of IO that is generated.
 Recently a block-chain like structure called the Multi-Chain was added to Tribler and soon another feature called credit mining will be introduced as well.
 The impact and increase of IO caused by these additions are unknown.
 
 Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
-This regression test will feature average use cases and automatic graph generation to give developers a good overview of their changes.
-
+This regression test will feature average use cases and automatic graph generation to give developers an instant overview of their changes.
 This system has to run automatically whenever a pull request is opened on GitHub.
-When it is down, a detailed breakdown of IO should be presented to the developer.
-Efforts can then be made to optimize the IO consumption and improve the performance of Tribler.
+Efforts can then be made to optimize the IO output and improve the performance of Tribler.
 
 \section{Resolving bottlenecks}
 To improve the performance of Tribler, (IO) bottlenecks to need to be removed.
 The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler.
 
-By careful inspection of the usage of IO, we identified that Tribler's IO is blocking.
+By careful inspection of the usage of IO, we identified that Tribler's IO is blocking the main thread.
 Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
-Unfortunately, Tribler is written in the Python programming language.
-Python lacks this feature as only one thread can be ran in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
-However, a thread does release the GIL when it's performing a blocking IO operation, allowing other ``ready'' threads to get a hold of the GIL.
-Leveraging this trait to gain performance is a huge step forward towards solving the (IO) bottlenecks Tribler is currently facing.
+Tribler does not have access to this paradigm as it's written in the Python programming language.
+Python lacks this feature as only one thread can run in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
+However, a thread does release the GIL when it's performing a blocking IO operation, allowing other threads to get a hold of the GIL and run.
+Leveraging this trait to gain performance is a huge step forward towards solving the (IO) bottleneck Tribler is currently facing.
 
 \section{Tribler's code base}
 At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
@@ -99,15 +97,15 @@ While it's not this thesis primary goal, refactoring the code involved with the 
 
 \section{Objective and research questions}
 \label{chp2:sct:objectives-research-questions}
-The objective of this thesis is to improve the performance and responsiveness of Tribler while improving its code base and stability. 
-This is done by focussing on removing bottlenecks present.
+The objective of this thesis is to introduce a IO regression test system and to improve the performance and responsiveness of Tribler.
+The verification of the system is done by focussing on removing bottlenecks present.
 These improvements will be applied by means of refactoring current code, which is largely undocumented, poorly tested and unnecessary complex.
 In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
 
 The research presented in this thesis was carried out in cooperation with the Tribler team. 
 The Tribler team consists of both staff members of the Technical University of Delft as well as Bachelor and Master students.
 In total Tribler has been in development for over 10 years and the project has received contributions from more than 40 contributors.
-Using the knowledge of senior developers still present, known problems of Tribler could be noted down immediately to which resulted in a set of diverse tasks to complete.
+Using the knowledge of a senior developer still present, known issues of Tribler could be noted down immediately to which resulted in a set of diverse tasks to complete.
 Based on the objectives of Tribler, this thesis aims to answer the main research question formulated below.\\
 
 \textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and code base by means of refactoring?\\
