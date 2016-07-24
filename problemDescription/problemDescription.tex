@@ -2,12 +2,12 @@
 \label{chp:problem-description}
 
 The official long-term goal of the Tribler project is to create a \enquote{create a censorship-free Internet} \cite{pouwelse2012moving}.
-The method of the Tribler project is to create a Youtube style service with full decentralisation and robustness against various attacks.
+The method of the Tribler project is to create a YouTube style service with full decentralisation and robustness against various attacks.
 All these features are implemented in a completely distributed manner, not relying on any centralized component.
 
 Numerous initiatives exist around these goals of re-decentralisation, censorship-resilience, and attack-resilient.
 However, none of them gathered any significant usage compared to the social media usage levels. 
-For instance, Youtube features one billion unique monthly users and there are 1.65 billion monthly active Facebook users.
+For instance, YouTube features one billion unique monthly users \cite{mainka2014government} and there are 1.8 billion monthly active Facebook users \cite{sharma2016strategies}.
 
 The problem is that the performance, usability, and features offered by decentralised alternatives are inferior when compared to the experience offered by central solutions.
 Creating academically pure self-organising systems such as Tribler has proven to be notoriously difficult.
@@ -20,70 +20,133 @@ Tribler has no dependency on central service infrastructure, does not need profi
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/roadmap}}
-	\caption{Three of the six uncompleted roadmap items.}
+	\caption{Three of the six uncompleted Tribler roadmap items.}
 	\label{fig:tribler_roadmap}
 \end{figure}
 
-The problem we address within this thesis is the underlying reason for poor performance and unacceptable user performance. Measurements dating back from 2014 indicate that Tribler performance is IO-bound.
+The problem we address within this thesis is the underlying reason for poor performance and unacceptable user performance. Measurements dating back from 2014 indicate that Tribler performance is I/O-bound.
 Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
 With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology ready for large-scale usage. 
 
 \section{Tribler database dependency}
 
 All information within Tribler is stored in a database for persistence and ease of use.
+Information about the network i.e. peers, messages and authentication is stored in a separate database managed by Dispersy.
+The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema}.
 
-Insert picture Dispersy SQL:
-[https://camo.githubusercontent.com/eae1fe5cce8095a934d48aa7b80cd752c672800f/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f313734313633322f3239303637352f32303935393466632d393265632d313165322d386264332d3463626434303335323964302e706e67]
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/dispersy_database_schema}}
+	\caption{The database schema of Dispersy.}
+	\label{fig:dispersy_database_schema}
+\end{figure}
 
-This database is becoming a key performance bottleneck.
-Insert picture MBytes/hour : [https://github.com/Tribler/tribler/issues/564]
+This database is becoming a key performance bottleneck \cite{pouwelse2014reduce}.
+In May 2013 Tribler read and wrote 660 Megabytes per hour to and from disk.
+Back in April 2014 this number was somewhat reduced to 623.
+In May 2014 efforts were made to reduce this enormous amount of I/O and after batching several database statements the number further dropped to 538 Megabytes per hour.
 
-\section{asynchronous IO}
+As performing I/O operations blocks a thread (see Chapter~\ref{cpt:pythons_thread_model}), it is essential keep track of this information and to work towards reducing this number.
+So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
+iotop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014}.
+Since 2014 no work or measurements have been done related to this issue.
 
-The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking IO calls with asynchronous non-blocking IO. 
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{iointribler/images/iotop}}
+	\caption{A screenshot of iotop showing Tribler's I/O, from Johan Pouwelse \cite{pouwelse2014reduce}.}
+	\label{fig:iotop_tribler_april_2014}
+\end{figure}
 
-Example:
-Instert picture like: [https://userscontent2.emaze.com/images/67f41361-9c9a-45c3-9a81-a4c49d5a66c8/95ba8eb4-aa59-4dab-992e-adcb38cf9d8c.jpg]
+In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain like structure \cite{norberhuis2015multichain}.
+This feature heavily relies on its database to store blocks and other information about the user and other peers their chains.
+Moreover, the MultiChain makes use of its own database rather than Dispersy's.
+Norberhuis points out: ``The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.'' \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
+This makes it hard to estimate Tribler's current I/O rates.
+
+Furthermore, a feature called ``credit mining'' is currently in development that will also interact with the database of Tribler.
+There are no metrics on the current situation of Tribler and it's hard if not impossible to estimate the impact of any addition to come.
+
+\section{Asynchronous I/O}
+\label{sec:async-programming}
+
+The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking I/O calls with asynchronous non-blocking I/O. 
+
+When programming asynchronously, the function that is being called (callee) by a caller returns -- what's called in the Twisted framework -- a deferred.
+A deferred is a place holder for the actual value that this function will return once the callee has computed it.
+In normal (synchronous) programming, when calling a function that performs an I/O operation, the thread will be waiting for the I/O operation to be completed, see Figure~\ref{fig:normal_io_flow}.
+This means the main loop of a program will block if the I/O call happens on the main thread.
+This wastes valuable CPU cycles if there are no other threads that can continue.
+To ensure we do not block on I/O operations, the I/O can be moved to a separate thread, returning a deferred.
+By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
+This thread can then block while the main thread continues executing other scheduled tasks on the event loop.
+Once the thread is done with its task it can invoke the callback of the deferred, notifying the main thread event loop.
+The event loop will then schedule the processing of the deferred's value and proceed, see Figure~\ref{fig:async_io_flow}.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{\textwidth}
+		\includegraphics[width=\textwidth]{problemDescription/images/normal_io_flow.png}
+		\caption{A schematic overview of an I/O operation done by the main thread (synchronous).}
+		\label{fig:normal_io_flow}
+	\end{subfigure}
+	~ %add desired spacing between images, e. g. ~, \quad, \qquad, \hfill etc. 
+	%(or a blank line to force the subfigure onto a new line)
+	\begin{subfigure}[b]{\textwidth}
+		% To not scale this picture, the normal flow is 755, this one 595, hence a ratio of 0.79
+		\includegraphics[width=0.79\textwidth]{problemDescription/images/async_io_flow.png}
+		\caption{A schematic overview of an I/O operation executing on a separate thread, retuning a deferred (asynchronous).}
+		\label{fig:async_io_flow}
+	\end{subfigure}
+	\caption{A schematic overview of a synchronous versus an asynchronous I/O call.}
+\end{figure}
+
+One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue executing other (unrelated) tasks.
+This may result in the caller changing values, the callee is dependent on.
+Especially when working with databases one needs to make sure that the order of database queries is not different.
+
+A second point of attention is the overhead generated by the asynchronous code.
+As pointed out by previous work (see Section~\ref{sct:multi_theaded_programming_performance}), offloading work to multiple threads may actually have a negative impact on performance.
+
+
 
 \section{Improved developer productivity}
 Refactoring.. important.. continous changes.. expand features...
-By using a database manager to handle asynchronous IO we also improve developers productivity, another vital performance measure. Less code and improved readability enhances productivity...
+By using a database manager to handle asynchronous I/O we also improve developers productivity, another vital performance measure. Less code and improved readability enhances productivity...
 
 
 
-\section{OLD TEXT}
-Only by comparing different builds can one gain insight into performance changes.
-Currently Tribler lacks this insight.
-As Tribler is heavy IO-based and likely IO-bound, it is crucial to have these numbers.
-A breakdown of database statements is needed and the amount of IO that is generated.
-Recently a block-chain like structure called the Multi-Chain was added to Tribler and soon another feature called credit mining will be introduced as well.
-The impact and increase of IO caused by these additions are unknown.
+%\section{OLD TEXT}
+%Only by comparing different builds can one gain insight into performance changes.
+%Currently Tribler lacks this insight.
+%As Tribler is heavy I/O-based and likely I/O-bound, it is crucial to have these numbers.
+%A breakdown of database statements is needed and the amount of I/O that is generated.
+%Recently a block-chain like structure called the Multi-Chain was added to Tribler and soon another feature called credit mining will be introduced as well.
+%The impact and increase of I/O caused by these additions are unknown.
 
-Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
-This regression test will feature average use cases and automatic graph generation to give developers an instant overview of their changes.
-This system has to run automatically whenever a pull request is opened on GitHub.
-Efforts can then be made to optimize the IO output and improve the performance of Tribler.
+%Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
+%This regression test will feature average use cases and automatic graph generation to give developers an instant overview of their changes.
+%This system has to run automatically whenever a pull request is opened on GitHub.
+%Efforts can then be made to optimize the I/O output and improve the performance of Tribler.
 
-\section{Resolving bottlenecks}
-To improve the performance of Tribler, (IO) bottlenecks to need to be removed.
-The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler.
+%\section{Resolving bottlenecks}
+%To improve the performance of Tribler, (I/O) bottlenecks to need to be removed.
+%The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler.
 
-By careful inspection of the usage of IO, we identified that Tribler's IO is blocking the main thread.
-Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
-Tribler does not have access to this paradigm as it's written in the Python programming language.
-Python lacks this feature as only one thread can run in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
-However, a thread does release the GIL when it's performing a blocking IO operation, allowing other threads to get a hold of the GIL and run.
-Leveraging this trait to gain performance is a huge step forward towards solving the (IO) bottleneck Tribler is currently facing.
+%By careful inspection of the usage of I/O, we identified that Tribler's I/O is blocking the main thread.
+%Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
+%Tribler does not have access to this paradigm as it's written in the Python programming language.
+%Python lacks this feature as only one thread can run in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
+%However, a thread does release the GIL when it's performing a blocking I/O operation, allowing other threads to get a hold of the GIL and run.
+%Leveraging this trait to gain performance is a huge step forward towards solving the (I/O) bottleneck Tribler is currently facing.
 
-\section{Tribler's code base}
-At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
-The current version has been in development for over nine months, is plagued with bugs and non-functioning on some platforms.
-As of writing, the code is only tested on a single Unix operating system.
-Tribler, however, is available for all three major operating systems: Windows, Mac OS and Unix distributions.
-As users are reporting platform specific bugs, it is evidently important that automated testing on all three platforms are realized.
-All this results in long and complex debugging processes and creates a steep learning curve for new students joining the project and might withhold members of the open-source community to start contributing.
+%\section{Tribler's code base}
+%At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
+%The current version has been in development for over nine months, is plagued with bugs and non-functioning on some platforms.
+%As of writing, the code is only tested on a single Unix operating system.
+%Tribler, however, is available for all three major operating systems: Windows, Mac OS and Unix distributions.
+%As users are reporting platform specific bugs, it is evidently important that automated testing on all three platforms are realized.
+%All this results in long and complex debugging processes and creates a steep learning curve for new students joining the project and might withhold members of the open-source community to start contributing.
 
-While it's not this thesis primary goal, refactoring the code involved with the bottlenecks and properly documenting and testing this refactored code is a secondary goal of this thesis, aiding in lowering the learning curve and improving the stability of the Tribler code base.
+%While it's not this thesis primary goal, refactoring the code involved with the bottlenecks and properly documenting and testing %this refactored code is a secondary goal of this thesis, aiding in lowering the learning curve and improving the stability of %the Tribler code base.
 
 % \section{Connectability}
 % One of the problems Tribler faces is the connectability of its users.
@@ -122,7 +185,7 @@ While it's not this thesis primary goal, refactoring the code involved with the 
 % Since Tribler is written in the python language, calls on any thread will cause other threads to halt their execution. % this is wrong.
 % Normally two separate threads can run code in parallel as they generally do not touch each other's state.
 % The cause of this is the Global Interpreter Lock (GIL) which states that only one function can be executed at a time.
-% In its current state, the Graphical User Interface (GUI) of Tribler will block if it's doing some CPU or IO intensive work.
+% In its current state, the Graphical User Interface (GUI) of Tribler will block if it's doing some CPU or I/O intensive work.
 % This yields a scenario in which the user is unable to perform any action, which is not user friendly.
 % In some cases the operating system itself will show e.g. a warning or visualisation that the process is not responding.
 % To solve this issue, heavy operations should be done on separate threads or processes which are not monitored by the GIL.
@@ -130,7 +193,7 @@ While it's not this thesis primary goal, refactoring the code involved with the 
 % Once the code of such a library is invoked and the execution is offloaded to the C/C++ code, the GIl is released, allowing other python code to ran in parallel.
 % Another approach is using the python framework Twisted.
 % Twisted has implemented a thread pool that also bypasses this GIL.
-% By rewriting CPU or IO intensive code to make use of this thread pool in an asynchronous way, the responsiveness of Tribler can be improved.
+% By rewriting CPU or I/O intensive code to make use of this thread pool in an asynchronous way, the responsiveness of Tribler can be improved.
 
 % \section{Code quality and testing}
 % Tribler's current code base is in a bare state.
@@ -148,7 +211,7 @@ While it's not this thesis primary goal, refactoring the code involved with the 
 
 \section{Objective and research questions}
 \label{chp2:sct:objectives-research-questions}
-The objective of this thesis is to introduce a IO regression test system and to improve the performance and responsiveness of Tribler.
+The objective of this thesis is to introduce a I/O regression test system and to improve the performance and responsiveness of Tribler.
 The verification of the system is done by focussing on removing bottlenecks present.
 These improvements will be applied by means of refactoring current code, which is largely undocumented, poorly tested and unnecessary complex.
 In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
@@ -191,7 +254,7 @@ Running a one hour benchmark per change per pull request will hog the system and
 
 \section{Main contributions}
 The main contribution this thesis offers are as follows.
-We introduce a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk IO.
+We introduce a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
 Next, to present the working of said system, we present methods to identify bottlenecks in a complex system such as Tribler. 
 We elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, code quality and performance.
