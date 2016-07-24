@@ -111,21 +111,6 @@ The seeding ratio can be seen as an indication of the level of collaboration i.e
 %The Tit-for-Tat strategy is to only provide help to peers that return this help.
 %However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
 
-\section{Asynchronous programming}
-\label{sec:async-programming}
-
-When programming asynchronously the function that is being called (callee) by a caller returns a so-called deferred.
-A deferred is a place holder for the actual value that this function will return once the callee has computed it.
-In normal (synchronous) programming, when calling a function the caller is waiting for the callee to provide an answer. 
-Making a synchronous call in a single or multi-threaded environment may not be efficient.
-If the callee takes a long time to compute and return the answer, the caller thread will be idle for that duration.
-When using deferreds, the callee will simply return a Deferred and starts the computation.
-The caller will resume its other operations and when the callee is done, it will fire a callback event, notifying that the deferred has either resolved into an answer or an error.
-By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.\\
-
-One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue.
-This may result in the caller changing values, the callee is dependent on.
-
 
 \todo{more explanation needed.}
 \section{Outline}
