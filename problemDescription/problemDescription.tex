@@ -1,23 +1,28 @@
 \chapter{Problem description}
 \label{chp:problem-description}
 
-The official long-term goal of the Tribler project is to create a \enquote{create a censorship-free Internet}\citeInternetSoc} % http://www.internetsociety.org/articles/moving-toward-censorship-free-internet.
+The official long-term goal of the Tribler project is to create a \enquote{create a censorship-free Internet} \cite{pouwelse2012moving}.
 The method of the Tribler project is to create a Youtube style service with full decentralisation and robustness against various attacks.
 All these features are implemented in a completely distributed manner, not relying on any centralized component.
 
-Numerous initiatives exist around these goals of re-decentralisation, censorship-reilience, and attack-resilient.
+Numerous initiatives exist around these goals of re-decentralisation, censorship-resilience, and attack-resilient.
 However, none of them gathered any significant usage compared to the social media usage levels. 
 For instance, Youtube features one billion unique monthly users and there are 1.65 billion monthly active Facebook users.
 
-The problem is that the performance, usability, and features offered by decentralised alternatives are inferiour when compared to the experience offered by central solutions.
+The problem is that the performance, usability, and features offered by decentralised alternatives are inferior when compared to the experience offered by central solutions.
 Creating academically pure self-organising systems such as Tribler has proven to be notoriously difficult.
-For example, the extensive list of 194 projects which all aim to create an alternative Internet experience using decentralisations shows the amount of years spend and lines of code produced [https://github.com/redecentralize/alternative-internet]. Most of these project are abandoned and few of them have actual real-world usage.
+For example, the extensive list of 194 projects which all aim to create an alternative Internet experience using decentralisations shows the amount of years spent and lines of code produced \cite{redecentralize2016alternative}.
+Most of these project are abandoned and few of them have actual real-world usage.
 
 \section{Performance of disk I/O}
-The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the Youtube video-on-demand service.
-Tribler has no dependancy on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, expecially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:roadmap} shows part of the six main uncompleted roadmap items.
+The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
+Tribler has no dependency on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, especially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
 
-Insert screenshot of: https://github.com/Tribler/tribler/issues/1
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/roadmap}}
+	\caption{Three of the six uncompleted roadmap items.}
+	\label{fig:tribler_roadmap}
+\end{figure}
 
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user performance. Measurements dating back from 2014 indicate that Tribler performance is IO-bound.
 Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
