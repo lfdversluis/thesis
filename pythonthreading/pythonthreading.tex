@@ -1,8 +1,9 @@
 \chapter{Python's threading model}
+\label{cpt:pythons_thread_model}
 
 \begin{figure}[t!]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{pythonthreading/diagrams/thread_io_release_diagram}}
-	\caption{A schematic view of Python threads releasing the GIL when performing IO.}
+	\caption{A schematic view of how threads release the GIL when performing IO in Python.}
 	\label{fig:python_threads_release_gil}
 \end{figure}
 
@@ -33,13 +34,17 @@ Note that a thread thus may or may not immediately reacquire the GIL after relea
 Since every thread has this check, CPU-bound threads will engage in cooperative multitasking.
 
 \section{Multi threaded programming performance}
+\label{sct:multi_theaded_programming_performance}
 
 Since threads cannot run in parallel, this changes the performance one may expect from a multi threaded program.
 Dadiv Beazly presented his findings in his Python Concurrency Workshop (2009).
 By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased by 185\% \cite{beazley2009inside}.
 Disabling one of his cpu cores yielded an increase of 154\% in run time.
+\todo{Explain what the slowdown causes.}
 
 
 
 
 \section{Asynchronous programming}
+
+\todo{In the problem description is explain why asynchrony helps resolving IO bottlenecks, what should be put here?}

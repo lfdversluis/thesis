@@ -1,8 +1,9 @@
 \chapter{Related work}
+\label{cpt:related_work}
 
 \section{Parallelism and asynchrony in Python}
 \label{sct:parallelism_and_asynchrony_in_python}
-Parallelize Python by removing the GIL, introducing asynchronous behaviour or by other means is a topic that regularly returns in e.g. the Python mailing list, topics as PyCon and other events \cite{python2015global}.
+Parallelize Python by removing the GIL, introducing asynchronous behaviour and other means to speed up Python are topics that regularly return in e.g. the Python mailing list and presentations at PyCon \cite{python2015global}.
 To gain performance, many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPU's.
 To date, no one has ever succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
 
@@ -35,8 +36,8 @@ Twisted has a custom event-loop called the reactor, on which tasks can be schedu
 This reactor handles callbacks/errbacks fired by deferreds and contains many utility functions and classes to perform asynchronous and non-blocking calls.
 Unlike many libraries and frameworks available, Twisted is available on the official repositories of Ubuntu and Debian and is a well tested, mature framework.
 
-In 2012 Guido van Rossum embarked on a journey to add asynchronous I/O to the Python 3 standard library.
-The asyncore library is showing it's age and according van Rossum \enquote{We have to throw it away and forget it ever existed.} (Guido van Rossum, PyCon 2013).
+In 2012 Guido van Rossum -- the founder of the Python programming language -- embarked on a journey to add asynchronous I/O to the Python 3 standard library.
+He explained that the asyncore library is showing it's age and that \enquote{We have to throw it away and forget it ever existed.} (Guido van Rossum, PyCon 2013).
 Van Rossum wrote a new Python Enhancement Proposal (PEP)\footnote{https://www.python.org/dev/peps/pep-3156/} and implemented a new framework \enquote{Tulip} \cite{edge2013pycon}.
 Tulip's implementation and features are inspired by many well-known asynchronous frameworks such as Twisted and Tornado.
 Tulip features Coroutines, Futures and Tasks.

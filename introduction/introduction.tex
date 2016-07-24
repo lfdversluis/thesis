@@ -31,11 +31,19 @@ Along with its components, it features more than 158 KLOC \cite{tribler2015about
 The remainder of this chapter is used to introduce Tribler and its components as well as providing the outline of this thesis.
 
 \section{Tribler}
+
+\begin{figure}
+	\includegraphics[width=\linewidth]{introduction/images/tribler_screenshot.png}
+	\caption{Screenshot of Tribler v6.5.2.}
+	\label{fig:tribler_screenshot}
+\end{figure}
+
+
 Tribler is a research platform for self organizing systems and online cooperation.
-All research is embedded in the Tribler BitTorrent client, visible in Figure X \todo{Add screenshot of 6.5}.
+All research is embedded in the Tribler BitTorrent client, visible in Figure~\ref{fig:tribler_screenshot}.
 Tribler can be downloaded free of charge from the Tribler website\footnote{\url{https://www.tribler.org}}.
-It has been downloaded approximately 1.8 million times, has more than 2 thousand monthly active users and anticipating more growth in the near future.\todo{Cite Pouwelse's slides.}.
-This makes Tribler one of the few research projects that allow researchers to run experimental code ``in the wild'' on a large heterogeneous user group.
+It has been downloaded approximately 1.8 million times, has more than 2 thousand monthly active users and anticipating more growth in the near future.
+This makes Tribler one of the few research projects that allow researchers to run experimental code \enquote{in the wild} on a large heterogeneous user group.
 
 Tribler focuses on the following goals:
 \begin{itemize}
@@ -46,14 +54,8 @@ Tribler focuses on the following goals:
 \end{itemize}
 
 A fully decentralized ecosystem i.e. no central components present, is Tribler's approach to achieve these goals.
-Tribler has been designed and build with this focus~\cite{Pouwelse-tribler,Bakker-tribler}.
+Tribler has been designed and build with this focus~\cite{Pouwelse-tribler,Bakker-tribler} \todo{cites}.
 A distributed network requires both the presence and collaboration of participants, called peers, to be able to achieve this.
-
-% \begin{figure}
-%	\centerline{\includegraphics[scale=0.6]{introduction/figs/tribler-screenshot.png}}
-%	\caption{Screenshot of Tribler v6.4.3.}
-%	\label{fig:tribler-screenshot}
-%\end{figure}
 
 \section{Dispersy}
 The Distributed Permission System (Dispersy) is an elastic database system written in the Python programming language and uses SQLite as its underlying database engine.
@@ -85,9 +87,13 @@ As of February 2013, BitTorrent was responsible for 3.35\% of all worldwide band
 Downloading files is done in a decentralized way, that means no central entity such as a server is needed.
 By obtaining a torrent file, users can download files associated with this torrent using a program that is compatible with the BitTorrent protocol.\\
 
-A torrent is a file that contains information about the files and \todo{add how a torrent file works, what it contains and how you are downloading e.g. connecting to peers.}\\
+A torrent is a file that contains meta information about the directories and files to be distributed.
+More specifically, it contains names, sizes, hashes to verify the integrity of the files and the folder structure of the content to be downloaded.
+A torrent usually contains a list of trackers and their network addresses.
+These trackers help participants locate each other and form efficient distribution groups -- \emph{swarms}.
+ 
 
-When sharing files by using the BitTorrent protocol, a user (or peer) that uploads i.e. provides a file to the BitTorrent network, is called a seeder.
+When sharing files by using the BitTorrent protocol, a user (or peer) that uploads i.e. allows other peers to download the user's files using the user's upload connection, is called a seeder.
 A peer that is downloading a file of a seeder is called a leecher.
 Any peer can be both a seeder and leecher at the same time, and join the network at any given time.\\
 
@@ -112,11 +118,13 @@ The seeding ratio can be seen as an indication of the level of collaboration i.e
 %However, it has been shown that this approach is not effective in battling abuse \cite{Pouwelse-tribler}.
 
 
-\todo{more explanation needed.}
+\todo{more explanation?}
 \section{Outline}
 In this chapter we provided an introduction of this thesis and presented the research questions this thesis aims to answer. 
-This section describes the other chapters in this thesis and their relevance to the research questions provided in section \ref{chp1:sct:objectives-research-questions}.
-Chapter \ref{chp:preliminaries} provides preliminaries and terminology used through this thesis.
-Chapter \ref{chp:problem-description} presents an overview of some of the problems Tribler is currently facing which this thesis addresses.
-Chapter 
-\todo{Add more here as cahpters are added.}
+This section describes the other chapters in this thesis.
+Chapter~\ref{chp:problem-description} provides the problem description and the research questions this thesis attempts to answer.
+Chapter~\ref{cpt:related_work} presents related work on the subjects overlapping this thesis work.
+Chapter~\ref{cpt:pythons_thread_model} explains the python threading module and why parallel programming in Python is different from a language such as Java. Additionally, the subjects of multi-threaded performance and asynchrony are covered.
+Chapter~\ref{cpt:tribler_current_state} elaborates on I/O problem Tribler is currently facing and the current state.
+Chapter~\ref{implementation_and_experiments} presents the implementation details and experimental results of this work.
+Finally, Chapter~\ref{cpt:conclusion_and_future_work} concludes this thesis and provides future work.
