@@ -1,6 +1,52 @@
 \chapter{Problem description}
 \label{chp:problem-description}
 
+The official long-term goal of the Tribler project is to create a \enquote{create a censorship-free Internet}\citeInternetSoc} % http://www.internetsociety.org/articles/moving-toward-censorship-free-internet.
+The method of the Tribler project is to create a Youtube style service with full decentralisation and robustness against various attacks.
+All these features are implemented in a completely distributed manner, not relying on any centralized component.
+
+Numerous initiatives exist around these goals of re-decentralisation, censorship-reilience, and attack-resilient.
+However, none of them gathered any significant usage compared to the social media usage levels. 
+For instance, Youtube features one billion unique monthly users and there are 1.65 billion monthly active Facebook users.
+
+The problem is that the performance, usability, and features offered by decentralised alternatives are inferiour when compared to the experience offered by central solutions.
+Creating academically pure self-organising systems such as Tribler has proven to be notoriously difficult.
+For example, the extensive list of 194 projects which all aim to create an alternative Internet experience using decentralisations shows the amount of years spend and lines of code produced [https://github.com/redecentralize/alternative-internet]. Most of these project are abandoned and few of them have actual real-world usage.
+
+\section{Performance of disk I/O}
+The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the Youtube video-on-demand service.
+Tribler has no dependancy on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, expecially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:roadmap} shows part of the six main uncompleted roadmap items.
+
+Insert screenshot of: https://github.com/Tribler/tribler/issues/1
+
+The problem we address within this thesis is the underlying reason for poor performance and unacceptable user performance. Measurements dating back from 2014 indicate that Tribler performance is IO-bound.
+Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
+With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology ready for large-scale usage. 
+
+\section{Tribler database dependency}
+
+All information within Tribler is stored in a database for persistence and ease of use.
+
+Insert picture Dispersy SQL:
+[https://camo.githubusercontent.com/eae1fe5cce8095a934d48aa7b80cd752c672800f/68747470733a2f2f662e636c6f75642e6769746875622e636f6d2f6173736574732f313734313633322f3239303637352f32303935393466632d393265632d313165322d386264332d3463626434303335323964302e706e67]
+
+This database is becoming a key performance bottleneck.
+Insert picture MBytes/hour : [https://github.com/Tribler/tribler/issues/564]
+
+\section{asynchronous IO}
+
+The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking IO calls with asynchronous non-blocking IO. 
+
+Example:
+Instert picture like: [https://userscontent2.emaze.com/images/67f41361-9c9a-45c3-9a81-a4c49d5a66c8/95ba8eb4-aa59-4dab-992e-adcb38cf9d8c.jpg]
+
+\section{Improved developer productivity}
+Refactoring.. important.. continous changes.. expand features...
+By using a database manager to handle asynchronous IO we also improve developers productivity, another vital performance measure. Less code and improved readability enhances productivity...
+
+
+
+\section{OLD TEXT}
 Only by comparing different builds can one gain insight into performance changes.
 Currently Tribler lacks this insight.
 As Tribler is heavy IO-based and likely IO-bound, it is crucial to have these numbers.
