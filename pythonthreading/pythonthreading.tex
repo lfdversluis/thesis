@@ -1,26 +1,45 @@
 \chapter{Python's threading model}
 
-Python threads are normal operating system (OS) threads, either POSIX or Windows threads.
+\begin{figure}[t!]
+	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{pythonthreading/diagrams/thread_io_release_diagram}}
+	\caption{A schematic view of Python threads releasing the GIL when performing IO.}
+	\label{fig:python_threads_release_gil}
+\end{figure}
+
+Python threads are normal operating system (OS) threads, either POSIX or Windows threads \cite{beazley2010understanding, beazley2009inside}.
 They are fully managed by the operating system that hosts them.
 In the Python programming language there is a Global Interpreter Lock (GIL).
 This GIL ensures that only one thread can run in the python interpreter at once, i.e. a thread needs to hold the GIL in order to execute.
+This means there cannot be any parallel execution.
 Once a thread is done executing or needs to wait it releases the GIL.
-This gives way for cooperative multitasking as visualized in Figure X \todo{Make a picture like in understanding-the-python-gil}.
+This gives way for cooperative multitasking as visualized in Figure \ref{fig:python_threads_release_gil}.
 Other threads that are ready to execute can try to acquire the GIL, the thread that obtains the GIL is determined by the OS.
 
-To make sure CPU heavy tasks do not hold the GIL indefinitely a simple check is built in that ``checks'' every thread once per 100 (default) ticks.
+To make sure CPU heavy tasks do not hold the GIL indefinitely a simple check mechanism is built in that ``checks'' every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
-\todo{Show code sample that takes 1 tick but takes long in time.}
-When a check is run the following steps are executed:
-\begin{itemize}
+Listing \ref{lst:one_tick} contains two code samples that only take one tick each, but take require different amount of time to compute.
+
+\lstinputlisting[caption={Two code samples that each take one tick yet require a different amount to compute.},label={lst:one_tick},language=Python]{pythonthreading/code/one_tick.py}
+
+When a check is run the following four steps are executed:
+\begin{enumerate}
 	\item The thread that holds the GIL resets its tick counter.
 	\item If the current thread it the main thread, it runs the signal handlers.
 	\item The thread releases the GIL.
 	\item The thread tries to reacquire the GIL.
-\end{itemize}
+\end{enumerate}
 
-
+Note that a thread thus may or may not immediately reacquire the GIL after releasing it.
+Since every thread has this check, CPU-bound threads will engage in cooperative multitasking.
 
 \section{Multi threaded programming performance}
+
+Since threads cannot run in parallel, this changes the performance one may expect from a multi threaded program.
+Dadiv Beazly presented his findings in his Python Concurrency Workshop (2009).
+By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased by 185\% \cite{beazley2009inside}.
+Disabling one of his cpu cores yielded an increase of 154\% in run time.
+
+
+
 
 \section{Asynchronous programming}
