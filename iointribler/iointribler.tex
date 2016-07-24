@@ -12,11 +12,11 @@ Since 2014 no work or measurements have been done related to this issue.
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{iointribler/images/iotop}}
-	\caption{A screenshot of iotop showing Tribler's IO, from Johan Pouwelse \cite{pouwelse2014reduce}}
+	\caption{A screenshot of iotop showing Tribler's IO, from Johan Pouwelse \cite{pouwelse2014reduce}.}
 	\label{fig:iotop_tribler_april_2014}
 \end{figure}
 
-In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own blockchain like structure \cite{norberhuis2015multichain}.
+In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain like structure \cite{norberhuis2015multichain}.
 This feature heavily relies on its database to store blocks and other information about the user and other peers their chains.
 Moreover, the MultiChain makes use of its own database rather than Dispersy's.
 Norberhuis points out: ``The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.'' \cite{norberhuis2015multichain}, yet numbers on how much IO the MultiChain generates are not presented.
@@ -37,7 +37,7 @@ CPU			&  \\
 HDD			&  \\ 
 RAM			&  \\
 	\end{tabular}
-	\caption{Hardware used during the idle iotop measurement}
+	\caption{Hardware used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
 	\label{table:tribler_idle}
 \end{table}
 
