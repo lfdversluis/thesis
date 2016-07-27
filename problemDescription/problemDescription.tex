@@ -32,11 +32,11 @@ With our focus on the fundamental issue we believe we can make a significant ste
 
 All information within Tribler is stored in a database for persistence and ease of use.
 Information about the network i.e. peers, messages and authentication is stored in a separate database managed by Dispersy.
-The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema}.
+The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema} (Johan Pouwelse, 2013).
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/dispersy_database_schema}}
-	\caption{The database schema of Dispersy.}
+	\caption{The database schema of Dispersy, (source: Johan Pouwelse, 2013) \cite{pouwelse2013documentation}.}
 	\label{fig:dispersy_database_schema}
 \end{figure}
 
@@ -47,12 +47,12 @@ In May 2014 efforts were made to reduce this enormous amount of I/O and after ba
 
 As performing I/O operations blocks a thread (see Chapter~\ref{cpt:pythons_thread_model}), it is essential keep track of this information and to work towards reducing this number.
 So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
-iotop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014}.
+iotop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014} (Johan Pouwelse, 2014).
 Since 2014 no work or measurements have been done related to this issue.
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{iointribler/images/iotop}}
-	\caption{A screenshot of iotop showing Tribler's I/O, from Johan Pouwelse \cite{pouwelse2014reduce}.}
+	\caption{A screenshot of iotop showing Tribler's I/O, (source: Johan Pouwelse, 2014 \cite{pouwelse2014reduce}).}
 	\label{fig:iotop_tribler_april_2014}
 \end{figure}
 
@@ -67,19 +67,6 @@ There are no metrics on the current situation of Tribler and it's hard if not im
 
 \section{Asynchronous I/O}
 \label{sec:async-programming}
-
-The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking I/O calls with asynchronous non-blocking I/O. 
-
-When programming asynchronously, the function that is being called (callee) by a caller returns -- what's called in the Twisted framework -- a deferred.
-A deferred is a place holder for the actual value that this function will return once the callee has computed it.
-In normal (synchronous) programming, when calling a function that performs an I/O operation, the thread will be waiting for the I/O operation to be completed, see Figure~\ref{fig:normal_io_flow}.
-This means the main loop of a program will block if the I/O call happens on the main thread.
-This wastes valuable CPU cycles if there are no other threads that can continue.
-To ensure we do not block on I/O operations, the I/O can be moved to a separate thread, returning a deferred.
-By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
-This thread can then block while the main thread continues executing other scheduled tasks on the event loop.
-Once the thread is done with its task it can invoke the callback of the deferred, notifying the main thread event loop.
-The event loop will then schedule the processing of the deferred's value and proceed, see Figure~\ref{fig:async_io_flow}.
 
 \begin{figure}
 	\centering
@@ -96,8 +83,21 @@ The event loop will then schedule the processing of the deferred's value and pro
 		\caption{A schematic overview of an I/O operation executing on a separate thread, retuning a deferred (asynchronous).}
 		\label{fig:async_io_flow}
 	\end{subfigure}
-	\caption{A schematic overview of a synchronous versus an asynchronous I/O call.}
+	\caption{A schematic overview of a how an I/O call is handled in a synchronous versus an asynchronous manner.}
 \end{figure}
+
+The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking I/O calls with asynchronous non-blocking I/O. 
+
+When programming asynchronously, the function that is being called (callee) by a caller returns -- what's called in the Twisted framework -- a deferred.
+A deferred is a place holder for the actual value that the callee eventually will return once its done computing.
+In normal (synchronous) programming, when calling a function that performs an I/O operation, the thread will be waiting for the I/O operation to be completed, see Figure~\ref{fig:normal_io_flow}.
+This means the main loop of a program will block if the I/O call happens on the main thread.
+This wastes valuable CPU cycles if there are no other threads that can continue.
+To ensure we do not block on I/O operations, the I/O can be moved to a separate thread, returning a deferred.
+By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
+This thread can then block while the main thread continues executing other scheduled tasks on the event loop.
+Once the thread is done with its task it can invoke the callback of the deferred, notifying the main thread event loop.
+The event loop will then schedule the processing of the deferred's value and proceed, see Figure~\ref{fig:async_io_flow}.
 
 One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue executing other (unrelated) tasks.
 This may result in the caller changing values, the callee is dependent on.
@@ -122,14 +122,16 @@ Ideally this database manager should handle all communication to and from the da
 This will yield increased stability and speed, improved maintainability and enhances the productivity of developers.
 
 \section{Realistic benchmarks}
-The next step is to introduce a performance regression system, tracking changes in vital numbers such as CPU consumption or I/O produced.
-This system should benchmark the current code base against proposed changes, capturing any differences in performance.
 Directly related to the performance problem is the benchmark problem.
 In order to improve user performance we require making assumptions about realistic use cases.
 Each user has different usage patterns, hardware and network conditions, all affecting performance.
+Creating one of more several benchmarks testing several scenario's is required to accurately tune the system for real world usage.
 
 Therefore, it is important to create a reference benchmark which has a close resemblance to real world usage.
-Changes in performance will then reflect real world user experience.
+
+The next step is to introduce a solution, tracking changes in vital numbers such as CPU consumption or I/O produced.
+Any improvement indicated by this benchmark should reflect improvement for real world users.
+This system should benchmark the current code base against proposed changes, capturing any differences in performance.
 
 
 %\section{OLD TEXT}
@@ -229,7 +231,7 @@ Changes in performance will then reflect real world user experience.
 
 \section{Objective and research questions}
 \label{chp2:sct:objectives-research-questions}
-The objective of this thesis is to introduce a I/O \todo{remove I/O?} regression test system and to improve the performance and responsiveness of Tribler.
+The objective of this thesis is to introduce an I/O regression test system and to improve the performance and responsiveness of Tribler.
 The verification of the system is done by focussing on removing bottlenecks present.
 These improvements will be applied by means of refactoring current code, which is largely undocumented, poorly tested and unnecessary complex.
 In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
@@ -240,7 +242,7 @@ In total Tribler has been in development for over 10 years and the project has r
 Using the knowledge of a senior developer still present, known issues of Tribler could be noted down immediately to which resulted in a set of diverse tasks to complete.
 Based on the objectives of Tribler, this thesis aims to answer the main research question formulated below.\\
 
-\textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and code base by means of refactoring?\\
+\textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and code base?\\
 
 To answer this main research question, we have defined three research questions below. Each of these research questions will be justified as why they contribute to the main research question.\\
 
@@ -252,7 +254,7 @@ Bottlenecks are parts of the code where often performance and responsiveness can
 Sometimes by implementing a more efficient algorithm or by introducing parallelization these bottlenecks can be resolved.
 Identifying these bottlenecks is the first step to resolve them.\\
 
-\textbf{Research Question 2:} Can a system such as Tribler benefit from asynchronous programming?\\
+\textbf{Research Question 2:} Can a system such as Tribler benefit from asynchrony?\\
 
 To improve performance and responsiveness, parts of Tribler can be rewritten to become asynchronous.
 By performing tasks asynchronously the performance and responsiveness of a program can improve.

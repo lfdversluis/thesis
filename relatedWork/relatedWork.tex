@@ -1,6 +1,9 @@
 \chapter{Related work}
 \label{cpt:related_work}
 
+A lot of work has been done on the topics of performance, benchmarking and regression testing.
+In this chapter we highlight some of the relevant work conducted in the past decade related to parallelism and asynchrony in Python, regression testing and benchmarking, and bottleneck detection using profilers.
+
 \section{Parallelism and asynchrony in Python}
 \label{sct:parallelism_and_asynchrony_in_python}
 Parallelize Python by removing the GIL, introducing asynchronous behaviour and other means to speed up Python are topics that regularly return in e.g. the Python mailing list and presentations at PyCon \cite{python2015global}.
@@ -32,6 +35,7 @@ In particular, many projects exist that attempt to make I/O asynchronous \cite{a
 
 Twisted is an event-driven networking engine written in Python.
 It allows for event-driven and asynchronous programming using deferreds.
+Deferreds are place holders for values that are still being computed.
 Twisted has a custom event-loop called the reactor, on which tasks can be scheduled.
 This reactor handles callbacks/errbacks fired by deferreds and contains many utility functions and classes to perform asynchronous and non-blocking calls.
 Unlike many libraries and frameworks available, Twisted is available on the official repositories of Ubuntu and Debian and is a well tested, mature framework.
@@ -41,8 +45,8 @@ He explained that the asyncore library is showing it's age and that \enquote{We 
 Van Rossum wrote a new Python Enhancement Proposal (PEP)\footnote{https://www.python.org/dev/peps/pep-3156/} and implemented a new framework \enquote{Tulip} \cite{edge2013pycon}.
 Tulip's implementation and features are inspired by many well-known asynchronous frameworks such as Twisted and Tornado.
 Tulip features Coroutines, Futures and Tasks.
-Coroutines are equivalent to callbacks which are python generators under the hood.
-Futures are similar to deferreds in Twisted, which is a placeholder for a value that is currently being computed.
+Coroutines are python generators which can be seen as callbacks in Twisted.
+Futures are similar to deferreds in Twisted; a place holder for a value that is currently being computed.
 Tasks are Futures wrapped in Coroutines.
 Just like Twisted, Tulip features an event loop which multiplexes different activities such as callbacks and signals. 
 It was added to Python 3.3 and is now part of the Python standard library in Python 3.4.
@@ -50,11 +54,16 @@ There are no plans to make Tulip available for older Python versions such as 2.7
 
 Decorated Concurrency (DECO) uses the multiprocessing package of Python to parallelize functions using a ``concurrent'' decorator \cite{sherman2016deco}.
 Different processes have their own GIL, which allows for parallel processing.
-Similarly, the ``synchronized''  inserts synchronization events to automatically refactors assignments of the results of ``concurrent'' function calls to happen during synchronization events.
-However, because of the overhead of creating a new process and communicating between different processes, this approach is only viable for heavy loads that generally can run on its own and requires heavy computation.
+Similarly, the ``synchronized''  inserts synchronization events to automatically refactor assignments of the results of ``concurrent'' function calls to happen during synchronization events.
+However, because of the overhead of creating a new process and communicating between different processes, this approach is only viable for heavy loads that generally can run on its own.
 
 \section{Regression testing}
-Regression testing has been extensively studied both in research as industrial appliances.
+Regression testing has been extensively studied both in research and industrial appliances.
+It is often seen as an important part in the software production process \cite{ghaith2013profile}.
+
+Regression testing is applied to ensure a new version of software does not perform worse than the previous.
+
+
 \todo{Add related work regarding regression testing.}
 
 \section{Profilers}

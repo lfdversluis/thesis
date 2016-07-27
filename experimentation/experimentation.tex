@@ -1,4 +1,25 @@
 \chapter{Implementation and experiments}
 \label{implementation_and_experiments}
 
-TBD.
+\section{Performance analysis}
+To observe the current situation, we have measured Tribler running idle (i.e. no human interaction) for X hours. \todo{Perform experiment and fill in values.}
+For this experiment we run Tribler version 6.6.0-exp1 which is a pre-release of 6.6, because it includes the MultiChain code.
+The hardware used during this experiment can be seen in Table \ref{table:tribler_idle}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		Hardware	& Specifications \\ \hline
+		CPU			&  \\ 
+		HDD			&  \\ 
+		RAM			&  \\
+	\end{tabular}
+	\caption{Hardware used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\label{table:tribler_idle}
+\end{table}
+
+The results are visible in Figure X.
+From these results we observe that Tribler current has an IO of Y.
+To observe the individual components separately, we have created a breakdown the database queries performed by Tribler.
+This breakdown is visible in Table Z.
+As we can see, B is doing the most IO... \todo{Fill in the stuff when experiment done}
