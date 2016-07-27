@@ -58,4 +58,23 @@ To realize this, a new database manager \enquote{StormDBManager} is introduced a
 StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
 It is developed using the Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
 Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an object-relational mapper (ORM).
-The Storm database framework has support for Twisted and is available on the official repositories of Ubuntu and Debian, making it a good basis for development.
+Currently, Storm supports three databases: SQLite, MySQL and PostgreSQL.
+As Dispersy makes use of a SQLite3 database, this was a necessity.
+Additionally, the Storm database framework has integrated support for Twisted and is available on the official repositories of Ubuntu and Debian, making it a good fit for Tribler.
+Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach.
+
+Since multi-threaded support is severely limited using SQLite3, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
+Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
+Using a thread-safe queue, all calls are executed in the same order as required, ensuring serialized behaviour.
+Whenever database access is required, a caller puts a tuple of four elements on the queue:
+
+\begin{itemize}
+	\item The function to be called, e.g. execute or fetchone.
+	\item The arguments to be passed to the function.
+	\item The keyword arguments to be passed to the function.
+	\item A deferred to handle the response in an asynchronous way.
+\end{itemize}
+
+The worker running on the thread waits blocking for new items to come, protecting the thread from being deleted.
+To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will take appropriate action.
+
