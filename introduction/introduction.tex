@@ -21,8 +21,9 @@ This principle holds even for large systems.
 In this thesis we use the BitTorrent client Tribler as a use case to implement a regression testing system and to find and resolve bottlenecks, demonstrating the working of said system.
 Tribler has been in development for over ten years and has grown into a highly complex and large distributed system.
 Along with its components, it features more than 158 KLOC \cite{tribler2015about}.
-
-Decentralized systems often cannot 
+Currently, the adoption of Tribler is hampered by its performance. 
+Products such as YouTube, FaceBook and Wikipedia have millions or even billions of monthly active users.
+Here, speed plays a key role: an increase of 500ms latency could reduce Google's traffic by 20\% \cite{mayer2009search}.
 
 The remainder of this chapter is used to introduce Tribler and its components as well as providing the outline of this thesis.
 
@@ -128,6 +129,5 @@ This section describes the other chapters in this thesis.
 Chapter~\ref{chp:problem-description} provides the problem description and the research questions this thesis attempts to answer.
 Chapter~\ref{cpt:related_work} presents related work on the subjects overlapping this thesis work.
 Chapter~\ref{cpt:pythons_thread_model} explains the python threading module and why parallel programming in Python is different from a language such as Java. Additionally, the subjects of multi-threaded performance and asynchrony are covered.
-Chapter~\ref{cpt:tribler_current_state} elaborates on I/O problem Tribler is currently facing and the current state.
 Chapter~\ref{implementation_and_experiments} presents the implementation details and experimental results of this work.
 Finally, Chapter~\ref{cpt:conclusion_and_future_work} concludes this thesis and provides future work.

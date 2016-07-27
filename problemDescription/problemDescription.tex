@@ -15,8 +15,6 @@ For example, the extensive list of 194 projects which all aim to create an alter
 Most of these project are abandoned and few of them have actual real-world usage.
 
 \section{Performance of disk I/O}
-The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
-Tribler has no dependency on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, especially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/roadmap}}
@@ -24,15 +22,15 @@ Tribler has no dependency on central service infrastructure, does not need profi
 	\label{fig:tribler_roadmap}
 \end{figure}
 
+
+The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
+Tribler has no dependency on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, especially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
+
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user performance. Measurements dating back from 2014 indicate that Tribler performance is I/O-bound.
 Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
 With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology ready for large-scale usage. 
 
 \section{Tribler database dependency}
-
-All information within Tribler is stored in a database for persistence and ease of use.
-Information about the network i.e. peers, messages and authentication is stored in a separate database managed by Dispersy.
-The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema} (Johan Pouwelse, 2013).
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/dispersy_database_schema}}
@@ -40,12 +38,17 @@ The current overview of the database structure is presented in Figure~\ref{fig:d
 	\label{fig:dispersy_database_schema}
 \end{figure}
 
+
+All information within Tribler is stored in a database for persistence and ease of use.
+Information about the network i.e. peers, messages and authentication is stored in a separate database managed by Dispersy.
+The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema} (Johan Pouwelse, 2013).
+
 This database is becoming a key performance bottleneck \cite{pouwelse2014reduce}.
 In May 2013 Tribler read and wrote 660 Megabytes per hour to and from disk.
 Back in April 2014 this number was somewhat reduced to 623.
 In May 2014 efforts were made to reduce this enormous amount of I/O and after batching several database statements the number further dropped to 538 Megabytes per hour.
 
-As performing I/O operations blocks a thread (see Chapter~\ref{cpt:pythons_thread_model}), it is essential keep track of this information and to work towards reducing this number.
+As performing I/O operations blocks a thread (see Section~\ref{sec:async-programming}), it is essential keep track of this information and to work towards reducing this number.
 So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
 iotop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014} (Johan Pouwelse, 2014).
 Since 2014 no work or measurements have been done related to this issue.
@@ -126,8 +129,10 @@ Directly related to the performance problem is the benchmark problem.
 In order to improve user performance we require making assumptions about realistic use cases.
 Each user has different usage patterns, hardware and network conditions, all affecting performance.
 Creating one of more several benchmarks testing several scenario's is required to accurately tune the system for real world usage.
+At the same time, a benchmark cannot consume too much time.
+Benchmarking is by nature time consuming \cite{huang2014performance}, however running long regression tests per commit done on a pull request will severely strain the development speed.
 
-Therefore, it is important to create a reference benchmark which has a close resemblance to real world usage.
+Therefore, it is important to create a reference benchmark which has a close resemblance to real world usage without consuming too much time.
 
 The next step is to introduce a solution, tracking changes in vital numbers such as CPU consumption or I/O produced.
 Any improvement indicated by this benchmark should reflect improvement for real world users.

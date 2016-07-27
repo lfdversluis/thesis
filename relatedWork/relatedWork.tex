@@ -60,11 +60,24 @@ However, because of the overhead of creating a new process and communicating bet
 \section{Regression testing}
 Regression testing has been extensively studied both in research and industrial appliances.
 It is often seen as an important part in the software production process \cite{ghaith2013profile}.
-
+Performance can directly affect user experience and job efficiency \cite{huang2014performance}.
 Regression testing is applied to ensure a new version of software does not perform worse than the previous.
 
+Ghaith et al. introduce the concept of using Transaction Profiles (TP) as load-independent indicator for performance characteristics \cite{ghaith2013profile}. 
+With Transaction Profiles, the complete series of service demands for one transaction is measured.
+Here service demands is defined as \enquote{the total amount of time required to serve the transaction
+on each resource} (Ghaith et al., 2013).
+TP is therefore considered to be a load-independent of the transaction.
+TP represent a lower bound on the transaction time, as if it was the only request currently running on a server.
+One of the main usages is to predict response times and to determine if new hardware of software resources are required.
+Additionally, it can be used as a load-independent indicator of performance characteristics in regression test systems.
 
-\todo{Add related work regarding regression testing.}
+Huang et al. introduce performance risk analysis (PRA) \cite{huang2014performance}.
+By statically analysing the commits with a high risk of introducing regression, these commits can be targeted for testing with higher priority.
+They introduce a tool \enquote{PerfScope} which alarms upon finding problematic commits.
+Their reasoning is that the amount of commits and the amount of regression tests are not in sync.
+While they admit that regression tests are by their nature time consuming, it is important to continuously scan for commits that introduce performance regression.
+
 
 \section{Profilers}
 Resolving bottlenecks using profilers has been applied for many years: \cite{pesterev2010locating, gorelick2014high, fan2013performance}.
@@ -77,7 +90,7 @@ By default, Python ships three profilers:
 \end{enumerate}
 
 Alternatively, profilers have been developed by the open-source community.
-Yappi is a profiler written in the C language that is thread-aware, allowing automatic profiling of multi-threaded applications [CITE]\todo{cite}.
+Yappi is a profiler written in the C language that is thread-aware, allowing automatic profiling of multi-threaded applications \cite{cip2014yet}.
 It provides options to measure CPU or wall time, sort the output by various parameters and support the callgrind and pstat output formats.
 
 Savrun-Yeni{\c{c}}eri et al. introduced an event-based profiler that performs better than the Python standard profilers which requires modest implementation effort \cite{savrun2015efficient}.

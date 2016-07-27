@@ -9,12 +9,13 @@ The hardware used during this experiment can be seen in Table \ref{table:tribler
 \begin{table}[h]
 	\centering
 	\begin{tabular}{l|l}
-		Hardware	& Specifications \\ \hline
-		CPU			&  \\ 
-		HDD			&  \\ 
-		RAM			&  \\
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		Operating System   	& Ubuntu 16.04 LTS \\
+		CPU					& Intel Core i5-2410M \\ 
+		HDD					& Samsung 850 EVO 250GB  \\ 
+		RAM					& 8 GB DDR3 1600MHz \\
 	\end{tabular}
-	\caption{Hardware used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
 	\label{table:tribler_idle}
 \end{table}
 
@@ -23,3 +24,38 @@ From these results we observe that Tribler current has an IO of Y.
 To observe the individual components separately, we have created a breakdown the database queries performed by Tribler.
 This breakdown is visible in Table Z.
 As we can see, B is doing the most IO... \todo{Fill in the stuff when experiment done}
+
+\section{Performance regression using Gumby}
+
+Tribler has an experiment runner framework for Dispersy and Tribler: Gumby.
+Using Gumby, one can specify configurations and scenario files to be executed.
+
+Configuration files specify all the settings needed in order to run an experiment using Gumby.
+The scenario file allows for a carefully timed execution of functions.
+Each line in a scenario file specifies which node executes which function at what time. \todo{Example of such a scenario file? yes/no?}
+Currently, Gumby is being used to run an experiment on the DAS5 super computer\footnote{\url{http://www.cs.vu.nl/das5/}}.
+Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system automatically schedules this experiment to be run.
+
+Using Gumby, statistics such as CPU, memory consumption and I/O are automatically tracked.
+Any additional information that one wishes to track can be logged and parsed using auxiliary post experiment scripts.
+Currently, graphs are being generated in the R programming language using the ggplot2 library.
+
+To obtain a regression testing system, we decided to extend Gumby.
+To obtain the data for comparison, the proposed commits first have to be run inside an experiment using a predetermined scenario and configuration file.
+Once this experiment is done, Jenkins can fetch the data of the last successful experiment run of the current code base.
+Next, using the data from both experiments we generate graphs.
+By creating a side-by-side plot of two graphs using the same scales, developers can immediately see any changes 
+
+\section{Validating the performance regression system}
+
+To validate the performance regression system, we have resolved one of Tribler's biggest bottlenecks: Dispersy's database I/O.
+Dispersy performs a lot of I/O.
+Currently, this I/O is blocking the main thread when waiting for the database, wasting valuable CPU cycles.
+To address this problem, we have written Dispersy's I/O to become asynchronous and non-blocking.
+To realize this, a new database manager \enquote{StormDBManager} is introduced and 90\%\todo{made up number, need to calculate the actual value.} of Dispersy's functions have been refactored.
+
+\subsection{A new database manager}
+StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
+It is developed using the Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
+Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an object-relational mapper (ORM).
+The Storm database framework has support for Twisted and is available on the official repositories of Ubuntu and Debian, making it a good basis for development.
