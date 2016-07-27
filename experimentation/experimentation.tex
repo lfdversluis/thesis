@@ -55,6 +55,13 @@ To address this problem, we have written Dispersy's I/O to become asynchronous a
 To realize this, a new database manager \enquote{StormDBManager} is introduced and 90\%\todo{made up number, need to calculate the actual value.} of Dispersy's functions have been refactored.
 
 \subsection{A new database manager}
+
+\begin{figure}[t!]
+	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{experimentation/diagrams/storm_db_worker.png}}
+	\caption{An overview of the queueing mechanism of StormDBManager.}
+	\label{fig:storm_db_worker}
+\end{figure}
+
 StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
 It is developed using the Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
 Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an object-relational mapper (ORM).
@@ -64,17 +71,30 @@ Additionally, the Storm database framework has integrated support for Twisted an
 Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach.
 
 Since multi-threaded support is severely limited using SQLite3, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
+This worked will be owned by the StormDBManager.
 Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
-Using a thread-safe queue, all calls are executed in the same order as required, ensuring serialized behaviour.
-Whenever database access is required, a caller puts a tuple of four elements on the queue:
+The system works as follows, visualized in Figure~\ref{fig:storm_db_worker}.
+Fist, a Dispersy function calls the StormDBManager (1).
+The StormDBManager generates a deferred and returns this to the caller (2).
+Next, the StormDBManager queues a tuple of four elements (3):
 
-\begin{itemize}
+\begin{enumerate}
 	\item The function to be called, e.g. execute or fetchone.
 	\item The arguments to be passed to the function.
 	\item The keyword arguments to be passed to the function.
 	\item A deferred to handle the response in an asynchronous way.
-\end{itemize}
+\end{enumerate}
 
-The worker running on the thread waits blocking for new items to come, protecting the thread from being deleted.
-To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will take appropriate action.
+Note that by using a thread-safe queue, all calls are scheduled in the same order as required, ensuring serialized behaviour.
+The worker running on the thread waits blocking for new items to come, preventing the thread from dying.
+Once it a tuple is available it fetches it (4).
+It then executes the function (5) and calls the deferred's callback with the result (6).
+After that, the worker proceeds to wait blocking for a new item, or executes the next tuple if present.
+To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will commit or shut down, respectively.
 
+\subsection{Refactoring Dispersy}
+
+As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
+Every caller of this function will need to be recursively updated as well to handle the deferreds being returned.
+By making extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator, approximately 90\% of all Dispersy functions were modified. \todo{Replace 90\% with actual number.}
+\todo{continue story.}
