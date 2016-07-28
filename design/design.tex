@@ -1,0 +1,24 @@
+\chapter{Design \& Implementation}
+
+With the recent addition of the MultiChain there are three distinct database files with three distinct database managers present in the Tribler code base.
+None these database managers are fully documented or tested.
+A proper solution is to merge these three databases files into a single database, controlled by a single database manager.
+This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation.
+Ideally this database manager should handle all communication to and from the database in an asynchronous, non-blocking manner.
+This will yield increased stability and speed, improved maintainability and enhances the productivity of developers.
+
+\subsection{A new framework}
+Storm was chosen but why... explained here..
+
+Tribler has Twisted integration, we would like to have a manager that supports Twisted...
+First mention of Twisted in Dispersy: \url{https://github.com/Tribler/tribler/issues/129} but was never done.
+Until now.
+
+
+\section{StormDBManager}
+
+Explanation
+
+Architecture...
+
+implementation...
