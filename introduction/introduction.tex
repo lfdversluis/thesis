@@ -1,10 +1,61 @@
 \chapter{Introduction}
 \label{chp:introduction}
 
+% Performance evaluation of software architectures:  http://dl.acm.org/citation.cfm?id=287353
+
+% Experience with Performance Testing of Software Systems: Issues, an Approach, and Case Study: http://search.proquest.com/docview/195577700?pq-origsite=gscholar
+
+% The Future of Software Performance Engineering: http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=4221619&tag=1
+
+% Performance Regression Testing Target Prioritization via Performance Risk Analysis: http://opera.ucsd.edu/paper/icse14-perfscope.pdf
+
+% 
+
+Performance is a vital aspect of any deployed system.
+For instance, an increase of 500 milliseconds latency in Google's search results could cause 20\% traffic loss \cite{mayer2009search}. 
+Performance directly affects user experience and job efficiency of developers \cite{huang2014performance}.
+Damaged customer relationships, lost productivity for users, lost revenue, missed market windows, increased costs, failures on deployment or even abandonment of projects can be caused by performance failures \cite{woodside2007future, williams1998performance}.
+The deterioration of performance introduced by changes is often referred to as \emph{performance regression}.
+
+To inspect if performance regression has occurred, performance regression tests can be applied.
+However, these tests are often applied too late, if at all.
+Once performance regression is detected, developers have to spend extra efforts determining what causes said regression \cite{huang2014performance}.
+
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\linewidth]{introduction/images/tribler_screenshot.png}
+	\caption{Screenshot of Tribler v6.5.2.}
+	\label{fig:tribler_screenshot}
+\end{figure}
+
+Tribler is the result of 10 years research, visible in Figure~\ref{fig:tribler_screenshot}.
+Over 100 scientific publications have Tribler in their foundation.
+Tribler can be downloaded free of charge from the Tribler website\footnote{\url{https://www.tribler.org}}.
+It has been downloaded approximately 1.8 million times, has more than two thousand \todo{cite to support this} monthly active users and anticipating more growth in the near future.
+This makes Tribler one of the few research projects that allow researchers to run experimental code \enquote{in the wild} on a large scale.
+
+Using Tribler, users can search for and download content in a complete decentralized way.
+To offer privacy and anonymity, support for anonymous downloads were introduced in 2014 by R. Plak \cite{plak2014anonymous} and R. Tanaskoski \cite{tanaskoski2014anonymous}.
+In 2015, the support for anonymous seeding of torrents using Tor-like hidden services was added by R. Ruigrok \cite{ruigrok2015bittorrent}.
+While it is communicated to the user that increased anonymity yields reduced download speed, Tribler is currently performing poorly.
+User reports of high CPU usage, low downloads speeds, even with anonymity disabled, and high I/O rates are hampering Tribler's performance. 
+
+The focus of this thesis is to improve Tribler's performance by making use of \emph{software performance engineering}.
+Software performance engineering is defined as: \enquote{... the entire collection of software engineering activities and related analyses used throughout the software development cycle, which are directed to meeting performance requirements} (Woodside et al. 2007) \cite{woodside2007future}.
+
+The rest of this thesis is structured as follows.
+Chapter~\ref{chp:problem-description} provides the problem description and the research questions this thesis attempts to answer.
+Chapter~\ref{cpt:related_work} presents related work on the subjects overlapping this thesis work.
+Chapter~\ref{cpt:pythons_thread_model} explains the python threading module and why parallel programming in Python is different from a language such as Java. Additionally, the subjects of multi-threaded performance and asynchrony are covered.
+Chapter~\ref{implementation_and_experiments} presents the implementation details and experimental results of this work.
+Finally, Chapter~\ref{cpt:conclusion_and_future_work} concludes this thesis and provides future work.
+
+\section{old text}
 Experiments are at the hearth of science.
 This understanding was introduced by Sir Isaac Newton in his revolutionary work \emph{hilosophiae naturalis principia mathematica}.
 Newton reasoned that researchers are to test their hypothesis with observable, measurable and empirical experiments.
 To this day, this approach is applied by many researchers.
+
 Especially in the area of Computer Science, it is key to provide empirical proof that a hypothesis one ought to prove holds.
 This empirical proof often manifests itself in the form of benchmarking.
 By benchmarking several programs/algorithms or different versions of the same program/algorithm on a variety of workloads, one can observe if there are notable changes in predefined metrics such as time or memory consumption.
@@ -26,13 +77,6 @@ Products such as YouTube, FaceBook and Wikipedia have millions or even billions 
 Here, speed plays a key role: an increase of 500ms latency could reduce Google's traffic by 20\% \cite{mayer2009search}.
 
 \section{Tribler}
-
-\begin{figure}
-	\includegraphics[width=\linewidth]{introduction/images/tribler_screenshot.png}
-	\caption{Screenshot of Tribler v6.5.2.}
-	\label{fig:tribler_screenshot}
-\end{figure}
-
 
 Tribler is a research platform for self organizing systems and online cooperation.
 All research is embedded in the Tribler BitTorrent client, visible in Figure~\ref{fig:tribler_screenshot}.
