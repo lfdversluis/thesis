@@ -34,6 +34,7 @@ Concretely, this means that resolving the vital bottlenecks yields the best dimi
 This principle holds even for large systems such as Tribler.
 
 After careful scrutiny it was decided that the most vital bottleneck to address, within the context of a nine month thesis, is Tribler's database I/O.
+
 \section{Tribler's database dependency}
 
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user experience. 
@@ -66,7 +67,7 @@ In May 2014 efforts were made to reduce this enormous amount of I/O and after ba
 
 So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
 iotop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014} (Johan Pouwelse, 2014).
-Measurements to observe to which extent Dispersy is responsible for these numbers were never conducted, however it is strongly suspected Dispersy performs the most I/O.
+Measurements to observe to which extent Dispersy is responsible for these numbers were never conducted, however it is strongly suspected by the Tribler developers that Dispersy is responsible for most of it.
 Since 2014 no work or measurements have been done related to this issue.
 
 \begin{figure}[!h]
@@ -104,6 +105,8 @@ There are no metrics on the current situation of Tribler and it's hard if not im
 
 \section{A lack of software performance engineering}
 
+
+Currently, Dispersy is not being maintained.
 
 \begin{figure}[!h]
 		\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/commits_openhub.png}}

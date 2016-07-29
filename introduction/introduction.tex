@@ -11,14 +11,25 @@
 
 % 
 
-Performance is a vital aspect of any deployed system and can directly affects user experience and job efficiency of developers \cite{huang2014performance}.
+Performance is a vital aspect of any deployed system and can directly affects user experience and job efficiency \cite{huang2014performance}.
 For instance, an increase of 500 milliseconds latency in Google's search results could cause 20\% traffic loss \cite{mayer2009search}. 
 The deterioration of performance introduced by changes is often referred to as \emph{performance regression}.
 Damaged customer relationships, lost productivity for users, lost revenue, missed market windows, increased costs, failures on deployment or even abandonment of projects can be the result of performance failures \cite{woodside2007future, williams1998performance}.
 
+Performance regression can have many origins, ranging from expensive function calls to introducing blocking behaviour which causes other functionalities of a program to halt.
+Nowadays, programs are evolving at a rapid speed.
+Code commits to fix bugs, refactor code, enhance or add functionality are pushed to code repositories at a frequent rate.
+As an example, the code repositories of Chrome and Linux receive more than 100 commits per day \cite{huang2014performance}.
+while not being immediately obvious, some of these commits may introduce performance regression.
+
 To inspect if performance regression has occurred, performance regression tests can be applied.
-However, these tests are often applied too late, if at all.
-Once performance regression is detected, developers have to spend extra efforts determining what causes said regression \cite{huang2014performance}.
+These tests are often applied too late, if at all.
+To illustrate the varying amounts for appliances, Huang et al. mention the performing testing interval of MySQL, Linux and Chrome.
+These projects apply performance tests every release, every week and every four revisions, respectively.
+Once performance regression is detected, developers have to spend extra efforts determining what causes said regression.
+
+Preferably performance tests should be executed as frequently and as comprehensively as possible, ideally on a commit basis using multiple loads \cite{woodside2007future}.
+However, as some testing suites take hours or even weeks, this approach is not always feasible.
 
 \begin{figure}[!h]
 	\centering
@@ -37,7 +48,10 @@ Using Tribler, users can search for and download content in a complete decentral
 To offer privacy and anonymity, support for anonymous downloads were introduced in 2014 by R. Plak \cite{plak2014anonymous} and R. Tanaskoski \cite{tanaskoski2014anonymous}.
 In 2015, the support for anonymous seeding of torrents using Tor-like hidden services was added by R. Ruigrok \cite{ruigrok2015bittorrent}.
 While it is communicated to the user that increased anonymity yields reduced download speed, Tribler is currently performing poorly.
-User reports of high CPU usage, low downloads speeds, even with anonymity disabled, and high I/O rates are hampering Tribler's performance. 
+Users frequently report high CPU usage, a non-responsive Graphical User Interface (GUI) and low downloads speeds, even with anonymity disabled.
+Furthermore, Tribler has high I/O rates which has been known since 2013 \cite{pouwelse2014reduce}. 
+
+All these problems are hampering Tribler's performance. 
 
 The focus of this thesis is to improve Tribler's performance by making use of \emph{software performance engineering}.
 Software performance engineering is defined as: \enquote{... the entire collection of software engineering activities and related analyses used throughout the software development cycle, which are directed to meeting performance requirements} (Woodside et al. 2007) \cite{woodside2007future}.
