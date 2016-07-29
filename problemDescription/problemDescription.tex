@@ -105,8 +105,11 @@ There are no metrics on the current situation of Tribler and it's hard if not im
 
 \section{A lack of software performance engineering}
 
-
-Currently, Dispersy is not being maintained.
+Performance regression can have many origins, ranging from expensive function calls to introducing blocking behaviour which causes other functionalities of a program to halt.
+Nowadays, programs are evolving at a rapid speed.
+Code commits to fix bugs, refactor code, enhance or add functionality are pushed to code repositories at a frequent rate.
+As an example, the code repositories of Chrome and Linux receive more than 100 commits per day \cite{huang2014performance}.
+while not being immediately obvious, some of these commits may introduce performance regression.
 
 \begin{figure}[!h]
 		\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/commits_openhub.png}}
@@ -120,6 +123,7 @@ The distribution of commits can be seen in Figure~\ref{fig:commits_openhub}.
 
 Recently, a major refactoring has been done on Tribler's code base and there is more to come.
 It is important that the performance is not compromised by these changes, if any it should improve.
+
 
 Currently there is a lack of performance engineering... no performance regression testing... not many github tickets related to performance....
 
@@ -137,6 +141,7 @@ Currently there is a lack of performance engineering... no performance regressio
 
 For the past 3 years there as been limited success in profiling Tribler and creating performance regression tests: \url{https://github.com/Tribler/tribler/issues/6}. 
 
+\todo{talk about the need for continuous regression testing.}
 
 \section{Realistic benchmarks}
 Directly related to the performance problem is the benchmark problem.
