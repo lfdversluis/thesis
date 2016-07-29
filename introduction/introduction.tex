@@ -30,17 +30,24 @@ These situations can lead to lost revenue and possibly missed market windows.
 Other consequences may be lost productivity for users, increased costs, failures on deployment or even abandonment of projects can be the result of performance failures \cite{woodside2007future, williams1998performance}.
 
 To inspect if performance regression has occurred, performance regression tests can be applied.
+Using regression tests, the system is tested for performance regression under various loads\cite{woodside2007future}.
 However, these tests are often applied too late, if at all.
-To illustrate the varying amounts for appliances, Huang et al. mention the performing testing interval of MySQL, Linux and Chrome.
+Traditional software development focusses on correctness, introducing performance issues in the long run.
+This approach is often called the \enquote{fix-it-later} approach.
+This causes regression testing to be applied at a late stage of the development cycle.
+To illustrate the varying amounts of regression testing appliances, Huang et al. mention the performing testing interval of MySQL, Linux and Chrome.
 These projects apply performance tests every release, every week and every four revisions, respectively.
-Once performance regression is detected, developers have to spend extra efforts determining what causes said regression, especially when a lot of changes have been applied since the last measurement.
-
-
+Once performance regression is detected, developers have to spend extra efforts determining what causes said regression, especially when a lot of changes have been applied since the last measurement \cite{huang2014performance}.
 Performance tests should be executed as frequently and as comprehensively as possible, ideally on a commit basis using multiple loads \cite{woodside2007future}.
 However, as some testing suites take hours or even weeks, this approach is not always feasible.
 
-\emph{Software performance engineering} (SPE) \enquote{provides a systematic, quantitative approach to constructing software systems that meet performance  objectives} (Smith et al. 2003) \cite{smith2003best}. 
-In SPE, the 
+\emph{Software performance engineering} (SPE) is the discipline concerned with construction software systems that meet performance objectives \cite{smith2003best}.
+It prescribed principles for creating responsive software, methods to to obtain performance specifications and offers guidelines for the types of evaluations to be conducted at each development stage.
+SPE features two general approaches \cite{woodside2007future}.
+The first approach is purely measurement based.
+This characterizes itself by applying regression tests, diagnosis and tuning late in the development cycle, when the system can be run and measured in real-time.
+The second approach features a model-based style.
+Using this approach, performance models are created at the early stages of development, adjusting the architecture and design of the system to meet performance requirements.
 
 \begin{figure}[!h]
 	\centering
@@ -58,11 +65,9 @@ This makes Tribler one of the few research projects that allow researchers to ru
 Using Tribler, users can search for and download content in a complete decentralized way.
 To offer privacy and anonymity, support for anonymous downloads were introduced in 2014 by R. Plak \cite{plak2014anonymous} and R. Tanaskoski \cite{tanaskoski2014anonymous}.
 In 2015, the support for anonymous seeding of torrents using Tor-like hidden services was added by R. Ruigrok \cite{ruigrok2015bittorrent}.
-Currently, Tribler has serious performance problems
-Users frequently report high CPU usage, a non-responsive Graphical User Interface (GUI) and low downloads speeds, even with anonymity disabled.
-Furthermore, Tribler has high I/O rates which has been known since 2013 \cite{pouwelse2014reduce}. 
-
-All these 
+Currently, Tribler has serious performance problems.
+Users frequently report high CPU usage, a non-responsive Graphical User Interface (GUI) and low downloads speeds.
+Furthermore, Tribler is plagued with high I/O rates which has been known since 2013 \cite{pouwelse2014reduce}. 
 
 The focus of this thesis is to improve Tribler's performance by making use of \emph{software performance engineering}.
 Software performance engineering is defined as: \enquote{... the entire collection of software engineering activities and related analyses used throughout the software development cycle, which are directed to meeting performance requirements} (Woodside et al. 2007) \cite{woodside2007future}.
