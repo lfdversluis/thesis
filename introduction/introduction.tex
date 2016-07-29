@@ -13,8 +13,8 @@
 
 Performance is a make-or-break quality for software.
 The cost of a software product is determined more by how well it achieves its objectives for quality attributes such as performance than by its functionality \cite{smith2003software}.
-Performance can be divided in two dimensions: responsiveness and scalability.
 
+Performance can be divided in two dimensions: responsiveness and scalability.
 Responsiveness is the ability of a system to meet the requirements for response time or throughput.
 It can be measured by how fast a system can respond to an event or how many events can be processed in a set amount of time.
 Scalability is the ability of a system to meet the required response time or throughput when faced with a growing demand of its software functions.
@@ -22,32 +22,29 @@ Scalability is the ability of a system to meet the required response time or thr
 Performance plays an important role in both industrial and academic areas.
 For instance, an increase of 500 milliseconds latency in Google's search results could cause 20\% traffic loss \cite{mayer2009search}.  
 The deterioration of performance introduced by changes is often referred to as \emph{performance regression}.
-Performance regression can lead to several undesired consequences.
-Damaged customer relationships can be the result of software not meeting its required performance.
-Huang et al. provide the example of MySQL where an e-commerce website saw an increase of 2000\% in their page loading times because of a switch from MySQL 4.1 to 5.0 \cite{huang2014performance}.
-This made the website almost unusable.
+Performance regression can lead to several undesired consequences such as damaged customer relationships which in turn can be the result of software not meeting its required performance.
+Huang et al. provide the example of an e-commerce website that saw an increase of 2000\% in their page loading times because of an update to the underlying database engine \cite{huang2014performance}.
 These situations can lead to lost revenue and possibly missed market windows.
-Other consequences may be lost productivity for users, increased costs, failures on deployment or even abandonment of projects can be the result of performance failures \cite{woodside2007future, williams1998performance}.
+Other consequences of performance failures may express themselves in lost productivity for users, increased costs, failures on deployment or even abandonment of projects \cite{woodside2007future, williams1998performance}.
 
-To inspect if performance regression has occurred, performance regression tests can be applied.
-Using regression tests, the system is tested for performance regression under various loads\cite{woodside2007future}.
-However, these tests are often applied too late, if at all.
-Traditional software development focusses on correctness, introducing performance issues in the long run.
-This approach is often called the \enquote{fix-it-later} approach.
-This causes regression testing to be applied at a late stage of the development cycle.
+To inspect whether the performance of a system has decreased, performance regression testing can be applied.
+Using this method, the system is tested for performance regression under various loads \cite{woodside2007future}.
+Traditional software development focusses on correctness, causing regression testing to be deferred to a late stage in the development cycle, if applied at all.
+%This approach is often called the \enquote{fix-it-later} approach.
 To illustrate the varying amounts of regression testing appliances, Huang et al. mention the performing testing interval of MySQL, Linux and Chrome.
 These projects apply performance tests every release, every week and every four revisions, respectively.
 Once performance regression is detected, developers have to spend extra efforts determining what causes said regression, especially when a lot of changes have been applied since the last measurement \cite{huang2014performance}.
-Performance tests should be executed as frequently and as comprehensively as possible, ideally on a commit basis using multiple loads \cite{woodside2007future}.
-However, as some testing suites take hours or even weeks, this approach is not always feasible.
+Performance tests should be executed as frequently as possible, ideally per change made by developers.
+However, as some tests take hours or even weeks, this approach is not always feasible.
 
-\emph{Software performance engineering} (SPE) is the discipline concerned with construction software systems that meet performance objectives \cite{smith2003best}.
-It prescribed principles for creating responsive software, methods to to obtain performance specifications and offers guidelines for the types of evaluations to be conducted at each development stage.
-SPE features two general approaches \cite{woodside2007future}.
-The first approach is purely measurement based.
-This characterizes itself by applying regression tests, diagnosis and tuning late in the development cycle, when the system can be run and measured in real-time.
+\emph{Software performance engineering} (SPE) is the discipline concerned with constructing software systems that meet performance objectives \cite{smith2003best}.
+It prescribes principles for creating responsive software, methods to to obtain performance specifications and offers guidelines for the types of evaluations to be conducted at each development stage.
+SPE features two general approaches \cite{woodside2007future} where the first approach is purely measurement based.
+This characterizes itself by performing actions late in the development cycle such as  applying regression tests, diagnosis and tuning, when the system can be run and measured in real-time.
 The second approach features a model-based style.
-Using this approach, performance models are created at the early stages of development, adjusting the architecture and design of the system to meet performance requirements.
+Using this approach, performance models are created at the early stages of development, influencing the architecture and design of the system to meet performance requirements.
+
+\todo{Uitleggen dat performance in centralized architecturen makkelijker is te tunen dan een decentraal systeem + plaatje met verschil}.
 
 \begin{figure}[!h]
 	\centering
@@ -56,21 +53,25 @@ Using this approach, performance models are created at the early stages of devel
 	\label{fig:tribler_screenshot}
 \end{figure}
 
-Tribler is the result of 10 years research, its interface visible in Figure~\ref{fig:tribler_screenshot}.
+Tribler is the result of ten years of scientific research in the field of decentralized networks and online cooperation.
 Over 100 scientific publications have Tribler in their foundation.
-Tribler can be downloaded free of charge from the Tribler website\footnote{\url{https://www.tribler.org}}.
-It has been downloaded approximately 1.8 million times, has more than two thousand \todo{cite to support this} monthly active users and anticipating more growth in the near future.
-This makes Tribler one of the few research projects that allow researchers to run experimental code \enquote{in the wild} on a large scale.
+Tribler is completely open-source and can be downloaded from the Tribler website\footnote{\url{https://www.tribler.org}}.
+Over the course of more than a decade Tribler has gained a tremendous amount of attention in both media and academia.
+It has been downloaded approximately 1.8 million times and has more than two thousand \todo{cite to support this} monthly active users.
+This makes Tribler one of the research projects that allow researchers to run experimental code \enquote{in the wild} on a large scale.
 
-Using Tribler, users can search for and download content in a complete decentralized way.
+One of Tribler's unique features is that it allows users to discover and exchange data in a complete decentralized way.
+
 To offer privacy and anonymity, support for anonymous downloads were introduced in 2014 by R. Plak \cite{plak2014anonymous} and R. Tanaskoski \cite{tanaskoski2014anonymous}.
 In 2015, the support for anonymous seeding of torrents using Tor-like hidden services was added by R. Ruigrok \cite{ruigrok2015bittorrent}.
-Currently, Tribler has serious performance problems.
-Users frequently report high CPU usage, a non-responsive Graphical User Interface (GUI) and low downloads speeds.
-Furthermore, Tribler is plagued with high I/O rates which has been known since 2013 \cite{pouwelse2014reduce}. 
+A trade-off has to be made by Tribler between the desired performance and the level of anonymity provided, as any additional layer of privacy comes with an increased number of cryptographic operations.
 
-The focus of this thesis is to improve Tribler's performance by making use of \emph{software performance engineering}.
-Software performance engineering is defined as: \enquote{... the entire collection of software engineering activities and related analyses used throughout the software development cycle, which are directed to meeting performance requirements} (Woodside et al. 2007) \cite{woodside2007future}.
+Not only anonymity impacts the overall performance of Tribler: architectural flaws introduced in the past have led to a decrease in performance today.
+This manifests itself in users frequently reporting high system load, a non-responsive Graphical User Interface (GUI) and low download speed.
+Furthermore, Tribler is plagued with a high number of disk operations which has been known since 2013 \cite{pouwelse2014reduce}. 
+Its interface visible in Figure~\ref{fig:tribler_screenshot}.
+
+The focus of this thesis is to improve Tribler's performance by making use of software performance engineering techniques with a particular focus on the performance of disk operations and software regression testing.
 
 The rest of this thesis is structured as follows.
 Chapter~\ref{chp:problem-description} provides the problem description and the research questions this thesis attempts to answer.
