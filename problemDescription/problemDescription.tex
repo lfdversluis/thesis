@@ -21,7 +21,7 @@ Most of these project are abandoned and few of them have actual real-world usage
 \end{figure}
 
 The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
-Tribler has no dependency on central service infrastructure, does not need profit or advertisements to generate revenue, and even can function without Internet connectivity. However, especially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
+However, especially the poor performance of Tribler is hampering wide-spread usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
 
 \section{Key performance optimizations}
 
@@ -30,8 +30,7 @@ Metrics from OpenHUB show that Tribler, along with its components, features more
 
 In large and complex systems there are likely to be many performance issue present, often referred to as \emph{bottlenecks}.
 J. M. Juran's Pareto principle admonishes that one should "Concentrate on the vital few, not the trivial many" \cite{ammons2004finding}. This principle is also known as the 80/20 rule.
-Concretely, this means that resolving the vital bottlenecks yields the best diminishing returns.
-This principle holds even for large systems such as Tribler.
+Concretely, this means that resolving the vital bottlenecks yields the best diminishing returns, even for large systems such as Tribler.
 
 After careful scrutiny it was decided that the most vital bottleneck to address, within the context of a nine month thesis, is Tribler's database I/O.
 
@@ -40,7 +39,7 @@ After careful scrutiny it was decided that the most vital bottleneck to address,
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user experience. 
 Measurements dating back from 2014 indicate that Tribler's performance is I/O-bound \cite{pouwelse2014reduce}.
 Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
-With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology ready for large-scale usage and providing a YouTube-like performance. 
+With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology ready for large-scale usage and to provide a YouTube-like performance. 
 
 \begin{figure}[!h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/dispersy_database_schema}}
@@ -77,7 +76,7 @@ Since 2014 no work or measurements have been done related to this issue.
 \end{figure}
 
 \subsection{Blocking I/O}
-The real problem lies in the blocking behaviour of I/O.
+One of the main causes of Tribler's dramatic performance can be explained by the blocking behaviour of I/O.
 Currently, Dispersy is deeply embedded into Tribler, running on the same main thread Tribler is running on.
 A thread performing an I/O operation will block (see Section~\ref{sec:async-programming}).
 This means whenever Dispersy performs I/O all functions of Tribler halt and vice versa.
@@ -93,15 +92,14 @@ These two threads do not saturate the available processing time offered by the m
 In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain like structure \cite{norberhuis2015multichain}.
 This feature heavily relies on its database to store blocks and other information about the user and other peers their chains.
 Moreover, the MultiChain makes use of its own database rather than Dispersy's.
-Norberhuis points out: ``The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.'' \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
+Norberhuis points out: \enquote{The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.} \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
 This makes it hard to estimate Tribler's current I/O rates.
 
-Furthermore, a feature called ``credit mining'' is currently in development that will also interact with the database of Tribler.
+Furthermore, a feature called e\enquote{credit mining} is currently in development that will also interact with the database of Tribler.
 There are no metrics on the current situation of Tribler and it's hard if not impossible to estimate the impact of any addition to come.
 
 %\section{Asynchronous I/O}
 %\label{sec:async-programming}
-
 
 \section{A lack of software performance engineering}
 
@@ -109,7 +107,7 @@ Performance regression can have many origins, ranging from expensive function ca
 Nowadays, programs are evolving at a rapid speed.
 Code commits to fix bugs, refactor code, enhance or add functionality are pushed to code repositories at a frequent rate.
 As an example, the code repositories of Chrome and Linux receive more than 100 commits per day \cite{huang2014performance}.
-while not being immediately obvious, some of these commits may introduce performance regression.
+While not being immediately obvious, some of these commits may introduce performance regression.
 
 \begin{figure}[!h]
 		\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/commits_openhub.png}}
@@ -121,8 +119,12 @@ Since 2005 Tribler is under continuous development.
 Over 17 thousands commits have been made, spanning more than a decade \cite{openhub2016tribler}.
 The distribution of commits can be seen in Figure~\ref{fig:commits_openhub}.
 
-Recently, a major refactoring has been done on Tribler's code base and there is more to come.
+Recently, a major refactoring has been done on Tribler's code base and more intensive refactoring is planned.
 It is important that the performance is not compromised by these changes, if any it should improve.
+
+For the past three years, attempts have been made to monitor the performance, yet all of them have failed.
+The first attempt was to create probes using Systemtap\footnote{\url{https://sourceware.org/systemtap/}}.
+While some success was reported, this system is no longer being maintained nor functional.
 
 
 Currently there is a lack of performance engineering... no performance regression testing... not many github tickets related to performance....
@@ -137,9 +139,6 @@ Currently there is a lack of performance engineering... no performance regressio
 % extreme cpu ticket: https://github.com/Tribler/tribler/issues/197
 % slow startup time ticket: https://github.com/Tribler/tribler/issues/255
 
-\subsection{Failed performance regression attempts}
-
-For the past 3 years there as been limited success in profiling Tribler and creating performance regression tests: \url{https://github.com/Tribler/tribler/issues/6}. 
 
 \todo{talk about the need for continuous regression testing.}
 

@@ -1,7 +1,13 @@
 \chapter{Python's threading model}
 \label{cpt:pythons_thread_model}
 
-\begin{figure}[t!]
+To better understand how we can gain performance by using multiple threads, we first need to better understand Python's threading model and how it runs inside an operating system (OS).
+By looking in depth how the OS and the python interpreter behave, how threads run concurrently and pros and cons of concurrency, we can look into how asynchrony in Tribler can boost the performance.
+This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation.
+
+\section{Threads in Python}
+
+\begin{figure}[!h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{pythonthreading/diagrams/thread_io_release_diagram}}
 	\caption{A schematic view of how threads release the GIL when performing IO in Python.}
 	\label{fig:python_threads_release_gil}
@@ -92,7 +98,7 @@ This degrades the response time of the I/O thread.
 	2	& 1 & 1149 & 3.3M \\ \hline
 	2	& 2 & 1149 & 9.5M \\ \hline
 	\end{tabular}
-	\caption{A summary of the rough measurements from David Beazley \cite{beazley2009inside}.}
+	\caption{A summary of the measurements from David Beazley \cite{beazley2009inside}.}
 	\label{tbl:system_calls_thread_switching}
 \end{table}
 
@@ -100,7 +106,7 @@ This degrades the response time of the I/O thread.
 
 \section{Asynchronous programming}
 
-\begin{figure}
+\begin{figure}[!h]
 	\centering
 	\begin{subfigure}[b]{\textwidth}
 		\includegraphics[width=\textwidth]{problemDescription/images/normal_io_flow.png}
