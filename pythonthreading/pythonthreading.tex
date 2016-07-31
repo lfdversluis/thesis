@@ -1,8 +1,8 @@
 \chapter{Python's threading model}
 \label{cpt:pythons_thread_model}
 
-To better understand how we can gain performance by using multiple threads, we first need to better understand Python's threading model and how it runs inside an operating system (OS).
-By looking in depth how the OS and the python interpreter behave, how threads run concurrently and pros and cons of concurrency, we can look into how asynchrony in Tribler can boost the performance.
+To understand how we can gain performance by using multiple threads, we first need to better understand Python's threading model and how it runs inside an operating system (OS).
+By looking in depth how the OS and the python interpreter behave together, how threads run concurrently and the pros and cons of concurrency, we can look into how asynchrony in Tribler can boost the performance.
 This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation.
 
 \section{Threads in Python}
@@ -18,11 +18,11 @@ Also Python does not have a thread scheduler, threads are fully managed by the o
 In the Python programming language there is a Global Interpreter Lock (GIL).
 This GIL ensures that only one thread can run in the python interpreter at once, i.e. a thread needs to hold the GIL in order to execute.
 This means there cannot be any parallel execution.
-Once a thread is done executing or needs to wait it releases the GIL.
+Once a thread is done executing or needs to wait i.e. \emph{block} it releases the GIL.
 This gives way for cooperative multitasking as visualized in Figure \ref{fig:python_threads_release_gil}.
 Other threads that are ready to execute can try to acquire the GIL, the thread that obtains the GIL is determined by the OS.
 
-To make sure CPU heavy tasks do not hold the GIL indefinitely a simple check mechanism is built in that ``checks'' every thread once per 100 ticks.
+To make sure Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built in that \enquote{checks} every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
 Listing \ref{lst:one_tick} contains two code samples that only take one tick each, but take require different amount of time to compute.
 
@@ -36,13 +36,13 @@ When a check is run the following four steps are executed:
 	\item The thread tries to reacquire the GIL.
 \end{enumerate}
 
-Note that a thread thus may or may not immediately reacquire the GIL after releasing it.
+Note that a thread may immediately reacquire the GIL after releasing it.
 Since every thread has this check, CPU-bound threads will engage in cooperative multitasking.
 
 \section{Multi threaded programming performance}
 \label{sct:multi_theaded_programming_performance}
 
-Since threads cannot run in parallel, this changes the performance one may expect from a multi-threaded program.
+Because threads cannot run in parallel, this changes the performance one may expect from a multi-threaded program.
 Dadiv Beazly presented his findings in his Python Concurrency Workshop (2009) \cite{beazley2009inside}.
 By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased by 185\%.
 Disabling one of his cpu cores yielded an increase of 154\% in run time.
@@ -57,7 +57,7 @@ Often, CPU-bound threads have a low priority and I/O-bound threads a high priori
 If a signal is send to a low priority thread and all CPUs are currently busy processing other, high priority thread, it won't be run until one of the CPUs becomes available.
 
 As it turns out, the GIL signalling is the source of the performance loss.
-Whenever the ``check'' (see the previous Section) in run, the following happens:
+Whenever the \enquote{check} (see the previous Section) in run, the following happens:
 
 \begin{itemize}
 	\item First the Python interpreter locks a mutex.
@@ -69,10 +69,16 @@ Beazley provided rough measurements on the number of system calls generated, sum
 From these numbers Beazley concludes that the overhead generated is significant and the main reason for the performance loss.
 He then dived deeper into these numbers to find a cause.
 
+ \begin{figure}[h]
+ 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{pythonthreading/images/gil_battle_threads}}
+ 	\caption{A schematic view of two threads battling for GIL acquisition (source: David Beazley, 2009).}
+ 	\label{fig:gil_battle_threads}
+ \end{figure}
+
 By recording a real-time trace of all GIL related operations i.e. acquisition, release, etc., Beazley was able to reconstruct what happens.
 When running multiple CPU-bound threads on multiple cores, all of them will be scheduled \emph{simultaneously}.
 The threads proceed to battle over GIL acquisition. 
-Whenever a thread releases the GIL because of the 100 tick ``check'', it immediately tries to reacquire it.
+Whenever a thread releases the GIL because of the 100 tick \enquote{check}, it immediately tries to reacquire it.
 Another thread will also try to acquire the GIL upon this signal, but as this signal arrives with a delay it will most likely fail.
 This processes is visualized by Figure~\ref{fig:gil_battle_threads} (David Beazley, 2009).
 Beazley argues that here two competing goals are clashing.
@@ -82,12 +88,6 @@ This clash raises a lot of overhead, which results in a severe performance penal
 Even when running the threads on one core results in these battles.
 I/O-bound threads which are high priority may fail to acquire the GIL when a CPU-bound thread is busy.
 This degrades the response time of the I/O thread.
-
- \begin{figure}[t!]
- 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{pythonthreading/images/gil_battle_threads}}
- 	\caption{A schematic view of two threads battling for GIL acquisition (source: David Beazley, 2009).}
- 	\label{fig:gil_battle_threads}
- \end{figure}
 
 \begin{table}[]
 	\centering
@@ -102,11 +102,66 @@ This degrades the response time of the I/O thread.
 	\label{tbl:system_calls_thread_switching}
 \end{table}
 
+\section{Attempts to parallelize Python}
+\label{sct:removing_the_gil}
 
+Parallelize Python by removing the GIL and other means to speed up Python are topics that regularly return in the Python mailing list and at PyCon \cite{python2015global}.
+Throughout the years many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPUs.
+To date, no one has succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
+
+On of the most well-known alternative implementations of Python is PyPy.
+It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
+By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a highly compatibility with existing python code \cite{pypy2016pypy}.
+PyPy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
+While it has many popular libraries ported to be used with PyPy, it still lacks some common used packages.
+Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian, making it unusable for the Tribler project.
+
+Two other popular implementations are JPython and IronPython.
+Both these projects have removed the GIL and can fully exploit multiprocessor systems \cite{python2015global}.
+
+JPython is a Python interpreter implemented in Java. It can be integrated in Java applications and allows python applications to be compiled into Java classes.
+Using JPython, Python after compiled to java bytecode will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
+
+IronPython does basically the same as JPython, compiling the source to in-memory bytecode and runs it on the Dynamic Language Runtime \cite{ironpython2014}.
+It allows developers to run Python using the .NET framework.
+
+To illustrate the attempts to remove the GIL are still on going, Larry Hastings presented \enquote{The Gilectomy} at PyCon 2016.
+He showed that removing the GIL is fairly easy, but has a huge negative impact on CPython's performance, cache misses being the main reason.
+Additionally, Hastings names some methods that may make The Gilectomy a viable alternative to CPython.\\
+
+Libraries that introduce parallelism are also available in large numbers.
+In particular, many projects exist that attempt to make I/O asynchronous \cite{asyncio2016python}.
+Often, these leverage the multiprocessing package in the standard library of Python.
+
+Decorated Concurrency (DECO) uses the multiprocessing package of Python to parallelize functions using a \enquote{concurrent} decorator \cite{sherman2016deco}.
+Different processes have their own Python interpreter which in turn has its own GIL, which allows for parallel processing.
+Using the \enquote{concurrent} decorator, a function will be wrapped and executed on a new process.
+Similarly, the \enquote{synchronized}  inserts synchronization events to automatically refactor assignments of the results of \enquote{concurrent} function calls to happen during synchronization events.
+However, because of the overhead creating a new process generates and communicating between different processes, this approach is only viable for heavy loads that generally can run on its own.
+The authors mention that a function should at least have an execution time of one millisecond for this method to be beneficial.
 
 \section{Asynchronous programming}
 
 \begin{figure}[!h]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\linewidth]{pythonthreading/diagrams/normal_execution_flow}}
+	\caption{Synchronous processing of tasks}
+	\label{fig:normal_execution_flow}
+\end{figure}
+
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\linewidth]{pythonthreading/diagrams/delays_in_execution}}
+	\caption{Tasks will be waiting when disk or network has to catch up.}
+	\label{fig:delays_in_execution}
+\end{figure}
+
+A second option it to make use of asynchronous programming to gain performance.
+Traditionally, synchronous programs execute tasks one by one as visualized in Figure\ref{fig:normal_execution_flow}.
+When these functions perform an I/O operation, they are waiting for the disk or network to catch up, visualized in Figure~\ref{fig:delays_in_execution}.
+In turn, the thread these functions run on will block, see Figure~\ref{fig:normal_io_flow}.
+This means the main thread of a program will block if the I/O call happens on that thread.
+A synchronous program that performs I/O operations regularly will therefore spend much of its time blocked waiting for disk or network to catch up.
+
+\begin{figure}[t]
 	\centering
 	\begin{subfigure}[b]{\textwidth}
 		\includegraphics[width=\textwidth]{problemDescription/images/normal_io_flow.png}
@@ -124,22 +179,94 @@ This degrades the response time of the I/O thread.
 	\caption{A schematic overview of a how an I/O call is handled in a synchronous versus an asynchronous manner.}
 \end{figure}
 
+In asynchronous programming, tasks are split into multiple chunks and executed interleaved, see Figure~.
+The fundamental idea behind this approach is that when faced with a task that would normally block waiting for I/O, it will instead execute some other task that can still make progress.
+This approach can outperform a synchronous program dramatically.
+
+Support for asynchrony in python 2.7 is poor so the use of a framework is required.
+Tribler makes use of Twisted, an event-driven networking engine written in Python \todo{cite naar Twisted pagina} which allows for event-driven and asynchronous programming.
+
+%Deferreds are place holders for values that are still being computed.
+%Twisted has a custom event-loop called the reactor, on which tasks can be scheduled.
+%This reactor handles callbacks/errbacks fired by deferreds and contains many utility functions and classes to perform asynchronous and non-blocking calls.
+%Unlike many libraries and frameworks available, Twisted is available on the official repositories of Ubuntu and Debian and is a well tested, mature framework.
+
 %The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking I/O calls with asynchronous, non-blocking I/O. 
 
-When programming asynchronously, the function that is being called (callee) by a caller returns -- what's called in the Twisted framework -- a deferred.
+When programming asynchronously in Twisted, the function that is being called (callee) returns a deferred.
 A deferred is a place holder for the actual value that the callee eventually will return once its done computing.
-In normal (synchronous) programming, when calling a function that performs an I/O operation, the thread will be waiting for the I/O operation to be completed, see Figure~\ref{fig:normal_io_flow}.
-This means the main loop of a program will block if the I/O call happens on the main thread.
-This wastes valuable CPU cycles if there are no other threads that can continue.
-To ensure we do not block on I/O operations, the I/O can be moved to a separate thread, returning a deferred.
-By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
-This thread can then block while the main thread continues executing other scheduled tasks on the event loop.
-Once the thread is done with its task it can invoke the callback of the deferred, notifying the main thread event loop.
-The event loop will then schedule the processing of the deferred's value and proceed, see Figure~\ref{fig:async_io_flow}.
 
-One of the dangers of asynchronous programming is that during the callee's computation, the caller will also continue executing other (unrelated) tasks.
-This may result in the caller changing values, the callee is dependent on.
+To ensure I/O operations does not block the main thread, the I/O can be moved to a separate thread, returning a deferred.
+By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
+These callbacks are handled by Twisted's event loop.
+This thread can then block while the main thread continues executing other scheduled task.
+Once the thread is done with its task it can invoke the callback of the deferred, notifying Twisted's event loop.
+The event loop will then schedule the continuation of the previous task and proceeds executing the current task if not done yet, see Figure~\ref{fig:async_io_flow}.
+
+\subsection{Drawbacks}
+
+The main drawback of asynchronous programming is that it theoretically makes the structure more complex.
+As any task can run while another task is waiting, one must be careful that the current task does not modify information the waiting task is dependant on.
 Especially when working with databases one needs to make sure that the order of database queries is not different.
 
-A second point of attention is the overhead generated by the asynchronous code.
-As pointed out by previous work, offloading work to multiple threads may actually have a negative impact on performance.
+A second point of attention is the overhead generated when creating multiple threads.
+As pointed out by the previous sections, offloading work to multiple threads may actually have a negative impact on performance.
+
+\subsection{Initial measurements}
+
+\begin{table}[]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		\textbf{Configuration}	& \textbf{I/O Asynchronous} & \textbf{CPU Asynchronous} & \textbf{Network Asynchronous} \\ \hline
+		0	& no & no & no \\ \hline
+		1	& yes & no & no \\ \hline
+		2	& no & no & yes \\ \hline
+		3	& yes & no & yes \\ \hline
+		4	& no & yes & no \\ \hline
+		5	& yes & yes & no \\ \hline
+		6	& no & yes & yes \\ \hline
+		7	& yes & yes & yes \\ \hline
+	\end{tabular}
+	\caption{Overview of which workload is processed asynchronously per run configuration.}
+	\label{tbl:experiment_configuration}
+\end{table}
+
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=0.9\paperwidth]{pythonthreading/images/initial_async_results}}
+	\caption{Results of the initial experiment.}
+	\label{fig:initial_results}
+\end{figure}
+
+To observe if Tribler can benefit from asynchrony, a simplistic yet representing experiment has been conducted.
+As Tribler functions as both a client and a server, CPU, I/O and network tasks are run interchangeably.
+To mimic these workloads, the experiment has been set up as follows. 
+
+First, as Tribler is both a client and a server, six client-server pairs are constructed where each server runs on a separate port.
+Each pair has its own database containing two tables: one for the server to fetch data from and one for the client to insert data into. 
+The table for the server to read from is filled with data beforehand.
+
+Next, the client performs ten requests to the server, representing network traffic.
+Upon receiving the request, the server performs a database query, generating I/O.
+Unique queries are performed to avoid caching or other optimization techniques employed by the database engine that could bias the results.
+Once the results have been fetched from the database, the server will perform several calculations on the data and compress the data using zlib, created a CPU-based load.
+After that, the server returns the compressed data to the client upon which the client decompresses and parses it, generating additional CPU load.
+Finally, the client will insert the data into the database generating additional I/O.
+
+By measuring the time it takes for all client-serve pairs to complete the requests, we can measure the impact when performs one of the three different workloads synchronous versus asynchronous respectively.
+In total there are eight possible configurations, defined in Table~\ref{tbl:experiment_configuration}.
+The results of the experiment are visible in Figure~\ref{fig:initial_results}.
+From this figure we conclude that offloading tasks to separate threads yield a superior performance over the synchronous case. Solely offloading I/O yields the best result: the time required to perform all requests decreased by 22.5\%.
+Offloading all components results in a decrease of 18.0\%, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.
+
+We conclude that Tribler can benefit from asynchronous programming as I/O is the primary bottleneck.
+
+\section{Conclusion}
+
+In this chapter we analysed the python threading model in detail.
+We explained why parallelism is not possible using standard Python and presented numerous initiatives that attempt to change this behaviour.\\
+We investigated the performance behaviour of multi-threaded programs in Python and explained why multiple threads can cause performance regression.
+Additionally, we have shown and repeated experiments conducted by David Beazley to confirm that this performance behaviour is still present in Python 2.7.\\
+Next, we presented the use case of asynchrony in Python and elaborated on its drawbacks.
+Our initial experiment shows that we can indeed gain performance when using asynchrony, answering the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
+Finally, we provided experimental evidence that Python3 will further increase performance using the new GIL that comes with it.
