@@ -1,15 +1,24 @@
 \chapter{Design \& Implementation}
 
-
-
-With the recent addition of the MultiChain there are three distinct database files with three distinct database managers present in the Tribler code base.
+After the initial results and discussion, it was clear that asynchronous I/O would be beneficial to Tribler's performance.
+The next step was to make Dispersy's database I/O asynchronous and non-blocking.
+To ensure a good foundation to build upon without reinventing the wheel, it was key to search for a framework that supports asynchronous I/O.
+This framework will then become the basis of a new database manager.
+With the recent addition of the MultiChain there are three distinct database files with three distinct database managers in the Tribler code base.
 None these database managers are fully documented or tested.
-A proper solution is to merge these three databases files into a single database, controlled by a single database manager.
-This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation.
-Ideally this database manager should handle all communication to and from the database in an asynchronous, non-blocking manner.
-This will yield increased stability and speed, improved maintainability and enhances the productivity of developers.
+A proper solution is to replace these three database managers with the new asynchronous one.
+This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation, yielding increased stability and speed, improved maintainability and enhances the productivity of developers.
 
 \subsection{A new framework}
+
+After careful scrutiny, four potential database frameworks were found: Axiom, Storm, Alchemy and X \todo{fill in}.
+These frameworks were compared on the possibility to use it as an object-relational mapper (ORM), the possibility to query the database using \enquote{raw} queries, support for Twisted integration and the availability in the official repositories of Ubuntu and Debian which is a must.
+The results of this comparison can be found in Table~ \todo{make table.}
+
+
+From this table it is clear that Alchemy and X \todo{replace} are not good fits, neither of them are available in the official repositories of Ubuntu and Debian. Moreover, they did not have support for Twisted integration.
+
+Axiom is a database framework developed by 
 Storm was chosen but why... explained here..
 
 Tribler has Twisted integration, we would like to have a manager that supports Twisted...
@@ -27,7 +36,7 @@ Until now.
 
 StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
 It is developed using the Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
-Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an object-relational mapper (ORM).
+Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an ORM.
 Currently, Storm supports three databases: SQLite, MySQL and PostgreSQL.
 As Dispersy makes use of a SQLite3 database, this was a necessity.
 Additionally, the Storm database framework has integrated support for Twisted and is available on the official repositories of Ubuntu and Debian, making it a good fit for Tribler.
@@ -60,3 +69,37 @@ Explanation
 Architecture...
 
 implementation...
+
+\subsection{Refactoring Dispersy}
+
+As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
+Every caller of this function will need to be recursively updated as well to handle the deferreds being returned.
+By making extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator, approximately 90\% of all Dispersy functions were modified. \todo{Replace 90\% with actual number.}
+\todo{continue story.}
+
+\section{Performance regression using Gumby}
+
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{experimentation/images/send.png}}
+	\caption{A side by side comparison of two \enquote{allchannel} experiment runs. Left the current code base, right asynchronous Dispersy with blocking I/O.}
+	\label{fig:side_by_side_send}
+\end{figure} 
+
+Tribler has an experiment runner framework for Dispersy and Tribler: Gumby.
+Using Gumby, one can specify configurations and scenario files to be executed.
+
+Configuration files specify all the settings needed in order to run an experiment using Gumby.
+The scenario file allows for a carefully timed execution of functions.
+Each line in a scenario file specifies which node executes which function at what time. \todo{Example of such a scenario file? yes/no?}
+Currently, Gumby is being used to run an experiment on the DAS5 super computer\footnote{\url{http://www.cs.vu.nl/das5/}}.
+Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system automatically schedules this experiment to be run.
+
+Using Gumby, statistics such as CPU, memory consumption and I/O are automatically tracked.
+Any additional information that one wishes to track can be logged and parsed using auxiliary post experiment scripts.
+Currently, graphs are being generated in the R programming language using the ggplot2 library.
+
+To obtain a regression testing system, we decided to extend Gumby.
+To obtain the data for comparison, the proposed commits first have to be run inside an experiment using a predetermined scenario and configuration file.
+Once this experiment is done, Jenkins can fetch the data of the last successful experiment run of the current code base.
+Next, using the data from both experiments we generate graphs.
+By creating a side-by-side plot of two graphs using the same scales, developers can immediately see any changes, see Figure~\ref{fig:side_by_side_send}.\todo{Replace the right one with the dispersy async + non-block, should be more of a change.}
