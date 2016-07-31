@@ -1,2 +1,11 @@
 \begin{abstract} %de abstract bevat alleen een korte samenvatting van de inhoud van het onderzoek
-TBD.
+Performance is a make-or-break quality for software.
+When making changes it is essential to ensure no \emph{performance regression} has occurred i.e. the program performs slowly or consumes more resources than previous versions.
+Tribler is the result of ten years scientific research in complex distributed systems.
+Over the course of years Tribler's performance has fallen below acceptable user experience levels.
+All past attempts to gain insight into key performance indicators have failed.
+
+By making use of \emph{software performance engineering}, we address Tribler's dramatic performance.
+We resolve Tribler's blocking synchronous I/O, the main bottleneck, by introducing asynchrony and show that we improve the performance i.e. responsiveness significantly.
+Additionally we implement a regression testing system to prevent the deterioration of performance in the future, making Tribler ready for large scale usage and another decade of research.
+\end{abstract}
