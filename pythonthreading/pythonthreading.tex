@@ -214,6 +214,20 @@ As pointed out by the previous sections, offloading work to multiple threads may
 
 \subsection{Initial measurements}
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		Operating System   	& Ubuntu 15.10 \\
+		Python version		& 2.7.11 \\
+		CPU					& Intel Core i7-2630QM \\ 
+		HDD					& Samsung 850 EVO 500GB  \\ 
+		RAM					& 8 GB DDR3 1600MHz \\
+	\end{tabular}
+	\caption{Specifications of the setup used in the initial CPU/IO/Network experiment}
+	\label{table:setup_initial_experiment}
+\end{table}
+
 \begin{table}[]
 	\centering
 	\begin{tabular}{|c|c|c|c|}
@@ -239,6 +253,7 @@ As pointed out by the previous sections, offloading work to multiple threads may
 \end{figure}
 
 To observe if Tribler can benefit from asynchrony, a simplistic yet representing experiment has been conducted.
+An overview of the system this experiment was is available in Table~\ref{table:setup_initial_experiment}.
 As Tribler functions as both a client and a server, CPU, I/O and network tasks are run interchangeably.
 To mimic these workloads, the experiment has been set up as follows. 
 
@@ -257,9 +272,9 @@ By measuring the time it takes for all client-serve pairs to complete the reques
 In total there are eight possible configurations, defined in Table~\ref{tbl:experiment_configuration}.
 The results of the experiment are visible in Figure~\ref{fig:initial_results}.
 From this figure we conclude that offloading tasks to separate threads yield a superior performance over the synchronous case. Solely offloading I/O yields the best result: the time required to perform all requests decreased by 22.5\%.
-Offloading all components results in a decrease of 18.0\%, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.
-
-We conclude that Tribler can benefit from asynchronous programming as I/O is the primary bottleneck.
+As a Solid State Drive (SSD) was used in this experiment, it is possible that the performance gain when using a hard disk with moving parts would be bigger as read and write operations are slower on such disks.\\
+Offloading all components using asynchronous programming results in a decrease of 18.0\% run time, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.\\
+From these results we conclude that Tribler can benefit from asynchronous programming especially since I/O is the primary bottleneck.
 
 \section{Conclusion}
 
