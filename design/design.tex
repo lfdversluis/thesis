@@ -2,7 +2,8 @@
 
 After the initial results and discussion, it was clear that asynchronous I/O would be beneficial to Tribler's performance.
 The next step was to make Dispersy's database I/O asynchronous and non-blocking.
-To ensure a good foundation to build upon without reinventing the wheel, it was key to search for a framework that supports asynchronous I/O.
+Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
+To ensure a good foundation to build upon without reinventing the wheel, it was key to search for a framework that supports both SQLite (Dispersy's current database system) and asynchronous I/O using Twisted.
 This framework will then become the basis of a new database manager.
 With the recent addition of the MultiChain there are three distinct database files with three distinct database managers in the Tribler code base.
 None these database managers are fully documented or tested.
@@ -11,20 +12,31 @@ This will result in less code to maintain, all logic in one place and easier to 
 
 \subsection{A new framework}
 
-After careful scrutiny, four potential database frameworks were found: Axiom, Storm, Alchemy and X \todo{fill in}.
-These frameworks were compared on the possibility to use it as an object-relational mapper (ORM), the possibility to query the database using \enquote{raw} queries, support for Twisted integration and the availability in the official repositories of Ubuntu and Debian which is a must.
-The results of this comparison can be found in Table~ \todo{make table.}
+\begin{table}[]
+	\centering
+	\caption{An overview which features each of the four frameworks support.}
+	\label{table:database_frameworks_comparison}
+	\begin{tabular}{l|c|c|c|c|}
+		\cline{2-5}
+		& \textbf{Twistar} & \textbf{Storm} & \textbf{Axiom} & \textbf{Alchimia} \\ \hline
+	\multicolumn{1}{|p{4cm}|}{Available in the Debian \& Ubuntu repositories} 	& \xmark & \cmark & \cmark & \xmark \\ \hline
+	\multicolumn{1}{|l|}{Allows \enquote{raw} queries} 							& \cmark & \cmark & \cmark & \cmark \\ \hline
+	\multicolumn{1}{|l|}{Allows an ORM approach} 								& \cmark & \cmark & \cmark & \xmark \\ \hline
+	\multicolumn{1}{|l|}{Framework is mature} 									& \cmark & \cmark & \cmark & \xmark \\ \hline
+	\end{tabular}
+\end{table}
 
 
-From this table it is clear that Alchemy and X \todo{replace} are not good fits, neither of them are available in the official repositories of Ubuntu and Debian. Moreover, they did not have support for Twisted integration.
+After careful scrutiny, four database frameworks that offer integration with Twisted and SQLite were selected: Axiom, Storm, Alchemia and Twistar.
+Next, they were compared on the possibility to use it as an object-relational mapper (ORM), the possibility to query the database using \enquote{raw} queries, its maturity and the availability in the official repositories of Ubuntu and Debian which is a must.
+The results of this comparison can be found in Table~\ref{table:database_frameworks_comparison}.
 
-Axiom is a database framework developed by 
-Storm was chosen but why... explained here..
-
-Tribler has Twisted integration, we would like to have a manager that supports Twisted...
-First mention of Twisted in Dispersy: \url{https://github.com/Tribler/tribler/issues/129} but was never done.
-Until now.
-
+From this table it is clear that Twister and Alchimia are not good fits; neither of them are available in the official repositories of Ubuntu and Debian.
+After comparing Axiom and Storm in better detail the final decision led us to choose Storm.
+The Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
+It features a rich tutorial and documentation, superior to that of Axiom, where new developers joining Tribler will benefit from.
+Additionally, all table creation and updates must explicitly be handled by the developer which is Tribler's and Dispersy's current approach.
+As we favour this enforcement over automatically generated tables, Storm was chosen as the foundation of the new database manager: \enquote{StormDBManager}.
 
 \section{StormDBManager}
 
@@ -35,15 +47,10 @@ Until now.
 \end{figure}
 
 StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
-It is developed using the Storm database framework which is developed by Canonical and featured in several other products such as Launchpad \cite{canonical2011storm}.
-Storm allows for both an old-fashioned database approach using direct SQL statements or to use it as an ORM.
-Currently, Storm supports three databases: SQLite, MySQL and PostgreSQL.
-As Dispersy makes use of a SQLite3 database, this was a necessity.
-Additionally, the Storm database framework has integrated support for Twisted and is available on the official repositories of Ubuntu and Debian, making it a good fit for Tribler.
-Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach.
+Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach in the future.
 
-Since multi-threaded support is severely limited using SQLite3, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
-This worked will be owned by the StormDBManager.
+Since multi-threaded support is severely limited using SQLite, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
+This worker will be owned by the StormDBManager.
 Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
 The system works as follows, visualized in Figure~\ref{fig:storm_db_worker}.
 Fist, a Dispersy function calls the StormDBManager (1).
@@ -64,18 +71,14 @@ It then executes the function (5) and calls the deferred's callback with the res
 After that, the worker proceeds to wait blocking for a new item, or executes the next tuple if present.
 To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will commit or shut down, respectively.
 
-Explanation
-
-Architecture...
-
-implementation...
-
-\subsection{Refactoring Dispersy}
+\subsection{Implementing StormDBManager in Dispersy}
 
 As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
-Every caller of this function will need to be recursively updated as well to handle the deferreds being returned.
+Every caller of this function will need to be transitively updated as well to handle the deferreds being returned.
 By making extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator, approximately 90\% of all Dispersy functions were modified. \todo{Replace 90\% with actual number.}
 \todo{continue story.}
+\todo{add deletion and additions in tribler and dispersy required.}
+\todo{Mention changes in Tribler and gumby too}
 
 \section{Performance regression using Gumby}
 
@@ -89,8 +92,7 @@ Tribler has an experiment runner framework for Dispersy and Tribler: Gumby.
 Using Gumby, one can specify configurations and scenario files to be executed.
 
 Configuration files specify all the settings needed in order to run an experiment using Gumby.
-The scenario file allows for a carefully timed execution of functions.
-Each line in a scenario file specifies which node executes which function at what time. \todo{Example of such a scenario file? yes/no?}
+Scenario file allows for a carefully timed execution of functions; each line in a scenario file specifies which node executes which function at what time. \todo{Example of such a scenario file? yes/no?}
 Currently, Gumby is being used to run an experiment on the DAS5 super computer\footnote{\url{http://www.cs.vu.nl/das5/}}.
 Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system automatically schedules this experiment to be run.
 

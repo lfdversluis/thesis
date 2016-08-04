@@ -42,12 +42,30 @@ Since every thread has this check, CPU-bound threads will engage in cooperative 
 \section{Multi threaded programming performance}
 \label{sct:multi_theaded_programming_performance}
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		Operating System   	& Ubuntu 16.04 LTS \\
+		Python version		& 2.7.12 \\
+		CPU					& Intel Core i5-2410M \\ 
+		HDD					& Samsung 850 EVO 250GB  \\ 
+		RAM					& 8 GB DDR3 1600MHz \\
+	\end{tabular}
+	\caption{Specifications of the setup used during the rerun David Beazly's experiment.}
+	\label{table:rerun_beazily}
+\end{table}
+
 Because threads cannot run in parallel, this changes the performance one may expect from a multi-threaded program.
 Dadiv Beazly presented his findings in his Python Concurrency Workshop (2009) \cite{beazley2009inside}.
-By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased by 185\%.
-Disabling one of his cpu cores yielded an increase of 154\% in run time.
-To investigate this behaviour, Beazley inspected the underlying C code to inspect why he was observing these performance results.
+By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased 24.6 to 45.5 seconds; an increase of 185\%.
+Disabling one of his cpu cores yielded 38.0 seconds, an increase of 154\% in run time.
 
+To confirm this behaviour still exists in the latest version of Python2, we rerun Beazly's experiment.
+The setup used in this experiment can be found in Table~\ref{table:rerun_beazily}.
+Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\%.
+
+To investigate this behaviour, Beazley studied the underlying C code to inspect why he was observing these performance results.
 Whenever a (Python) thread releases the GIL, it sends out a signal.
 The OS then Propagates this signal to other threads which then can attempt to acquire the GIL.
 The lag between thread switching and execution may be significant depending on the OS, according Beazley.
@@ -101,6 +119,29 @@ This degrades the response time of the I/O thread.
 	\caption{A summary of the measurements from David Beazley \cite{beazley2009inside}.}
 	\label{tbl:system_calls_thread_switching}
 \end{table}
+
+\subsection{A new GIL}
+
+To solve the excessive amount of GIL signalling, a new GIL has been introduced in Python 3.2 \cite{beazley2010understanding}.
+Instead of having the 100 ticks \enquote{check}, there is now a global variable.
+A thread will continue running until this variable is set to one, indicating another thread requests to acquire the GIL at which the running thread must release the GIL.
+This means whenever only one thread is running, the variable will never be set (there is no competing thread) and no signalling takes place.
+Whenever another thread is present, it will be in a suspended state as it does not hold the GIL, and starts a 5 milliseconds timeout.
+From here two things can happen: the running thread releases the GIL voluntarily within the timeout (e.g. an I/O operation is performed) at which the other thread can immediately acquire it, or the timeout expires.
+If the timeout expires, the other thread will set the global variable to one and enters another timeout, awaiting a signal that the GIL has been released.
+The running thread will release the GIL, sends out a signal that it has done so and starts a wait period.
+When the other thread acquires the GIL it will send out an acknowledgement to the thread that just released the GIL and starts its computations.
+Finally, the former running thread will now enter a timeout upon receiving the acknowledgement so that it may require the GIL again.
+
+To observe if the new GIL had any better performance Beazley ran the same experiment using Python 3.2 and the results look promising.
+Running the code sequentially, using two threads and using four threads on a quad core MacBook resulted in run times of 11.53, 11.93 and 12.32 second respectively.
+Unfortunately, there are caveats when performing I/O operations using the new GIL.
+Whenever an I/O operation does not block, the thread still releases the GIL which requires the thread to initiate the timeout again to reacquire the GIL.
+Meanwhile CPU bound threads will also attempt to acquire the GIL since it was released, causing stalls.
+Beazley argues that some more work is required on the GIL to get rid of this behaviour, yet expresses that even with the GIL present threads can still deliver excellent performance and programmers still should use threads when appropriate.
+
+Tribler currently runs on Python 2.7 and a considerable amount of work is required to migrate to Python3.
+However, as the new GIL does look promising with respect to blocking I/O it can be noted down as future work.
 
 \section{Attempts to parallelize Python}
 \label{sct:removing_the_gil}
@@ -184,14 +225,7 @@ The fundamental idea behind this approach is that when faced with a task that wo
 This approach can outperform a synchronous program dramatically.
 
 Support for asynchrony in python 2.7 is poor so the use of a framework is required.
-Tribler makes use of Twisted, an event-driven networking engine written in Python \todo{cite naar Twisted pagina} which allows for event-driven and asynchronous programming.
-
-%Deferreds are place holders for values that are still being computed.
-%Twisted has a custom event-loop called the reactor, on which tasks can be scheduled.
-%This reactor handles callbacks/errbacks fired by deferreds and contains many utility functions and classes to perform asynchronous and non-blocking calls.
-%Unlike many libraries and frameworks available, Twisted is available on the official repositories of Ubuntu and Debian and is a well tested, mature framework.
-
-%The challenge we address in this thesis is attempting to remove this performance constraint by replacing all blocking I/O calls with asynchronous, non-blocking I/O. 
+Tribler makes use of Twisted, an event-driven networking engine written in Python \todo{cite naar Twisted pagina} which allows for event-driven and asynchronous programming. 
 
 When programming asynchronously in Twisted, the function that is being called (callee) returns a deferred.
 A deferred is a place holder for the actual value that the callee eventually will return once its done computing.
@@ -271,9 +305,9 @@ Finally, the client will insert the data into the database generating additional
 By measuring the time it takes for all client-serve pairs to complete the requests, we can measure the impact when performs one of the three different workloads synchronous versus asynchronous respectively.
 In total there are eight possible configurations, defined in Table~\ref{tbl:experiment_configuration}.
 The results of the experiment are visible in Figure~\ref{fig:initial_results}.
-From this figure we conclude that offloading tasks to separate threads yield a superior performance over the synchronous case. Solely offloading I/O yields the best result: the time required to perform all requests decreased by 22.5\%.
+From this figure we conclude that offloading tasks to separate threads yield a superior performance over the synchronous case. Solely offloading I/O offers the best result: the time required to perform all requests decreased by 22.5\%.
 As a Solid State Drive (SSD) was used in this experiment, it is possible that the performance gain when using a hard disk with moving parts would be bigger as read and write operations are slower on such disks.\\
-Offloading all components using asynchronous programming results in a decrease of 18.0\% run time, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.\\
+Offloading all components using asynchronous programming results in a decrease of 18.0\% run time, 4.5\% less than only offloading I/O, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.\\
 From these results we conclude that Tribler can benefit from asynchronous programming especially since I/O is the primary bottleneck.
 
 \section{Conclusion}
@@ -282,6 +316,6 @@ In this chapter we analysed the python threading model in detail.
 We explained why parallelism is not possible using standard Python and presented numerous initiatives that attempt to change this behaviour.\\
 We investigated the performance behaviour of multi-threaded programs in Python and explained why multiple threads can cause performance regression.
 Additionally, we have shown and repeated experiments conducted by David Beazley to confirm that this performance behaviour is still present in Python 2.7.\\
-Next, we presented the use case of asynchrony in Python and elaborated on its drawbacks.
+We shortly elaborated on the the new GIL introduced in Python 3.2, which could be a point of future work to improve Tribler's performance.
+Next, we presented the use case of asynchrony in the context of I/O in Python and elaborated on its drawbacks.
 Our initial experiment shows that we can indeed gain performance when using asynchrony, answering the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
-Finally, we provided experimental evidence that Python3 will further increase performance using the new GIL that comes with it.
