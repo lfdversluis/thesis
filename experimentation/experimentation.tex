@@ -4,8 +4,8 @@
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
 In this chapter we elaborate on these experiments and discuss the results. 
 
-\section{Performance analysis}
-To observe the current situation, we have measured Tribler running idle (i.e. no human interaction) for 4 hours.
+\section{Tribler's current state}
+To observe the current situation, we have measured Tribler running idle (i.e. no human interaction) for two hours using iotop.
 For this experiment we run Tribler version 6.6.0-exp1 which is a pre-release of 6.6, because it includes the MultiChain code.
 The hardware used during this experiment can be seen in Table \ref{table:tribler_idle}.
 
@@ -24,13 +24,13 @@ The hardware used during this experiment can be seen in Table \ref{table:tribler
 \end{table}
 
 \begin{figure}[h]
-	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{experimentation/images/htop.png}}
-	\caption{The output of a four hour idle run.}
+	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{experimentation/images/iotop.png}}
+	\caption{The output of a two hour idle run.}
 	\label{fig:htop_io_idle_run}
 \end{figure} 
 
 The results are visible in Figure~\ref{fig:htop_io_idle_run}. \todo{cut unity desktop}
-From these results we observe that Tribler current has an IO of 144 MB/Hour.
+From these results we observe that Tribler current has an IO of 73 MB/Hour.
 
 \section{I/O breakdown}
 

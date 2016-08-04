@@ -10,7 +10,7 @@ None these database managers are fully documented or tested.
 A proper solution is to replace these three database managers with the new asynchronous one.
 This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation, yielding increased stability and speed, improved maintainability and enhances the productivity of developers.
 
-\subsection{A new framework}
+\section{A new framework}
 
 \begin{table}[]
 	\centering
@@ -38,7 +38,7 @@ It features a rich tutorial and documentation, superior to that of Axiom, where 
 Additionally, all table creation and updates must explicitly be handled by the developer which is Tribler's and Dispersy's current approach.
 As we favour this enforcement over automatically generated tables, Storm was chosen as the foundation of the new database manager: \enquote{StormDBManager}.
 
-\section{StormDBManager}
+\subsection{StormDBManager}
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{experimentation/diagrams/storm_db_worker.png}}
@@ -84,7 +84,7 @@ By making extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://tw
 
 \begin{figure}[h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{experimentation/images/send.png}}
-	\caption{A side by side comparison of two \enquote{allchannel} experiment runs. Left the current code base, right asynchronous Dispersy with blocking I/O.}
+	\caption{An example of a side by side comparison of two \enquote{allchannel} experiment runs. Left the current code base, right asynchronous Dispersy with blocking I/O.}
 	\label{fig:side_by_side_send}
 \end{figure} 
 
@@ -92,7 +92,7 @@ Tribler has an experiment runner framework for Dispersy and Tribler: Gumby.
 Using Gumby, one can specify configurations and scenario files to be executed.
 
 Configuration files specify all the settings needed in order to run an experiment using Gumby.
-Scenario file allows for a carefully timed execution of functions; each line in a scenario file specifies which node executes which function at what time. \todo{Example of such a scenario file? yes/no?}
+Scenario files allow for a carefully timed execution of functions; each line in a scenario file specifies which nodes execute which function at what time. \todo{Example of such a scenario file? yes/no?}
 Currently, Gumby is being used to run an experiment on the DAS5 super computer\footnote{\url{http://www.cs.vu.nl/das5/}}.
 Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system automatically schedules this experiment to be run.
 
@@ -100,8 +100,9 @@ Using Gumby, statistics such as CPU, memory consumption and I/O are automaticall
 Any additional information that one wishes to track can be logged and parsed using auxiliary post experiment scripts.
 Currently, graphs are being generated in the R programming language using the ggplot2 library.
 
-To obtain a regression testing system, we decided to extend Gumby.
-To obtain the data for comparison, the proposed commits first have to be run inside an experiment using a predetermined scenario and configuration file.
-Once this experiment is done, Jenkins can fetch the data of the last successful experiment run of the current code base.
-Next, using the data from both experiments we generate graphs.
+To realize a regression testing system, we decided to extend Gumby with additional functionalities and scripts.
+First the proposed commits first have to be run inside an experiment using a predetermined scenario and configuration file.
+This will produce data about the changes made to the codebase.
+Once this experiment is done, Jenkins can fetch the performance data of the current code base, which we can compare against.
+To create a comparison that requires little effort to interpret, graphs \todo{and tables?} will be generated.
 By creating a side-by-side plot of two graphs using the same scales, developers can immediately see any changes, see Figure~\ref{fig:side_by_side_send}.\todo{Replace the right one with the dispersy async + non-block, should be more of a change.}
