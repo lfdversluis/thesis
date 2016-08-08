@@ -1,6 +1,14 @@
 \chapter{Conclusion and future work}
 \label{cpt:conclusion_and_future_work}
 
+In this thesis we have improved Tribler's performance significantly by making use of software performance engineering.
+We have addressed Tribler's blocking database I/O, its main performance bottleneck, by integrating the Storm database framework into a new database manager: \enquote{StormDBManager}.
+StormDBManager features a complete asynchronous, non-blocking interface for database access while still maintaining a serialized query execution strategy.
+Additionally we have created a regression test system to ensure software performance engineering becomes part of the Tribler development cycle, further maturing the project.
+We have verified both the regression test system and the resolving of the bottlenecks by providing experimental results.
+We believe that with this performance boost and software engineering focus, we have readied Tribler for further years of research and strengthened Tribler's chances on becoming a decentralized alternative for YouTube-like streaming.
+
+
 Future work
 
 \begin{itemize}

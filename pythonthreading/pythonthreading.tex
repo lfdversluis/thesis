@@ -1,8 +1,8 @@
 \chapter{Python's threading model}
 \label{cpt:pythons_thread_model}
 
-To understand how we can gain performance by using multiple threads, we first need to better understand Python's threading model and how it runs inside an operating system (OS).
-By looking in depth how the OS and the python interpreter behave together, how threads run concurrently and the pros and cons of concurrency, we can look into how asynchrony in Tribler can boost the performance.
+Before we can address Tribler's blocking I/O problem, we first need to better understand Python's threading model and how the Python interpreter behaves.
+By looking in depth how the operating system (OS) and the python interpreter behave together, how threads run concurrently and the pros and cons of concurrency, we can look into if asynchrony can boost Tribler's performance.
 This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation.
 
 \section{Threads in Python}
@@ -13,14 +13,13 @@ This allows us to answer the second research question \enquote{Can a system such
 	\label{fig:python_threads_release_gil}
 \end{figure}
 
-Python threads are normal operating system (OS) threads, either POSIX (pthread) or Windows threads \cite{beazley2010understanding, beazley2009inside}.
-Also Python does not have a thread scheduler, threads are fully managed by the operating system that hosts them.
-In the Python programming language there is a Global Interpreter Lock (GIL).
+Python threads are normal OS threads, either POSIX (pthread) or Windows threads \cite{beazley2010understanding, beazley2009inside}.
+Python does not feature a thread scheduler, threads are fully managed by the operating system that hosts them.
+To control thread execution Python features a construct called the Global Interpreter Lock (GIL).
 This GIL ensures that only one thread can run in the python interpreter at once, i.e. a thread needs to hold the GIL in order to execute.
 This means there cannot be any parallel execution.
-Once a thread is done executing or needs to wait i.e. \emph{block} it releases the GIL.
-This gives way for cooperative multitasking as visualized in Figure \ref{fig:python_threads_release_gil}.
-Other threads that are ready to execute can try to acquire the GIL, the thread that obtains the GIL is determined by the OS.
+Once a thread is done executing or needs to block it releases the GIL.
+This gives way for cooperative multitasking as other threads that are ready to execute can try to acquire the GIL, visualized in Figure \ref{fig:python_threads_release_gil}.
 
 To make sure Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built in that \enquote{checks} every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
@@ -63,19 +62,18 @@ Disabling one of his cpu cores yielded 38.0 seconds, an increase of 154\% in run
 
 To confirm this behaviour still exists in the latest version of Python2, we rerun Beazly's experiment.
 The setup used in this experiment can be found in Table~\ref{table:rerun_beazily}.
-Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\%.
+Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\% which is in range of Beazley's observations
 
 To investigate this behaviour, Beazley studied the underlying C code to inspect why he was observing these performance results.
 Whenever a (Python) thread releases the GIL, it sends out a signal.
-The OS then Propagates this signal to other threads which then can attempt to acquire the GIL.
-The lag between thread switching and execution may be significant depending on the OS, according Beazley.
-Most operating systems make use of a priority system for threads. 
-The thread with the highest priority will be scheduled by the OS.
+The OS then propagates this signal to other threads which then can attempt to acquire the GIL.
+The time or \emph{lag} between thread switching and execution may be significant depending on the OS, according Beazley.
+Most operating systems make use of a priority system for threads: the thread with the highest priority will be scheduled by the OS.
 Often, CPU-bound threads have a low priority and I/O-bound threads a high priority.
-If a signal is send to a low priority thread and all CPUs are currently busy processing other, high priority thread, it won't be run until one of the CPUs becomes available.
+If a signal is send to a low priority thread and all CPUs are currently busy processing other, high priority threads, it won't be run until one of the CPUs becomes available.
 
 As it turns out, the GIL signalling is the source of the performance loss.
-Whenever the \enquote{check} (see the previous Section) in run, the following happens:
+Whenever the periodic \enquote{check} runs, the following happens:
 
 \begin{itemize}
 	\item First the Python interpreter locks a mutex.
@@ -84,7 +82,7 @@ Whenever the \enquote{check} (see the previous Section) in run, the following ha
 \end{itemize}
 
 Beazley provided rough measurements on the number of system calls generated, summarized in Table~\ref{tbl:system_calls_thread_switching}.
-From these numbers Beazley concludes that the overhead generated is significant and the main reason for the performance loss.
+From these numbers Beazley concludes that the amount of additional calls generated is significant and the main reason for the performance loss.
 He then dived deeper into these numbers to find a cause.
 
  \begin{figure}[h]
@@ -93,19 +91,18 @@ He then dived deeper into these numbers to find a cause.
  	\label{fig:gil_battle_threads}
  \end{figure}
 
-By recording a real-time trace of all GIL related operations i.e. acquisition, release, etc., Beazley was able to reconstruct what happens.
+By recording a real-time trace of all GIL related operations i.e. acquisition, release, etc., Beazley was able to reconstruct the key problem.
 When running multiple CPU-bound threads on multiple cores, all of them will be scheduled \emph{simultaneously}.
 The threads proceed to battle over GIL acquisition. 
 Whenever a thread releases the GIL because of the 100 tick \enquote{check}, it immediately tries to reacquire it.
 Another thread will also try to acquire the GIL upon this signal, but as this signal arrives with a delay it will most likely fail.
 This processes is visualized by Figure~\ref{fig:gil_battle_threads} (David Beazley, 2009).
 Beazley argues that here two competing goals are clashing.
-On the one hand Python wants to only run one thread at a time and on the other hand the OS wants to schedule as many processes/threads to take advantage of its cores.
+On the one hand Python wants to only run one thread at a time where on the other hand the OS wants to schedule as many processes/threads to take advantage of its multiple core architecture.
 This clash raises a lot of overhead, which results in a severe performance penalty.
 
-Even when running the threads on one core results in these battles.
-I/O-bound threads which are high priority may fail to acquire the GIL when a CPU-bound thread is busy.
-This degrades the response time of the I/O thread.
+Even running threads on one core result in these GIL acquisition battles.
+I/O-bound threads which are high priority may fail to acquire the GIL when a CPU-bound thread is busy, degrading the response time of the I/O thread.
 
 \begin{table}[]
 	\centering
@@ -124,24 +121,24 @@ This degrades the response time of the I/O thread.
 
 To solve the excessive amount of GIL signalling, a new GIL has been introduced in Python 3.2 \cite{beazley2010understanding}.
 Instead of having the 100 ticks \enquote{check}, there is now a global variable.
-A thread will continue running until this variable is set to one, indicating another thread requests to acquire the GIL at which the running thread must release the GIL.
+A thread will continue running until this variable is set to one (1), indicating another thread requests to acquire the GIL at which the running thread must release the GIL.
 This means whenever only one thread is running, the variable will never be set (there is no competing thread) and no signalling takes place.
-Whenever another thread is present, it will be in a suspended state as it does not hold the GIL, and starts a 5 milliseconds timeout.
+Whenever another thread is present, it will be in a suspended state as it does not hold the GIL, and starts a five millisecond timeout.
 From here two things can happen: the running thread releases the GIL voluntarily within the timeout (e.g. an I/O operation is performed) at which the other thread can immediately acquire it, or the timeout expires.
 If the timeout expires, the other thread will set the global variable to one and enters another timeout, awaiting a signal that the GIL has been released.
 The running thread will release the GIL, sends out a signal that it has done so and starts a wait period.
 When the other thread acquires the GIL it will send out an acknowledgement to the thread that just released the GIL and starts its computations.
 Finally, the former running thread will now enter a timeout upon receiving the acknowledgement so that it may require the GIL again.
 
-To observe if the new GIL had any better performance Beazley ran the same experiment using Python 3.2 and the results look promising.
+To observe if the new GIL has any better performance, Beazley ran the same experiment using Python 3.2 and the results look promising.
 Running the code sequentially, using two threads and using four threads on a quad core MacBook resulted in run times of 11.53, 11.93 and 12.32 second respectively.
 Unfortunately, there are caveats when performing I/O operations using the new GIL.
 Whenever an I/O operation does not block, the thread still releases the GIL which requires the thread to initiate the timeout again to reacquire the GIL.
 Meanwhile CPU bound threads will also attempt to acquire the GIL since it was released, causing stalls.
 Beazley argues that some more work is required on the GIL to get rid of this behaviour, yet expresses that even with the GIL present threads can still deliver excellent performance and programmers still should use threads when appropriate.
 
-Tribler currently runs on Python 2.7 and a considerable amount of work is required to migrate to Python3.
-However, as the new GIL does look promising with respect to blocking I/O it can be noted down as future work.
+Unfortunately, Tribler currently runs on Python 2.7 and a considerable amount of work is required to migrate to Python3.
+However, as the new GIL does look promising with respect to blocking I/O it can be noted down as an item for future work.
 
 \section{Attempts to parallelize Python}
 \label{sct:removing_the_gil}
@@ -152,10 +149,10 @@ To date, no one has succeeded in removing the GIL and meet the (hard) requiremen
 
 On of the most well-known alternative implementations of Python is PyPy.
 It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
-By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a highly compatibility with existing python code \cite{pypy2016pypy}.
+By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a high compatibility with existing python code \cite{pypy2016pypy}.
 PyPy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
 While it has many popular libraries ported to be used with PyPy, it still lacks some common used packages.
-Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian, making it unusable for the Tribler project.
+Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian, rendering PyPy unusable for the Tribler project as publishing Tribler on said repositories requires the dependencies to be available on them as well.
 
 Two other popular implementations are JPython and IronPython.
 Both these projects have removed the GIL and can fully exploit multiprocessor systems \cite{python2015global}.
@@ -170,7 +167,7 @@ To illustrate the attempts to remove the GIL are still on going, Larry Hastings 
 He showed that removing the GIL is fairly easy, but has a huge negative impact on CPython's performance, cache misses being the main reason.
 Additionally, Hastings names some methods that may make The Gilectomy a viable alternative to CPython.\\
 
-Libraries that introduce parallelism are also available in large numbers.
+Libraries that introduce parallelism or asynchrony to gain performance are also available in large numbers.
 In particular, many projects exist that attempt to make I/O asynchronous \cite{asyncio2016python}.
 Often, these leverage the multiprocessing package in the standard library of Python.
 

@@ -5,9 +5,8 @@ To evaluate Tribler's current situation and to validate our implementations are 
 In this chapter we elaborate on these experiments and discuss the results. 
 
 \section{Tribler's current state}
-To observe the current situation, we have measured Tribler running idle (i.e. no human interaction) for two hours using iotop.
-For this experiment we run Tribler version 6.6.0-exp1 which is a pre-release of 6.6, because it includes the MultiChain code.
-The hardware used during this experiment can be seen in Table \ref{table:tribler_idle}.
+To observe if and how the amount of I/O has changed over time, we have performed measurements on four\todo{change if needed} different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
+The hardware used during this experiment can be seen in Table \ref{table:tribler_idle} \todo{Change to VM 15.10 specs}.
 
 \begin{table}[h]
 	\centering
@@ -30,7 +29,7 @@ The hardware used during this experiment can be seen in Table \ref{table:tribler
 \end{figure} 
 
 The results are visible in Figure~\ref{fig:htop_io_idle_run}. \todo{cut unity desktop}
-From these results we observe that Tribler current has an IO of 73 MB/Hour.
+From these results we observe that Tribler I/O has reduced significantly, yet still resides around X\todo{update this}.
 
 \section{I/O breakdown}
 
@@ -40,20 +39,26 @@ From these results we observe that Tribler current has an IO of 73 MB/Hour.
 	\label{table:breakdown_tribler_idle}
 	\begin{tabular}{|l|r|r|l|l|l|}
 		\hline
-	\textbf{Query}	& \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max}  & \textbf{Average} & \textbf{Min} \\ \hline
-	fetchone	& 83036	& 3361.644 	& 0.81436	& 0.04048	& 0.00006 \\ \hline
-	fetchall	& 2569	& 22.512	& 0.66344	& 0.00876	& 0.00007 \\ \hline
-	execute		& 422	& 2.326  	& 0.20488	& 0.00551	& 0.00007 \\ \hline
-	executemany	& 1		& 0.009 	& 0.00915 	& 0.00915	& 0.00915 \\ \hline
+		\textbf{Query}	& \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max}  & \textbf{Average} & \textbf{Min} \\ \hline
+		fetchone	& 83036	& 3361.644 	& 0.81436	& 0.04048	& 0.00006 \\ \hline
+		fetchall	& 2569	& 22.512	& 0.66344	& 0.00876	& 0.00007 \\ \hline
+		execute		& 422	& 2.326  	& 0.20488	& 0.00551	& 0.00007 \\ \hline
+		executemany	& 1		& 0.009 	& 0.00915 	& 0.00915	& 0.00915 \\ \hline
 	\end{tabular}
 \end{table}
 
-To observe the individual components separately, we have created a breakdown the database queries performed by Tribler and Dispersy.
-We have run Tribler idle for one hour on a fresh install and traced how many times each of the five database functions in StormDBManager were being called by either Dispersy or Tribler and how long it takes between scheduling the query and receiving the answer.
-A breakdown of these five functions is visible in Table~\ref{table:breakdown_tribler_idle}.
-From this table we see that the \enquote{fetchone} function is being called the most, accounting almost for the full duration of the experiment; 56 minutes out of the ~60 minutes.
-Previously, this would have been blocking, meaning ~93\% of the time the reactor thread of Tribler would have been blocked.
-This demonstrates the urgency of the problem this thesis addresses. 
+To observe the individual components separately, we have created a breakdown of the database queries performed by Tribler and Dispersy.
+We have run Tribler idle for one hour and tracked how many times each function in StormDBManager was called by either Dispersy or Tribler and how long it takes between scheduling the query the callback being invoked.
+A breakdown of the functions is visible in Table~\ref{table:breakdown_tribler_idle}.
+From this table we see that the \enquote{fetchone} function is being called the most, but what does this mean\todo{change and elaborate}
+
+\section{Tribler's responsiveness}
+
+Performance is defined by responsiveness... we measured responsiveness by measuring how many calls were delayed when running idle... next we performed responsiveness measurements using JMeter on the API introduced in Tribler, measuring throughput AND response times, variance etc. in a table. \todo{todo}
+
+\section{Scalability}
+
+If allchannel works, talk about scalability of nodes. \todo{todo}
 
 \section{Validating the performance regression system}
 

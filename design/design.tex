@@ -10,7 +10,7 @@ None these database managers are fully documented or tested.
 A proper solution is to replace these three database managers with the new asynchronous one.
 This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation, yielding increased stability and speed, improved maintainability and enhances the productivity of developers.
 
-\section{A new framework}
+\section{A new database framework}
 
 \begin{table}[]
 	\centering
@@ -25,7 +25,6 @@ This will result in less code to maintain, all logic in one place and easier to 
 	\multicolumn{1}{|l|}{Framework is mature} 									& \cmark & \cmark & \cmark & \xmark \\ \hline
 	\end{tabular}
 \end{table}
-
 
 After careful scrutiny, four database frameworks that offer integration with Twisted and SQLite were selected: Axiom, Storm, Alchemia and Twistar.
 Next, they were compared on the possibility to use it as an object-relational mapper (ORM), the possibility to query the database using \enquote{raw} queries, its maturity and the availability in the official repositories of Ubuntu and Debian which is a must.
@@ -71,7 +70,7 @@ It then executes the function (5) and calls the deferred's callback with the res
 After that, the worker proceeds to wait blocking for a new item, or executes the next tuple if present.
 To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will commit or shut down, respectively.
 
-\subsection{Implementing StormDBManager in Dispersy}
+\subsection{Introducing StormDBManager in Dispersy}
 
 As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
 Every caller of this function will need to be transitively updated as well to handle the deferreds being returned.
