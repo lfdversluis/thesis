@@ -4,9 +4,29 @@
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
 In this chapter we elaborate on these experiments and discuss the results. 
 
-\section{Tribler's current state}
-To observe if and how the amount of I/O has changed over time, we have performed measurements on four\todo{change if needed} different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
-The hardware used during this experiment can be seen in Table \ref{table:tribler_idle} \todo{Change to VM 15.10 specs}.
+\section{Tribler's I/O over the years}
+As explained earlier, Tribler's I/O has been a problem for years.
+To observe if and how the amount of I/O has changed over time, we have performed measurements on four \todo{change if needed} different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
+The versions and their release dates are depicted in Table~\ref{table:tribler_version_dates}.
+The hardware used during this experiment can be found in Table \ref{table:tribler_idle} \todo{Change to VM 15.10 specs}.
+
+As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
+This will provide valuable insight in Tribler's behaviour and the extent of the problem.
+Moreover it will show us if the amount of I/O is being reduced since the creating of the ticker on GitHub.
+
+\begin{table}[h]
+	\centering
+	\caption{The versions of Tribler and their release dates.}
+	\label{table:tribler_version_dates}
+	\begin{tabular}{|l|l|}
+		\hline
+		Tribler version & Release date \\ \hline
+		6.3.5           &              \\ \hline
+		6.4.3           &              \\ \hline
+		6.5.2           &              \\ \hline
+		6.6.0-exp1      &              \\ \hline
+	\end{tabular}
+\end{table}
 
 \begin{table}[h]
 	\centering
@@ -22,14 +42,28 @@ The hardware used during this experiment can be seen in Table \ref{table:tribler
 	\label{table:tribler_idle}
 \end{table}
 
-\begin{figure}[h]
-	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{experimentation/images/iotop.png}}
-	\caption{The output of a two hour idle run.}
-	\label{fig:htop_io_idle_run}
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\linewidth]{experimentation/images/io_history}
+	\caption{The amount of I/O per version of Tribler.}
+	\label{fig:io_history}
 \end{figure} 
 
-The results are visible in Figure~\ref{fig:htop_io_idle_run}. \todo{cut unity desktop}
-From these results we observe that Tribler I/O has reduced significantly, yet still resides around X\todo{update this}.
+Each version of Tribler will run for one hour idle, using a clean state directory i.e. no prior knowledge of the network and its contents.
+During the idle run, Tribler will start discovering peers and content such as channels and torrents, storing the obtained data in the database which gets flushed to disk.
+Additionally, peers will start requesting data from this Tribler instance such as search and peer exchange requests, causing Tribler to read data from the database.
+These read and writes operations will be monitored by iotop and the amounts automatically accumulated.
+After one hour, the amount of read and write I/O is noted down and Tribler is shutdown.
+
+The results of this experiment are visible in Figure~\ref{fig:io_history}.
+From this figure we observe that Tribler's I/O has reduced significantly in version 6.5.2, yet is climbing again in the latest release due to the MultiChain feature added. 
+
+Additionally, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
+We believe the reason for this is due to the 100 mbit connection of the experiment machine, providing excellent connectability conditions. 
+Secondly, the fact that it began with a clean state directory while running idle, provides ideal conditions for Tribler to spend most of its resources on discovering peers and content.
+
+Finally, we observe that the total amount of I/O the latest version of Tribler is performing is 2598 MB/hour.
+This shows the urgency of the I/O to become asynchronous and non-blocking.
 
 \section{I/O breakdown}
 
@@ -54,15 +88,26 @@ From this table we see that the \enquote{fetchone} function is being called the 
 
 \section{Tribler's responsiveness}
 
-Performance is defined by responsiveness... we measured responsiveness by measuring how many calls were delayed when running idle... next we performed responsiveness measurements using JMeter on the API introduced in Tribler, measuring throughput AND response times, variance etc. in a table. \todo{todo}
+To measure the performance gain of Tribler, we have conducted two sets of experiments where two instances of Tribler, one with the old implementation and one with the asynchronous version of Dispersy, are compared.
+
+In the first experiment we have ran Tribler idle for one hour while querying the Twisted event loop every 100 milliseconds for delayed calls.
+By doing so we can observe if certain tasks have been delayed past their set time of execution i.e. measure the latency in the system.
+
+In the second experiment we have stress-tested Tribler's new API.
+By requesting data from an endpoint at several rates per second, we can observe the throughput, response times, variance in these response times and throughput of Tribler.
+
+\subsection{Measuring the latency of Tribler}
+
+In this experiment we have compared two versions of Tribler, one with Dispersy having  blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
+Each instance of Tribler was run one hour idle where every 100 milliseconds the event loop of Twisted was queried for delayed calls.
+By observing if delayed calls are past their set time of execution, we can measure the amount of latency in the system.
+
+\subsection{Measuring the responsiveness of Tribler}
+
+
 
 \section{Scalability}
 
 If allchannel works, talk about scalability of nodes. \todo{todo}
 
-\section{Validating the performance regression system}
-
-To validate the performance regression system, we have resolved one of Tribler's biggest bottlenecks: Dispersy's blocking database I/O.
-To address this problem, we have written Dispersy's I/O to become asynchronous and non-blocking.
-To realize this, a new database manager \enquote{StormDBManager} is introduced and 90\%\todo{made up number, need to calculate the actual value.} of Dispersy's functions have been refactored.
 

@@ -1,7 +1,7 @@
 \chapter{Problem description}
 \label{chp:problem-description}
 
-Tribler's goal is to offer a YouTube-like experience with similar performance.
+Tribler's goal is to offer a YouTube-like experience with similar performance and ease of use.
 All Tribler's features are implemented in a completely distributed manner, not relying on any centralized component.
 
 Numerous initiatives exist around these goals of re-decentralisation, censorship-resilience, and attack-resilient.
@@ -19,8 +19,8 @@ Most of these project are abandoned and few of them have actual real-world usage
 	\label{fig:tribler_roadmap}
 \end{figure}
 
-The Tribler project created a roadmap to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
-However, especially the poor performance of Tribler is hampering wide-spread adaption and usage. Figure~\ref{fig:tribler_roadmap} shows part of the six main uncompleted roadmap items.
+The Tribler project created a roadmap -- available on its GitHub repository -- to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
+However, especially the poor performance of Tribler is hampering wide-spread adaption and usage. Figure~\ref{fig:tribler_roadmap} shows three of the six main uncompleted roadmap items.
 
 \section{Key performance optimizations}
 
@@ -97,7 +97,7 @@ This makes it hard to estimate Tribler's current I/O rates.
 
 Furthermore, a feature called \enquote{credit mining} is currently in development that will also interact with the database of Tribler.
 There are no metrics on the current situation of Tribler and it's hard if not impossible to estimate the impact of any addition to come.
-One could state there currently is a lack of insight in these metrics, or a lack of \emph{software performance engineering}, causing the exact extent of the problem to be unknown.
+Currently, there is a lack of insight in these metrics, or a lack of \emph{software performance engineering}, causing the exact extent of the problem to be unknown.
 
 %\section{Asynchronous I/O}
 %\label{sec:async-programming}
@@ -111,7 +111,7 @@ One could state there currently is a lack of insight in these metrics, or a lack
 \end{figure}
 
 Nowadays, programs are evolving at a rapid speed and Tribler is no exception. 
-Since 2005 Tribler is under continuous development, over 17 thousands commits have been made, spanning more than a decade \cite{openhub2016tribler}.
+Since 2005 Tribler is under continuous development, over seventeen thousands commits have been made, spanning more than a decade \cite{openhub2016tribler}.
 The distribution of these commits can be seen in Figure~\ref{fig:commits_openhub}.
 Code commits to fix bugs, refactor code, enhance or add functionality are pushed to code repositories at a frequent rate.
 It is important that software performance engineering is a part of this process: performance should not get compromised by changes, if any it should improve.
@@ -120,13 +120,13 @@ Naturally trade-offs can be made performance wise, but it should be done with a 
 For the past three years, attempts have been made to monitor the performance, yet all of them have failed.
 The first attempt was to create probes using Systemtap\footnote{\url{https://sourceware.org/systemtap/}}.
 While some success was reported, this system is no longer being maintained nor functional.
-After this, a decorators was added to the Dispersy code base to track and log if a function was running longer than a fixed amount of time.
-While this implementation does provide some insight, it workings are crude and only covering some of the functions present.
+After this, code was added to the Dispersy code base to track and log if a function was running longer than a fixed amount of time.
+While this implementation does provide some insight, its workings are crude and only covering some of the functions present.
 For instance, it cannot handle asynchronous constructions.
 Tribler did not have any observation system integrated, leaving the development team in the dark regarding its performance.
 
-It is clear that there is a lack of software performance engineering. 
-Performance has never been one of the priorities in Tribler's lifetime; only 36 tickets on GitHub are (indirectly) related to performance out of the 648.
+It is apparent that there is a lack of software performance engineering in the development cycle of Tribler.
+Performance has never been one of the priorities in Tribler's lifetime; only 6\% of all tickets on GitHub are (indirectly) related to performance.
 To ensure performance will no longer degrade realistic benchmarks need to be developed which Tribler can be tested with.
 Changes can then be compared against the current codebase, tracking important performance statistics such as the amount of I/O, run time of functions, throughput and responsiveness.
 These benchmarks can then be integrated into a regression testing system which can be integrated in our Jenkins continuous integration system.
@@ -295,7 +295,7 @@ Running an one hour benchmark per change per pull request will severely strain t
 
 \section{Main contributions}
 The main contributions of this thesis are as follows.
-We introduce a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
-Next, to present the working of said system, we present methods to identify bottlenecks in a complex system such as Tribler. 
-We elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
-Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, code quality and performance.
+First, we elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
+We then resolve the vital I/O bottleneck currently present in Tribler using asynchrony and a multi-threaded approach.
+Next, we introduce software performance engineering into Tribler's development process by adding a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
+Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, performance and user experience.

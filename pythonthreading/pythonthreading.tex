@@ -236,8 +236,8 @@ The event loop will then schedule the continuation of the previous task and proc
 
 \subsection{Drawbacks}
 
-The main drawback of asynchronous programming is that it theoretically makes the structure more complex.
-As any task can run while another task is waiting, one must be careful that the current task does not modify information the waiting task is dependant on.
+The main drawback of asynchronous programming is that it makes the structure and execution of a program more complex.
+As any task can run while another task is blocking, one must be careful that the current task does not modify information the blocking task is dependant on.
 Especially when working with databases one needs to make sure that the order of database queries is not different.
 
 A second point of attention is the overhead generated when creating multiple threads.
@@ -283,23 +283,26 @@ As pointed out by the previous sections, offloading work to multiple threads may
 	\label{fig:initial_results}
 \end{figure}
 
-To observe if Tribler can benefit from asynchrony, a simplistic yet representing experiment has been conducted.
-An overview of the system this experiment was is available in Table~\ref{table:setup_initial_experiment}.
+To observe if Tribler can benefit from asynchrony, an experiment has been conducted which replicates Tribler's workload.
+An overview of the system this experiment is available in Table~\ref{table:setup_initial_experiment}.
 As Tribler functions as both a client and a server, CPU, I/O and network tasks are run interchangeably.
 To mimic these workloads, the experiment has been set up as follows. 
 
 First, as Tribler is both a client and a server, six client-server pairs are constructed where each server runs on a separate port.
-Each pair has its own database containing two tables: one for the server to fetch data from and one for the client to insert data into. 
-The table for the server to read from is filled with data beforehand.
+Each pair has its own SQLite database containing two tables: one for the server to fetch data from and one for the client to insert data into. 
+The table for the server to read from is filled with fixed data beforehand.
 
 Next, the client performs ten requests to the server, representing network traffic.
 Upon receiving the request, the server performs a database query, generating I/O.
 Unique queries are performed to avoid caching or other optimization techniques employed by the database engine that could bias the results.
-Once the results have been fetched from the database, the server will perform several calculations on the data and compress the data using zlib, created a CPU-based load.
-After that, the server returns the compressed data to the client upon which the client decompresses and parses it, generating additional CPU load.
+Once the results have been fetched from the database, the server will perform several calculations on the data and compress the data using zlib, creating a CPU-based load.
+After that, the server returns the compressed data to the client upon which it decompresses and parses said data, generating additional CPU load.
 Finally, the client will insert the data into the database generating additional I/O.
 
-By measuring the time it takes for all client-serve pairs to complete the requests, we can measure the impact when performs one of the three different workloads synchronous versus asynchronous respectively.
+By measuring the time it takes for all client-serve pairs to complete the requests, we can measure the impact when processing the three different workloads (CPU, I/O and network) synchronously versus asynchronously.
+To perform these task asynchronously, the Twisted framework has been used at it currently embedded into Tribler.
+This framework features utilities to offload work to a thread-pool, running the task on a separate thread and taking care of the communication to and from this thread-pool.
+
 In total there are eight possible configurations, defined in Table~\ref{tbl:experiment_configuration}.
 The results of the experiment are visible in Figure~\ref{fig:initial_results}.
 From this figure we conclude that offloading tasks to separate threads yield a superior performance over the synchronous case. Solely offloading I/O offers the best result: the time required to perform all requests decreased by 22.5\%.
