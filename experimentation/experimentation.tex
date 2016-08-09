@@ -1,14 +1,28 @@
 \chapter{Experimental results}
 \label{cpt:experiments}
 
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		OS   				& Ubuntu 15.10 \\
+		Python version		& 2.7.10 \\
+		CPU					& 1 Core with 4 processors (2.5 GHz each) \\ 
+		HDD					& 25 GB  \\ 
+		RAM					& 8 GB  \\
+	\end{tabular}
+	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\label{table:virtual_machine_specs}
+\end{table}
+
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
 In this chapter we elaborate on these experiments and discuss the results. 
+All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table\ref{table:virtual_machine_specs}.
 
 \section{Tribler's I/O over the years}
 As explained earlier, Tribler's I/O has been a problem for years.
 To observe if and how the amount of I/O has changed over time, we have performed measurements on four \todo{change if needed} different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
 The versions and their release dates are depicted in Table~\ref{table:tribler_version_dates}.
-The hardware used during this experiment can be found in Table \ref{table:tribler_idle} \todo{Change to VM 15.10 specs}.
 
 As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
 This will provide valuable insight in Tribler's behaviour and the extent of the problem.
@@ -21,25 +35,11 @@ Moreover it will show us if the amount of I/O is being reduced since the creatin
 	\begin{tabular}{|l|l|}
 		\hline
 		Tribler version & Release date \\ \hline
-		6.3.5           &              \\ \hline
-		6.4.3           &              \\ \hline
-		6.5.2           &              \\ \hline
-		6.6.0-exp1      &              \\ \hline
+		6.3.5           & 2014-11-06   \\ \hline
+		6.4.3           & 2015-01-21   \\ \hline
+		6.5.2           & 2016-05-13   \\ \hline
+		6.6.0-exp1      & 2016-07-26   \\ \hline
 	\end{tabular}
-\end{table}
-
-\begin{table}[h]
-	\centering
-	\begin{tabular}{l|l}
-		\textbf{Component} 	& \textbf{Specifications} \\ \hline
-		Operating System   	& Ubuntu 16.04 LTS \\
-		Python version		& 2.7.12 \\
-		CPU					& Intel Core i5-2410M \\ 
-		HDD					& Samsung 850 EVO 250GB  \\ 
-		RAM					& 8 GB DDR3 1600MHz \\
-	\end{tabular}
-	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
-	\label{table:tribler_idle}
 \end{table}
 
 \begin{figure}[!h]
@@ -88,7 +88,7 @@ From this table we see that the \enquote{fetchone} function is being called the 
 
 \section{Tribler's performance}
 
-To measure the performance gain of Tribler, we have conducted two sets of experiments where two instances of Tribler, one with the old implementation and one with the asynchronous version of Dispersy, are compared.
+To measure the performance gain of Tribler, we have conducted two sets of experiments where two instances of Tribler, one with a synchronous, blocking Dispersy implementation and one with the asynchronous, non-blocking version of Dispersy, are compared.
 
 In the first experiment we have ran Tribler idle for one hour while querying the Twisted event loop every 100 milliseconds for delayed calls.
 By doing so we can observe if certain tasks have been delayed past their set time of execution i.e. measure the latency in the system.
@@ -97,6 +97,20 @@ In the second experiment we have stress-tested Tribler's new API.
 By requesting data from an endpoint at several rates per second, we can observe the throughput, response times, variance in these response times and throughput of Tribler.
 
 \subsection{Measuring the latency of Tribler}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{l|l}
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		Operating System   	& Ubuntu 16.04 LTS \\
+		Python version		& 2.7.12 \\
+		CPU					& Intel Core i5-2410M \\ 
+		HDD					& Samsung 850 EVO 250GB  \\ 
+		RAM					& 8 GB DDR3 1600MHz \\
+	\end{tabular}
+	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\label{table:tribler_idle}
+\end{table}
 
 In this experiment we have compared two versions of Tribler, one with Dispersy having  blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
 Each instance of Tribler was run one hour idle where every 100 milliseconds the event loop of Twisted was queried for delayed calls.
@@ -177,6 +191,8 @@ If we plot the theoretical, asynchronous and the synchronous throughput we obtai
 As we can see the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
 At this point Tribler starts to show signs of being overloaded, which is also visible in the Table~\ref{table:responsiveness_tribler_load} when looking at the amount of responses received per second.
 Nonetheless, this demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput up to 150\%.
+
+\todo{Maybe plot the response times over time? per request Async should be more smooth. I could also create a comparison graph and show this in the performance regression chapter?}
 
 \section{Scalability}
 
