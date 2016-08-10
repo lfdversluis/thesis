@@ -144,17 +144,20 @@ Examples of this is checking out the current version of Tribler using git and ru
 Additionally, Jenkins can automatically run jobs on defined events such as commits pushed to a pull request or a new pull request being opened on the GitHub repository.
 
 At the start of this thesis, Jenkins would only run unit tests on a Linux server.
-To be able to run tests on all major platforms Tribler supports, three additional servers were setup running Windows 32-bit, Windows 64-bit and Mac OSX (64 bit), respectively.
+To be able to run tests on all major platforms Tribler supports, three additional servers were set up running Windows 32-bit, Windows 64-bit and OS X Yosemite, respectively.
 After these were deployed a code coverage and pylint checker job were added which track how much of the code has been tested and if the code adheres the PEP8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} code style, respectively.
 When either the code coverage drops or the pylint check fails, the build is marked as failed, safeguarding deterioration of the code base.
 
-To further improve Tribler's development process, we have created a job that runs a \todo{speicfy which} benchmark and added it to the \enquote{GH\_Tribler\_PR} MultiJob.
+To further improve Tribler's development process, we have created a job \todo{maybe give it a name to reference it?} that runs a \todo{speicfy which} benchmark and added it to the \enquote{GH\_Tribler\_PR} MultiJob.
 This \enquote{GH\_Tribler\_PR} MultiJob runs whenever a user pushes a commit to an open pull request, forces a rerun or opens a new pull request on GitHub.
 Whenever this performance regression job, or any other of the mentioned checks, fails -- indicating performance regression has occured -- the \enquote{GH\_Tribler\_PR} is marked as failed.
 The author of the pull request can then inspect which checks have failed and adjust the proposed code modifications as needed.
 
+To compare the output of the job  above with the current code base, we have created a separate job that runs the current code base of Tribler daily using the same experiment.
+Next, we command Jenkins to fetch the data from this job so we can create a comparison graph and table depicting changes between the outputs of each job.
+
+To make sure the build server can process all jobs in parallel without running out of resources, each server has a specific amount of slots defined.
 In Jenkins, every job that is running takes up a slot on a build server.
-To make sure the build server can process all tasks in parallel without running out of resources, each server has a specific amount of slots defined.
 To avoid allocating too many slots at once, the \enquote{GH\_Tribler\_PR} MultiJob consists of three phases:
 
 \begin{enumerate}
@@ -165,8 +168,6 @@ To avoid allocating too many slots at once, the \enquote{GH\_Tribler\_PR} MultiJ
 
 As our benchmark falls under experiments, we decided to add our job to the third phase.
 Figure~ \todo{maak plaatje met 3 stages} visualizes the three phases of the \enquote{GH\_Tribler\_PR} MultiJob.
-
-\todo{vertel ook dat jenkins makkelijk data van andere jobs kan pakken om mee te vergelijken}
 
 \subsection{Multiple platforms}
 
