@@ -1,7 +1,6 @@
 #Tex
 *.log
 *.aux
-*.pdf
 *.bbl
 *.blg
 *.out
