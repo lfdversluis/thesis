@@ -106,6 +106,8 @@ I/O-bound threads which are high priority may fail to acquire the GIL when a CPU
 
 \begin{table}[]
 	\centering
+	\caption{A summary of the measurements from David Beazley \cite{beazley2009inside}.}
+	\label{tbl:system_calls_thread_switching}
 	\begin{tabular}{|l|l|l|l|}
 		\hline
 	\textbf{Threads}	& \textbf{Cores} & \textbf{Unix system calls} & \textbf{Mach system calls} \\ \hline
@@ -113,8 +115,6 @@ I/O-bound threads which are high priority may fail to acquire the GIL when a CPU
 	2	& 1 & 1149 & 3.3M \\ \hline
 	2	& 2 & 1149 & 9.5M \\ \hline
 	\end{tabular}
-	\caption{A summary of the measurements from David Beazley \cite{beazley2009inside}.}
-	\label{tbl:system_calls_thread_switching}
 \end{table}
 
 \subsection{A new GIL}
@@ -222,7 +222,7 @@ The fundamental idea behind this approach is that when faced with a task that wo
 This approach can outperform a synchronous program dramatically.
 
 Support for asynchrony in python 2.7 is poor so the use of a framework is required.
-Tribler makes use of Twisted, an event-driven networking engine written in Python \todo{cite naar Twisted pagina} which allows for event-driven and asynchronous programming. 
+Tribler makes use of Twisted, an event-driven networking engine written in Python which allows for event-driven and asynchronous programming \cite{kinder2005event}. 
 
 When programming asynchronously in Twisted, the function that is being called (callee) returns a deferred.
 A deferred is a place holder for the actual value that the callee eventually will return once its done computing.
@@ -247,6 +247,8 @@ As pointed out by the previous sections, offloading work to multiple threads may
 
 \begin{table}[h]
 	\centering
+	\caption{Specifications of the setup used in the initial CPU/IO/Network experiment}
+	\label{table:setup_initial_experiment}
 	\begin{tabular}{l|l}
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
 		Operating System   	& Ubuntu 15.10 \\
@@ -255,12 +257,12 @@ As pointed out by the previous sections, offloading work to multiple threads may
 		HDD					& Samsung 850 EVO 500GB  \\ 
 		RAM					& 8 GB DDR3 1600MHz \\
 	\end{tabular}
-	\caption{Specifications of the setup used in the initial CPU/IO/Network experiment}
-	\label{table:setup_initial_experiment}
 \end{table}
 
 \begin{table}[]
 	\centering
+	\caption{Overview of which workload is processed asynchronously per run configuration.}
+	\label{tbl:experiment_configuration}
 	\begin{tabular}{|c|c|c|c|}
 		\hline
 		\textbf{Configuration}	& \textbf{I/O Asynchronous} & \textbf{CPU Asynchronous} & \textbf{Network Asynchronous} \\ \hline
@@ -273,8 +275,6 @@ As pointed out by the previous sections, offloading work to multiple threads may
 		6	& no & yes & yes \\ \hline
 		7	& yes & yes & yes \\ \hline
 	\end{tabular}
-	\caption{Overview of which workload is processed asynchronously per run configuration.}
-	\label{tbl:experiment_configuration}
 \end{table}
 
 \begin{figure}[h]

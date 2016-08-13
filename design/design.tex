@@ -46,20 +46,21 @@ As we favour this enforcement over automatically generated tables, Storm was cho
 	\label{fig:storm_db_worker}
 \end{figure}
 
-StormDBManager features a complete asynchronous and non-blocking interface to handle database access.
+StormDBManager features a complete asynchronous, non-blocking yet serialized interface to handle database access.
 Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach in the future.
 
 Since multi-threaded support is severely limited using SQLite, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
 This worker will be owned by the StormDBManager.
 Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
+Furthermore, the StormDBManager guarantees that queries will be executed in the same order as they are scheduled, guaranteeing no conflicts in database fields can occur because of race conditions.
 The system works as follows, visualized in Figure~\ref{fig:storm_db_worker}.
-Fist, a Dispersy function calls the StormDBManager (1).
+Fist, a Dispersy function calls the StormDBManager to run a query (1).
 The StormDBManager generates a deferred and returns this to the caller (2).
 Next, the StormDBManager queues a tuple of four elements (3):
 
 \begin{enumerate}
 	\item The function to be called, e.g. execute or fetchone.
-	\item The arguments to be passed to the function.
+	\item The arguments to be passed to the function i.e. the query.
 	\item The keyword arguments to be passed to the function.
 	\item A deferred to handle the response in an asynchronous way.
 \end{enumerate}
@@ -75,8 +76,36 @@ To make sure the worker can still commit or release the thread, two predetermine
 
 As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
 Every caller of this function will need to be transitively updated as well to handle the deferreds being returned.
-By making extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator, approximately 90\% of all Dispersy functions were modified. \todo{Replace 90\% with actual number.}
-\todo{continue story.}
-\todo{add deletion and additions in tribler and dispersy required.}
-\todo{Mention changes in Tribler and gumby too}
-\todo{Also add how many fetchones, selects etc there are.}
+
+\begin{figure}[h]
+	\begin{subfigure}[b]{.5\linewidth}
+		\lstinputlisting[caption={Foo synchronous},label={lst:foo_sync},language=Python]{design/listings/foo_sync.py}
+	\end{subfigure}
+	\begin{subfigure}[b]{.5\linewidth}
+		\lstinputlisting[caption={Foo asynchronous},label={lst:foo_async},language=Python]{design/listings/foo_async.py}
+	\end{subfigure}
+	\caption*{Example of the same function synchronous and asynchronous.}
+\end{figure}
+
+To keep the amount of changes to a minimum we have made extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator.
+The inlineCallbacks decorator allows programmers to write asynchronous code in a synchronized manner.
+To illustrate this in an example, consider the two code samples of the same function called \enquote{foo} in Listings \ref{lst:foo_sync} and \ref{lst:foo_async}.
+The left listing shows the synchronous version of foo calling a function \enquote{bar} which for example performs a database query.
+After refactoring bar to make use of the \enquote{StormDBManager} it will become asynchronous, returning a deferred.
+To handle this, we can need to update foo to cope with this.
+The right listing shows the refactored version of foo; it is decorated with the inlineCallbacks decorator and has now a \enquote{yield} statement in front of the bar function call.
+Twisted automatically waits for bar's deferred to fire and then continues with the execution.
+
+Consequentially, because of the inlineCallbacks decorator, foo is now an asynchronous function as well, returning a deferred whenever called.
+As a result all functions that call foo needs to be updated transitively as well.
+
+In total there are 129 function calls to Dispersy's database (excluding tests): 26 fetchall, 29 execute, 53 fetchone, 2 insert, 9 executescript, 10 executemany.
+There functions were spread across X methods which all needed to be refactored transitively as with the example provided previously.
+After Dispersy was fully refactored, 47 files were modified with 4605 lines of additions and 2003 of deletion.
+To express the extent of this refactoring, approximately 90\% of all Dispersy functions were updated to handle the asynchrony introduced.
+Naturally Tribler also required modifications; in total 106 files required modifications spanning 3572 additions and 1242 deletions to the code base.
+Finally, an experiment framework called Gumby (see Section~\ref{sct:gumby_introduction}) required modifications as well, resulting more than eleven thousand modified lines of code spanning more than six months of work.
+
+
+
+\todo{Replace 90\% with actual number.}

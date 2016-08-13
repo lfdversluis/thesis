@@ -70,7 +70,7 @@ Measurements to observe to which extent Dispersy is responsible for these number
 Since 2014 no work or measurements have been done related to this issue.
 
 \begin{figure}[!h]
-	\makebox[\textwidth][c]{\includegraphics[width=0.95\paperwidth]{iointribler/images/iotop}}
+	\makebox[\textwidth][c]{\includegraphics[width=0.9\paperwidth]{iointribler/images/iotop}}
 	\caption{A screenshot of htop showing Tribler's I/O, (source: Johan Pouwelse, 2014 \cite{pouwelse2014reduce}).}
 	\label{fig:iotop_tribler_april_2014}
 \end{figure}
@@ -86,8 +86,8 @@ With the enormous amount of I/O Tribler is performing, this forms a huge limitin
 When a thread suspends, other threads can take over and perform operations, yet besides the main thread there are only two additional threads in Tribler: the Graphical User Interface (GUI) thread and the Dispersy endpoint thread.
 As the name implies, the GUI is running on the GUI thread as the framework Tribler currently uses requires this.
 Ironically, the Dispersy endpoint thread was introduced because of the blocking I/O behaviour.
-Under heavy load, Dispersy would drop packets because it could not keep up.
-As processing is done on the main thread and this frequently blocks the buffers would overflow, causing packet loss.
+Under heavy load, Dispersy drops packets because it cannot keep up.
+As processing is done on the main thread and this frequently blocks because of the I/O, the buffers overflow causing packet loss.
 These two threads do not saturate the available processing time offered by the main thread blocking, leading to wasting valuable CPU cycles.
 
 In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain like structure \cite{norberhuis2015multichain}.

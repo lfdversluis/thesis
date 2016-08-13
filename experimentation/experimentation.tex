@@ -3,6 +3,8 @@
 
 \begin{table}[h]
 	\centering
+	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\label{table:virtual_machine_specs}
 	\begin{tabular}{l|l}
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
 		OS   				& Ubuntu 15.10 \\
@@ -11,8 +13,6 @@
 		HDD					& 25 GB  \\ 
 		RAM					& 8 GB  \\
 	\end{tabular}
-	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
-	\label{table:virtual_machine_specs}
 \end{table}
 
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
@@ -56,35 +56,76 @@ These read and writes operations will be monitored by iotop and the amounts auto
 After one hour, the amount of read and write I/O is noted down and Tribler is shutdown.
 
 The results of this experiment are visible in Figure~\ref{fig:io_history}.
-From this figure we observe that Tribler's I/O has reduced significantly in version 6.5.2, yet is climbing again in the latest release due to the MultiChain feature added. 
+From this figure we observe that Tribler's I/O has been reduced significantly in version 6.5.2.
+This decrease was the result of batching multiple database queries and periodically flush them to disk, an effective optimization technique also applied in other work \cite{ouyang2011beyond, lin2009database}. 
+Furthermore we observe the amount of I/O is increasing again in the latest 6.6.0-exp1 release due to the MultiChain feature added. 
 
-Additionally, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
-We believe the reason for this is due to the 100 mbit connection of the experiment machine, providing excellent connectability conditions. 
-Secondly, the fact that it began with a clean state directory while running idle, provides ideal conditions for Tribler to spend most of its resources on discovering peers and content.
-
-Finally, we observe that the total amount of I/O the latest version of Tribler is performing is 2598 MB/hour.
-This shows the urgency of the I/O to become asynchronous and non-blocking.
-
-\section{I/O breakdown}
+Peculiarly, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
+We believe the reason two reasons contribute to these numbers.
+The first one is due to the 100 mbit connection of the experiment machine, providing excellent connectability conditions. 
+Secondly, the fact that this instance began with a clean state directory while running idle, provides ideal conditions for Tribler to spend most of its resources on discovering peers and content.
 
 \begin{table}[]
 	\centering
-	\caption{A breakdown of the functions called on StormDBManager.}
+	\caption{The packets collected for each version by Tribler when running idle for one hour using a clean state directory.}
+	\label{table:packets_collected_idle}
+	\begin{tabular}{|l|l|l|}
+		\hline
+		Paket type                         & Tribler version & Amount  \\ \hline
+		\multirow{4}{*}{Dispersy-identity} & 6.3.5           & 20,026  \\ \cline{2-3} 
+		& 6.4.3           & 38,268  \\ \cline{2-3} 
+		& 6.5.2           & 46,890  \\ \cline{2-3} 
+		& 6.6.0-exp1      & 41,480  \\ \hline
+		\multirow{4}{*}{Dispersy-undo-own} & 6.3.5           & 40,594  \\ \cline{2-3} 
+		& 6.4.3           & 45,095  \\ \cline{2-3} 
+		& 6.5.2           & 47,409  \\ \cline{2-3} 
+		& 6.6.0-exp1      & 44,279  \\ \hline
+		\multirow{4}{*}{votecast}          & 6.3.5           & 44,990  \\ \cline{2-3} 
+		& 6.4.3           & 90,339  \\ \cline{2-3} 
+		& 6.5.2           & 116,557 \\ \cline{2-3} 
+		& 6.6.0-exp1      & 96,509  \\ \hline
+	\end{tabular}
+\end{table}
+
+To observe the cost versus the benefits, we have tracked the amount of packets Tribler managed to synchronize while running one hour idle using a clean state directory for each version.
+The results are visible in Table~\ref{table:packets_collected_idle}.
+From this table we conclude that while version 6.3.5 and 6.4.3 perform much more I/O, the amount of packets obtained is significantly less.
+From these numbers we this conclude that the cost of having high I/O rates is not justified by the benefits as they perform even worse. 
+Interestingly, the numbers of the latest 6.6.0-exp1 version are similar to that of 6.4.3, while we cannot explain this fully, we believe it may be caused by external network conditions or the MultiChain feature.
+
+In conclusion, we believe that the I/O rate of Tribler does not show a correlation with the amount of packets synchronized. As the I/O rate of Tribler rises again in the latest version, possibly because of the MultiChain feature requiring additional computations, it shows the urgency of the I/O to become asynchronous and non-blocking.
+
+\section{I/O breakdown}
+
+\begin{table}[h]
+	\centering
+	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\label{table:tribler_idle}
+	\begin{tabular}{l|l}
+		\hline
+		\textbf{Packet type}	& \textbf{Amount} \\ \hline
+		Operating System   	& Ubuntu 16.04 LTS \\
+		Python version		& 2.7.12 \\
+		CPU					& Intel Core i5-2410M \\ 
+		HDD					& Samsung 850 EVO 250GB  \\ 
+		RAM					& 8 GB DDR3 1600MHz \\
+	\end{tabular}
+\end{table}
+
+\begin{table}[]
+	\centering
+	\caption{A breakdown of the Dispersy database function calls when running Tribler idle for one hour using a clean state directory.}
 	\label{table:breakdown_tribler_idle}
 	\begin{tabular}{|l|r|r|l|l|l|}
 		\hline
 		\textbf{Query}	& \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max}  & \textbf{Average} & \textbf{Min} \\ \hline
-		fetchone	& 83036	& 3361.644 	& 0.81436	& 0.04048	& 0.00006 \\ \hline
-		fetchall	& 2569	& 22.512	& 0.66344	& 0.00876	& 0.00007 \\ \hline
-		execute		& 422	& 2.326  	& 0.20488	& 0.00551	& 0.00007 \\ \hline
-		executemany	& 1		& 0.009 	& 0.00915 	& 0.00915	& 0.00915 \\ \hline
+		execute			& 1,099,211	& 36.068 	& 0.24959	& 0.00003	& 0.00001 \\ \hline
+		commit			& 65	& 11.089	& 1.12432	& 0.17061	& 0.00001 \\ \hline
+		executemany		& 4282	& 0.233  	& 0.00071	& 0.00005	& 0.00001 \\ \hline
 	\end{tabular}
 \end{table}
 
-To observe the individual components separately, we have created a breakdown of the database queries performed by Tribler and Dispersy.
-We have run Tribler idle for one hour and tracked how many times each function in StormDBManager was called by either Dispersy or Tribler and how long it takes between scheduling the query the callback being invoked.
-A breakdown of the functions is visible in Table~\ref{table:breakdown_tribler_idle}.
-From this table we see that the \enquote{fetchone} function is being called the most, but what does this mean\todo{change and elaborate}
+To observe the individual components separately, we have created a breakdown of the database queries performed by Dispersy. \todo{Run this experiment on the ubuntu 15.10 machine.}
 
 \section{Tribler's performance}
 
@@ -98,21 +139,14 @@ By requesting data from an endpoint at several rates per second, we can observe 
 
 \subsection{Measuring the latency of Tribler}
 
-\begin{table}[h]
+\begin{figure}[!h]
 	\centering
-	\begin{tabular}{l|l}
-		\textbf{Component} 	& \textbf{Specifications} \\ \hline
-		Operating System   	& Ubuntu 16.04 LTS \\
-		Python version		& 2.7.12 \\
-		CPU					& Intel Core i5-2410M \\ 
-		HDD					& Samsung 850 EVO 250GB  \\ 
-		RAM					& 8 GB DDR3 1600MHz \\
-	\end{tabular}
-	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
-	\label{table:tribler_idle}
-\end{table}
+	\includegraphics[width=\linewidth]{experimentation/images/ecdf_latency_idle}
+	\caption{An ECDF plot of the latency when running Tribler idle.}
+	\label{fig:ecdf_latency_idle}
+\end{figure} 
 
-In this experiment we have compared two versions of Tribler, one with Dispersy having  blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
+In this experiment we have compared two versions of Tribler, one with Dispersy having blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
 Each instance of Tribler was run one hour idle where every 100 milliseconds the event loop of Twisted was queried for delayed calls.
 By observing if scheduled calls are past their set time of execution, we can measure the amount of delay or \emph{latency} in the system.
 Latency occurs when the twisted reactor thread is blocked or busy with a task that takes a relative long time to complete, causing other tasks to become delayed.
@@ -125,18 +159,11 @@ In this experiment the hypothesis is that the latency of the asynchronous versio
 Since Tribler is running idle it has more resources i.e. CPU time available to tend to Dispersy which is running in the background, which most likely will cause the difference to be smaller than when Tribler is experiencing additional load.
 However, we believe the average may still be significant enough to prefer the asynchronous implementation.
 
-\begin{figure}[!h]
-	\centering
-	\includegraphics[width=\linewidth]{experimentation/images/ecdf_latency_idle}
-	\caption{An ECDF plot of the latency when running Tribler idle.}
-	\label{fig:ecdf_latency_idle}
-\end{figure} 
-
 After running the experiment, we have created an empirical cumulative distribution function (ECDF) plot of the delayed calls, visible in Figure~\ref{fig:ecdf_latency_idle}.
 From this figure we observe that the asynchronous version performs better than the synchronous version.
 On average, the synchronous version has a latency of 87 milliseconds, where the asynchronous version has a latency of 66 milliseconds, a difference of 24\%.
-Also, the synchronous case has more outliers, some even crossing the one second mark.
-This performance gain is significant enough to confirm the hypothesis.
+Furthermore, the synchronous case has more outliers, some even touching the one second mark.
+This observations are enough to confirm the hypothesis: both on average and in maxima the latency of the asynchronous version are lower.
 
 \subsection{Measuring the responsiveness of Tribler}
 
@@ -146,7 +173,7 @@ In this experiment we use a state directory containing around 1200 channels.
 By querying Tribler's channel API endpoint for all discovered channels, all channels in the database will be fetched and returned.
 As this is Tribler's heaviest endpoint in terms of computation, it's the best way to put Tribler under load.
 In total the experiment will be run six times, querying the channel endpoint exactly 1000 times per run using 1, 2, 5, 10, 15 and 20 requests per second respectively.
-By tracking the response times, the amount of requests per seconds and the throughput the API can offer, we can measure the gain in responsiveness and thus in performance of Tribler.
+By tracking the response times, the amount of requests per seconds and the throughput the API can offer, we can measure the gain in responsiveness and thus in performance (T) of Tribler.
 We expect that the asynchronous version will outperform the synchronous version significantly in both response times as throughput.
 
 \begin{table}[!h]
@@ -155,7 +182,7 @@ We expect that the asynchronous version will outperform the synchronous version 
 	\label{table:responsiveness_tribler_load}
 	\begin{tabular}{|c|c|c|c|c|c|c|c|}
 		\hline
-		Req./s              & Async. & Avg & Min & Max  & Std. Dev. & Throughput (KB/s) & Responses/s \\ \hline
+		Req./s              & Async. & Avg (ms) & Min & Max & Std. Dev. & T (KB/s) & Resp./s \\ \hline
 		\multirow{2}{*}{1}  & \xmark      & 315 & 53  & 4774 & 615.90    & 564.19            & 0.9         \\ \cline{2-8} 
 		& \cmark      & 134 & 57  & 2576 & 189.89    & 612.60            & 1.0         \\ \hline
 		\multirow{2}{*}{2}  & \xmark       & 237 & 52  & 4524 & 475.31    & 1049.31           & 1.7         \\ \cline{2-8} 
@@ -189,7 +216,7 @@ Another indication that the system has become more responsive is the the standar
 For every run the standard deviation of the asynchronous version is significantly less than its synchronous counterpart, indicating the response times are more stable than the synchronous version. 
 This can be explained by the slicing of tasks because of asynchrony; as tasks are more interleaved, smaller tasks such as a request will be processed in between bigger tasks, yielding a higher and more stable responsivity.
 
-Another promising statistic is the throughput.
+A third promising statistic is the throughput.
 As the response is 613 kilobytes (KB) in size, the theoretical maximum throughput will be 613, 1226, 3065, 6130, 9195 and 12260 KB/s, respectively.
 If we plot the theoretical, asynchronous and the synchronous throughput we obtain Figure~\ref{fig:throughput_requests}.
 As we can see the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
@@ -206,27 +233,23 @@ Even though this means that more responses per second can be provided, percentag
 
 All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput up to 150\%.
 
-\todo{Maybe plot the response times over time? per request Async should be more smooth. I could also create a comparison graph and show this in the performance regression chapter?}
-
 \subsection{Validating the performance regression test system}
 
-To validate the performance regression system, we run the experiment above with 5 requests per second automatically.
+\begin{figure}[!h]
+	\centering
+	\makebox[\textwidth][c]{\includegraphics[width=0.9\paperwidth]{experimentation/images/response_times_comparison.pdf}}
+	\caption{The comparison graph showing the response times of Tribler's API. Left: Tribler running Dispersy with synchronous, blocking I/O, right: Tribler running Dispersy with asynchronous, non-blocking I/O.}
+	\label{fig:tribler_response_times_comparison}
+\end{figure} 
+
+To validate the performance regression system, we run the experiment above with 5 requests per second.
 From the results, Gumby creates a side-by-side comparison graph and a table with an overview of the differences in the data obtained.
 
-Figure~ \todo{todo} shows the comparison graph generated.
+Figure~\ref{fig:tribler_response_times_comparison} shows the comparison graph generated.
 From this figure, it is clear that the left hand side -- showing the current code base -- has higher response times than the right side.
-From this graph it is immediately clear that the proposed changes have a positive impact on the response times.
+From this graph it is immediately clear that the proposed changes have a positive impact on the responsiveness of the API.
 
 To look at the data generated by the benchmark in more detail, the generated table shown in Figure~ \todo{todo} provides a breakdown of the data.
-From this we can see in better detail where the biggest changes lie.
-
-Additionally, Jenkins automatically indicates whether performance regression has occurred on the GitHub pull request.
-These indicators are visible in Figure A and B for a ok and not ok respectively \todo{todo}.
-\todo{Misschien nog een scriptje maken dat faalt as performance in gedropt, een bolletje erbij in Tribler jenkins PR ding?}
-This indicator informs developers without them needing to inspect benchmarks individually.
+This breakdown highlights the average, minimum, maximum and standard deviation in response times as well as the throughput obtained.
 
 From these figures we conclude that the performance regression test system provides a suitable overview for developers to get a quick overview of the current state.
-
-\section{Scalability}
-
-If allchannel works, talk about scalability of nodes. \todo{todo}
