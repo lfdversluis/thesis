@@ -9,9 +9,9 @@
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
 		OS   				& Ubuntu 15.10 \\
 		Python version		& 2.7.10 \\
-		CPU					& 1 Core with four 2.5Ghz processors \\ 
+		CPU					& 1 core with 4x Intel Xeon E5-2450 v2 @2.50GHz \\ 
 		HDD					& 25 GB  \\ 
-		RAM					& 8 GB  \\
+		RAM					& 8 GB 1000 MHz  \\
 	\end{tabular}
 \end{table}
 
@@ -22,7 +22,7 @@ All experiments with the exception of one have been conduction on a virtual priv
 \section{Tribler's I/O over the years}
 As explained in Section~\ref{sct:triblers_database_dependency}, Tribler's I/O has been a problem for years.
 To observe if and how the amount of I/O has changed over time, we have performed measurements on four different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
-The versions and their release dates are depicted in Table~\ref{table:tribler_version_dates}.
+The versions and their release dates are shown in Table~\ref{table:tribler_version_dates}.
 
 As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
 This will provide valuable insight in Tribler's behaviour and the extent of the problem.
@@ -50,7 +50,7 @@ Moreover it will show us if the amount of I/O is being reduced since the creatin
 
 Each version of Tribler will run for one hour idle, using a clean state directory i.e. no prior knowledge of the network and its contents.
 During the idle run, Tribler will start discovering peers and content such as channels and torrents, storing the obtained data in the database which gets flushed to disk.
-Additionally, peers will start requesting data from this Tribler instance such as search and peer exchange requests, causing Tribler to read data from the database.
+Additionally, peers will start requesting data from this Tribler instance such as search and peer exchange requests, causing Tribler to read data from its database.
 These read and writes operations will be monitored by iotop and the amounts automatically accumulated.
 After one hour, the amount of read and write I/O is noted down and Tribler is shutdown.
 
@@ -61,7 +61,7 @@ Furthermore we observe the amount of I/O is increasing again in the latest 6.6.0
 
 Peculiarly, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
 We believe there are two reasons that contribute to these numbers.
-The first reason being to the 100 mbit connection of the experiment machine, providing excellent connectability conditions. 
+The first reason being to the 100 Mbit connection of the experiment machine, providing excellent connectability conditions. 
 The second reason is the fact that this instance began with a clean state directory while running idle.
 This provides ideal conditions for Tribler to spend most of its resources on discovering peers and content.
 
@@ -99,24 +99,43 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[]
 	\centering
-	\caption{A breakdown of the Dispersy database function calls when running Tribler idle for one hour using a clean state directory.}
-	\label{table:breakdown_tribler_idle}
-	\begin{tabular}{|l|r|r|l|l|l|}
+	\caption{The breakdown of Tribler's queries when running Tribler idle for one hour using an empty state directory.}
+	\label{table:query_breakdown_tribler_empty_state_dir}
+	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
-		\textbf{Query}	& \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max}  & \textbf{Average} & \textbf{Min} \\ \hline
-		execute			& 1,099,211	& 36.068 	& 0.24959	& 0.00003	& 0.00001 \\ \hline
-		commit			& 65	& 11.089	& 1.12432	& 0.17061	& 0.00001 \\ \hline
-		executemany		& 4282	& 0.233  	& 0.00071	& 0.00005	& 0.00001 \\ \hline
+		\textbf{Query}     & \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max} & \textbf{Average} & \textbf{Min} \\ \hline
+		fetchall           & 91661                    & 278.319                 & 0.23420      & 0.00304          & 0.00000      \\ \hline
+		execute            & 218818                   & 16.142                  & 0.21455      & 0.00007          & 0.00000      \\ \hline
+		executemany        & 22558                    & 10.414                  & 0.06059      & 0.00046          & 0.00000      \\ \hline
+		update             & 6647                     & 22.542                  & 0.22119      & 0.00339          & 0.00227      \\ \hline
+		insert\_or\_ignore & 18511                    & 50.580                  & 0.16437      & 0.00273          & 0.00000      \\ \hline
+		fetchone           & 87904                    & 273.999                 & 0.21972      & 0.00312          & 0.00196      \\ \hline
 	\end{tabular}
 \end{table}
 
-To observe the impact of each query separately, an infrastructure was created that automatically provides insight into the most expensive, most executed, and longest duration queries. With one million queries per hours, Tribler developers desperately need such a tool.
+\begin{table}[]
+	\centering
+	\caption{The breakdown of Dispersy's queries when running Tribler idle for one hour using an empty state directory.}
+	\label{table:query_breakdown_dispersy_empty_state_dir}
+	\begin{tabular}{|l|l|l|l|l|l|}
+		\hline
+		\textbf{Query} & \textbf{Amount of calls} & \textbf{Total time (s)} & \textbf{Max} & \textbf{Average} & \textbf{Min} \\ \hline
+		commit         & 69                       & 2.758                   & 0.21891      & 0.03998          & 0.00000      \\ \hline
+		execute        & 741633                   & 29.300                  & 0.14197      & 0.00004          & 0.00000      \\ \hline
+		executemany    & 6781                     & 0.309                   & 0.01387      & 0.00005          & 0.00001      \\ \hline
+		executescript  & 3                        & 0.000                   & 0.00001      & 0.00001          & 0.00001      \\ \hline
+	\end{tabular}
+\end{table}
+
+To observe the impact of each query separately, an infrastructure was created that automatically provides insight into the most expensive, most executed, and longest duration queries. 
+With more than one million queries per hour, Tribler developers desperately need such a tool.
 Developers can use this information to directly dive into the relevant source code and test possible improvements.
 To get insight into Tribler's current query statistics, we have run two versions of Tribler for one hour using an empty state directly and a filled state directory containing 100,000 torrents and roughly 1200 channels discovered.
 Such a filled state directory is quite common for regular Tribler users as their discover the network and its contents.
 Additionally we marked 10 channels as favourite, meaning Tribler will attempt to discover all content within these channels.
 Using our tool, we generated a breakdown of the database queries performed by both Tribler and Dispersy for both runs.
-The breakdown of Tribler's database queries can be found in Table~ and Table~ , whereas the breakdown of Dispersy's queries can be found in Table~ and Table~. \todo{Run this experiment on the ubuntu 15.10 machine.}
+The breakdown of Tribler's database queries can be found in Table~\ref{table:query_breakdown_tribler_empty_state_dir} and Table~ , showing the breakdown of running Tribler idle for one hour with an empty and a filled state directory, respectively.
+The breakdown of Dispersy's queries can be found in Table~\ref{table:query_breakdown_dispersy_empty_state_dir} and Table~. \todo{Run this experiment on the ubuntu 15.10 machine.}
 
 From these breakdowns we observe that Tribler's database I/O has an enormous impact on Tribler's performance.
 In the first experiment with an empty state directory, Dispersy generated X seconds worth of I/O using X queries in total. 
@@ -276,7 +295,14 @@ Figure~\ref{fig:tribler_response_times_comparison} shows the comparison graph ge
 From this figure, it is clear that the left hand side -- showing the current code base -- has higher response times than the right side.
 From this graph it is immediately clear that the proposed changes have a positive impact on the responsiveness of the API.
 
-To look at the data generated by the benchmark in more detail, the generated table shown in Figure~ \todo{todo} provides a breakdown of the data.
-This breakdown highlights the average, minimum, maximum and standard deviation in response times as well as the throughput obtained.
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\linewidth]{experimentation/images/table_changes}
+	\caption{The generated table depicting changes between the current and modified code base.}
+	\label{fig:compare_table}
+\end{figure} 
+
+To look at the data generated by the benchmark in more detail, developers can look at the table generated by the regression test system, visible in Figure~\ref{fig:compare_table}.
+This breakdown presents the average, minimum, maximum and standard deviation in response times as well as the throughput and amount of responses per second obtained.
 
 From these figures we conclude that the performance regression test system provides a suitable overview for developers to get a quick overview of the current state.

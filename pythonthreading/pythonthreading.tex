@@ -201,7 +201,7 @@ In turn, the thread these functions run on will block, see Figure~\ref{fig:norma
 This means the main thread of a program will block if the I/O call happens on that thread.
 A synchronous program that performs I/O operations regularly will therefore spend much of its time blocked waiting for disk or network to catch up.
 
-\begin{figure}[t]
+\begin{figure}[h]
 	\centering
 	\begin{subfigure}[b]{\textwidth}
 		\includegraphics[width=\textwidth]{problemDescription/images/normal_io_flow.png}
@@ -219,9 +219,15 @@ A synchronous program that performs I/O operations regularly will therefore spen
 	\caption{A schematic overview of a how an I/O call is handled in a synchronous versus an asynchronous manner.}
 \end{figure}
 
-In asynchronous programming, tasks are split into multiple chunks and executed interleaved, see Figure~ \todo{todo}.
-The fundamental idea behind this approach is that when faced with a task that would normally block waiting for I/O, it will instead execute some other task that can still make progress.
-This approach can outperform a synchronous program dramatically.
+\begin{figure}[h]
+	\makebox[\textwidth][c]{\includegraphics[width=0.6\linewidth]{pythonthreading/diagrams/async_execution}}
+	\caption{Tasks will be executed interleaved when made asynchronous.}
+	\label{fig:async_execution}
+\end{figure}
+
+In asynchronous programming, tasks are split into multiple chunks and executed interleaved, see Figure~\ref{fig:async_execution}.
+The fundamental idea behind this approach is that when faced with a task that would normally block waiting for I/O, it will instead execute some other task that can still make progress, saving valuable time.
+By leveraging this trait, an asynchronous system can outperform a synchronous program considerably.
 
 Support for asynchrony in python 2.7 is poor so the use of a framework is required.
 Tribler makes use of Twisted, an event-driven networking engine written in Python which allows for event-driven and asynchronous programming \cite{kinder2005event}.
@@ -240,7 +246,7 @@ The event loop will then schedule the continuation of the previous task and proc
 \subsection{Drawbacks}
 
 The main drawback of asynchronous programming is that it makes the structure and execution of a program more complex.
-As any task can run while another task is blocking, one must be careful that the current task does not modify information the blocking task is dependant on.
+As any task can run while another task is blocking, one must be careful that the current task does not modify information the blocking task is dependent on.
 Especially when working with databases one needs to make sure that the order of database queries is not different.
 
 A second point of attention is the overhead generated when creating multiple threads.
