@@ -2,8 +2,9 @@
 \label{cpt:pythons_thread_model}
 
 Before we can address Tribler's blocking I/O problem, we first need to better understand Python's threading model and how the Python interpreter behaves.
-By looking in depth how the operating system (OS) and the python interpreter behave together, how threads run concurrently and the pros and cons of concurrency, we can look into if asynchrony can boost Tribler's performance.
-This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation.
+By looking in depth how the operating system (OS) and the python interpreter behave together, we can look into how multiple threads can be beneficial to Tribler.
+Additionally we take a look at asynchrony in Python to see if we can apply this to Tribler to gain performance by improving the responsiveness.
+This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation for our blocking I/O problem.
 
 \section{Threads in Python}
 
@@ -43,6 +44,8 @@ Since every thread has this check, CPU-bound threads will engage in cooperative 
 
 \begin{table}[h]
 	\centering
+	\caption{Specifications of the setup used during the rerun David Beazly's experiment.}
+	\label{table:rerun_beazily}
 	\begin{tabular}{l|l}
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
 		Operating System   	& Ubuntu 16.04 LTS \\
@@ -51,8 +54,6 @@ Since every thread has this check, CPU-bound threads will engage in cooperative 
 		HDD					& Samsung 850 EVO 250GB  \\ 
 		RAM					& 8 GB DDR3 1600MHz \\
 	\end{tabular}
-	\caption{Specifications of the setup used during the rerun David Beazly's experiment.}
-	\label{table:rerun_beazily}
 \end{table}
 
 Because threads cannot run in parallel, this changes the performance one may expect from a multi-threaded program.
@@ -145,6 +146,7 @@ However, as the new GIL does look promising with respect to blocking I/O it can 
 
 Parallelize Python by removing the GIL and other means to speed up Python are topics that regularly return in the Python mailing list and at PyCon \cite{python2015global}.
 Throughout the years many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPUs.
+While many attempts are software related, some alternative implementations have been applied to hardware \cite{tabba2010adding}.
 To date, no one has succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
 
 On of the most well-known alternative implementations of Python is PyPy.
@@ -217,12 +219,13 @@ A synchronous program that performs I/O operations regularly will therefore spen
 	\caption{A schematic overview of a how an I/O call is handled in a synchronous versus an asynchronous manner.}
 \end{figure}
 
-In asynchronous programming, tasks are split into multiple chunks and executed interleaved, see Figure~.
+In asynchronous programming, tasks are split into multiple chunks and executed interleaved, see Figure~ \todo{todo}.
 The fundamental idea behind this approach is that when faced with a task that would normally block waiting for I/O, it will instead execute some other task that can still make progress.
 This approach can outperform a synchronous program dramatically.
 
 Support for asynchrony in python 2.7 is poor so the use of a framework is required.
-Tribler makes use of Twisted, an event-driven networking engine written in Python which allows for event-driven and asynchronous programming \cite{kinder2005event}. 
+Tribler makes use of Twisted, an event-driven networking engine written in Python which allows for event-driven and asynchronous programming \cite{kinder2005event}.
+In particular, Twisted is built around event-driven, asynchronous I/O \cite{lefkowitz2003network}.
 
 When programming asynchronously in Twisted, the function that is being called (callee) returns a deferred.
 A deferred is a place holder for the actual value that the callee eventually will return once its done computing.

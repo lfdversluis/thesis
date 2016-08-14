@@ -25,12 +25,7 @@ Just as with their cars users expect software performance to advance or at least
 	\label{fig:facebook_bad_reviews}
 \end{figure}
 
-Performance can be divided in two dimensions: \emph{responsiveness} and \emph{scalability}.
-Responsiveness is the ability of a system to meet the requirements for response time or throughput.
-The response time can be measured by how fast a system can respond to an event, where throughput can be measured by how many events can be processed in a set amount of time.
-Scalability is the ability of a system to meet the required response time or throughput when faced with a growing demand of its software functions.
-
-Performance plays an important role in both industrial and academic areas.
+Interestingly, both industry and academia agree performance plays an important role in software development.
 Smith et al. have shown that the cost of a software product is determined more by how well it achieves its objectives for quality attributes such as performance than by its functionality \cite{smith2003software}.
 For instance, an increase of 500 milliseconds latency in Google's search results could cause 20\% traffic loss \cite{mayer2009search}.  
 The deterioration of performance introduced by changes is often referred to as \emph{performance regression}.
@@ -39,7 +34,12 @@ Huang et al. provide the example of an e-commerce website that saw an increase o
 These situations can lead to lost revenue and possibly missed market windows.
 Other consequences of performance failures may express themselves in lost productivity for users, increased costs, failures on deployment or even abandonment of projects \cite{woodside2007future, williams1998performance}.
 
-To inspect whether the performance of a system has decreased, performance regression testing can be applied.
+Performance can be divided in two dimensions: \emph{responsiveness} and \emph{scalability}.
+Responsiveness is the ability of a system to meet the requirements for response time or throughput.
+The response time can be measured by how fast a system can respond to an event, where throughput can be measured by how many events can be processed in a set amount of time.
+Scalability is the ability of a system to meet the required response time or throughput when faced with a growing demand of its software functions.
+
+To inspect if one of these two dimensions has decreased when changes are made, performance regression testing can be applied.
 Using this method, the system is tested for performance regression under various loads \cite{woodside2007future}.
 Traditional software development focusses on correctness, causing regression testing to be deferred to a late stage in the development cycle, if applied at all.
 %This approach is often called the \enquote{fix-it-later} approach.
@@ -55,8 +55,6 @@ SPE features two general approaches \cite{woodside2007future} where the first ap
 This characterizes itself by performing actions late in the development cycle such as  applying regression tests, diagnosis and tuning, when the system can be run and measured in real-time.
 The second approach features a model-based style.
 Using this approach, performance models are created at the early stages of development, influencing the architecture and design of the system to meet performance requirements.
-
-\todo{Uitleggen dat performance in centralized architecturen makkelijker is te tunen dan een decentraal systeem + plaatje met verschil}.
 
 \begin{figure}[!h]
 	\centering

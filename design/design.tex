@@ -1,7 +1,8 @@
 \chapter{Design \& Implementation}
 
-After the initial results and discussion, it is evident that asynchronous I/O is beneficial to Tribler's performance.
-The next step is to make Dispersy's database I/O asynchronous and non-blocking.
+After the initial results and discussion of asynchrony in python, it is evident that asynchronous I/O is beneficial to Tribler's performance.
+Since almost all of Tribler's I/O operations are database operations, it is key point to focus on.
+This translates itself into making Dispersy's database I/O asynchronous and non-blocking.
 Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
 To ensure a good foundation to build upon without reinventing the wheel, it is key to search for a framework that supports both SQLite (Dispersy's current database system) and asynchronous I/O using Twisted.
 This framework will then become the basis of a new database manager.

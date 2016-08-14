@@ -25,14 +25,14 @@ However, especially the poor performance of Tribler is hampering wide-spread ada
 \section{Key performance optimizations}
 
 Tribler can be seen as a large and complex distributed system.
-Metrics from OpenHUB show that Tribler, along with its components, features more than 169 KLOC, received contributions from 111 unique contributors and took approximately 44 years of effort \cite{openhub2016tribler}.
+Metrics from OpenHUB show that Tribler, along with its components, features more than 169 thousand lines of code, received contributions from 111 unique contributors and took approximately 44 years of effort \cite{openhub2016tribler}.
 
 In large and complex systems there are likely to be many performance issue present, often referred to as \emph{bottlenecks}.
 J. M. Juran's Pareto principle admonishes that one should "Concentrate on the vital few, not the trivial many" \cite{ammons2004finding}. This principle is also known as the 80/20 rule.
 Concretely, this means that resolving the vital bottlenecks yields the best diminishing returns, even for large systems such as Tribler.
 After careful scrutiny it was decided that the most vital bottleneck to address, within the context of a nine month thesis, is Tribler's database I/O.
 
-\section{Tribler's database dependency}
+\section{Addressing blocking I/O}
 \label{sct:triblers_database_dependency}
 
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user experience. 
@@ -264,19 +264,11 @@ The research presented in this thesis was carried out in cooperation with the Tr
 The Tribler team consists of both staff members of the Technical University of Delft as well as Bachelor and Master students.
 Based on the objectives of Tribler, this thesis aims to answer the main research question formulated below.\\
 
-\textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and code base?\\
+\textbf{Main Research Question:} How can we improve Tribler's performance, responsiveness and throughput?\\
 
 To answer this main research question, we have defined three research questions below. Each of these research questions will be justified as why they contribute to the main research question.\\
 
-\textbf{Research Question 1:} How can we identify bottlenecks in a complex system such as Tribler?\\
-
-Software projects such as Tribler are often dependent on libraries i.e. third party code and combine several components or modules to form a program.
-To improve the performance of such a system, one needs to be able to identify bottlenecks.
-Bottlenecks are parts of the code where often performance and responsiveness can be gained. 
-Sometimes by implementing a more efficient algorithm or by introducing parallelization these bottlenecks can be resolved.
-Identifying these bottlenecks is the first step to resolve them.\\
-
-\textbf{Research Question 2:} Can a system such as Tribler benefit from asynchrony?\\
+\textbf{Research Question 1:} Can a system such as Tribler benefit from asynchrony?\\
 
 To improve performance and responsiveness, parts of Tribler can be rewritten to become asynchronous.
 By performing tasks asynchronously the performance and responsiveness of a program can improve.
@@ -285,12 +277,18 @@ One of these drawbacks is that it requires a different mindset for the programme
 Identifying these drawbacks and deciding if the benefits outweigh the costs is necessary to prevent the current state from worsening. \\
 
 \noindent
-\textbf{Research Question 3:} How do we incorporate benchmarking and regression testing into Tribler to gain insight into performance statistics?\\
+\textbf{Research Question 2:} How do we incorporate software performance engineering into Tribler to gain insight into performance statistics?\\
 
-To be able to conclude performance has improved, we need to benchmark current and new code using a regression testing system.
+To be able to conclude performance has improved, we can apply software performance engineering.
+This study focuses on introducing benchmarks and regression testing using said benchmarks to prevent performance regression.
+
+\textbf{Research Question 3:} How do we create benchmarks which are a representative use case of Tribler?\\
+
+Ultimately the user should benefit from performance enhancements.
 The key issue here is to define metrics and workloads to benchmark with.
 If the metrics do not represent a realistic use-case the benchmark may be flawed, rendering the outcome unreliable and inaccurate.
 
+A second constraint is the run time of a benchmark.
 Preferably, the regression testing system should not clog the throughput of the current test architecture.
 Running an one hour benchmark per change per pull request will severely strain the development speed.
 
