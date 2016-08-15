@@ -279,8 +279,10 @@ Identifying these drawbacks and deciding if the benefits outweigh the costs is n
 \noindent
 \textbf{Research Question 2:} How do we incorporate software performance engineering into Tribler to gain insight into performance statistics?\\
 
-To be able to conclude performance has improved, we can apply software performance engineering.
-This study focuses on introducing benchmarks and regression testing using said benchmarks to prevent performance regression.
+Currently, not a single developer has insight into how well Tribler performs and what impact changes has on said performance.
+To be able to conclude performance changes do not negatively impact the performance and responsiveness of Tribler, we can apply software performance engineering.
+Software performance engineering focuses on introducing performance regression tests and benchmarks into the development cycle.
+By making use of these regression tests, Tribler finally gets insight into the impact of changes which developers desperately need.\\
 
 \textbf{Research Question 3:} How do we create benchmarks which are a representative use case of Tribler?\\
 
@@ -296,5 +298,6 @@ Running an one hour benchmark per change per pull request will severely strain t
 The main contributions of this thesis are as follows.
 First, we elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 We then resolve the vital I/O bottleneck currently present in Tribler using asynchrony and a multi-threaded approach.
+This is done by introducing the Storm database framework into Tribler and creating a database manager with a asynchronous, non-blocking yet serialized interface.
 Next, we introduce software performance engineering into Tribler's development process by adding a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
 Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, performance and user experience.
