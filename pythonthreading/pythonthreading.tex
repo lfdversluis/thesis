@@ -3,7 +3,7 @@
 
 Before we can address Tribler's blocking I/O problem, we first need to better understand Python's threading model and how the Python interpreter behaves.
 By looking in depth how the operating system (OS) and the python interpreter behave together, we can look into how multiple threads can be beneficial to Tribler.
-Additionally we take a look at asynchrony in Python to see if we can apply this to Tribler to gain performance by improving the responsiveness.
+Additionally we take a look at asynchrony in Python to see if we can apply this in Tribler to gain performance by improving the responsiveness.
 This allows us to answer the second research question \enquote{Can a system such as Tribler benefit from asynchrony?} and gives us a direction of design and implementation for our blocking I/O problem.
 
 \section{Threads in Python}
@@ -15,14 +15,14 @@ This allows us to answer the second research question \enquote{Can a system such
 \end{figure}
 
 Python threads are normal OS threads, either POSIX (pthread) or Windows threads \cite{beazley2010understanding, beazley2009inside}.
-Python does not feature a thread scheduler, threads are fully managed by the operating system that hosts them.
+Python does not feature a thread scheduler; threads are fully managed by the operating system that hosts them.
 To control thread execution Python features a construct called the Global Interpreter Lock (GIL).
-This GIL ensures that only one thread can run in the python interpreter at once, i.e. a thread needs to hold the GIL in order to execute.
+This GIL ensures that only one thread can run in the python interpreter at any time, i.e. a thread needs to hold the GIL in order to execute.
 This means there cannot be any parallel execution.
 Once a thread is done executing or needs to block it releases the GIL.
 This gives way for cooperative multitasking as other threads that are ready to execute can try to acquire the GIL, visualized in Figure \ref{fig:python_threads_release_gil}.
 
-To make sure Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built in that \enquote{checks} every thread once per 100 ticks.
+To make sure Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built-in that \enquote{checks} every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
 Listing \ref{lst:one_tick} contains two code samples that only take one tick each, but take require different amount of time to compute.
 
@@ -31,7 +31,7 @@ Listing \ref{lst:one_tick} contains two code samples that only take one tick eac
 When a check is run the following four steps are executed:
 \begin{enumerate}
 	\item The thread that holds the GIL resets its tick counter.
-	\item If the current thread it the main thread, it runs the signal handlers.
+	\item If the current thread is the main thread, it runs the signal handlers.
 	\item The thread releases the GIL.
 	\item The thread tries to reacquire the GIL.
 \end{enumerate}
@@ -59,13 +59,14 @@ Since every thread has this check, CPU-bound threads will engage in cooperative 
 Because threads cannot run in parallel, this changes the performance one may expect from a multi-threaded program.
 Dadiv Beazly presented his findings in his Python Concurrency Workshop (2009) \cite{beazley2009inside}.
 By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased 24.6 to 45.5 seconds; an increase of 185\%.
-Disabling one of his cpu cores yielded 38.0 seconds, an increase of 154\% in run time.
+Disabling one of his CPU cores yielded a run time 38.0 seconds, an increase of 154\%.
 
 To confirm this behaviour still exists in the latest version of Python2, we rerun Beazly's experiment.
 The setup used in this experiment can be found in Table~\ref{table:rerun_beazily}.
-Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\% which is in range of Beazley's observations
+Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\% which is in range of Beazley's observations.
 
 To investigate this behaviour, Beazley studied the underlying C code to inspect why he was observing these performance results.
+
 Whenever a (Python) thread releases the GIL, it sends out a signal.
 The OS then propagates this signal to other threads which then can attempt to acquire the GIL.
 The time or \emph{lag} between thread switching and execution may be significant depending on the OS, according Beazley.
@@ -149,7 +150,7 @@ Throughout the years many attempts have been made to alter Python or remove the 
 While many attempts are software related, some alternative implementations have been applied to hardware \cite{tabba2010adding}.
 To date, no one has succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
 
-On of the most well-known alternative implementations of Python is PyPy.
+One of the most well-known alternative implementations of Python is PyPy.
 It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
 By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a high compatibility with existing python code \cite{pypy2016pypy}.
 PyPy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
@@ -173,11 +174,11 @@ Libraries that introduce parallelism or asynchrony to gain performance are also 
 In particular, many projects exist that attempt to make I/O asynchronous \cite{asyncio2016python}.
 Often, these leverage the multiprocessing package in the standard library of Python.
 
-Decorated Concurrency (DECO) uses the multiprocessing package of Python to parallelize functions using a \enquote{concurrent} decorator \cite{sherman2016deco}.
-Different processes have their own Python interpreter which in turn has its own GIL, which allows for parallel processing.
+Decorated Concurrency (DECO) uses the multiprocessing package of Python to parallelize functions using  \enquote{concurrent} and \enquote{synchronized} decorators \cite{sherman2016deco}.
+Different processes have their own Python interpreter which in turn has its own GIL, allowing for parallel processing.
 Using the \enquote{concurrent} decorator, a function will be wrapped and executed on a new process.
-Similarly, the \enquote{synchronized}  inserts synchronization events to automatically refactor assignments of the results of \enquote{concurrent} function calls to happen during synchronization events.
-However, because of the overhead creating a new process generates and communicating between different processes, this approach is only viable for heavy loads that generally can run on its own.
+Similarly, the \enquote{synchronized} decorator  inserts synchronization events to automatically refactor assignments of the results of \enquote{concurrent} function calls to happen during synchronization events.
+However, this approach is only viable for heavy loads that generally can run on its own as constructing a new process and communicating between different processes generate overhead.
 The authors mention that a function should at least have an execution time of one millisecond for this method to be beneficial.
 
 \section{Asynchronous programming}
@@ -195,11 +196,11 @@ The authors mention that a function should at least have an execution time of on
 \end{figure}
 
 A second option it to make use of asynchronous programming to gain performance.
-Traditionally, synchronous programs execute tasks one by one as visualized in Figure\ref{fig:normal_execution_flow}.
+Traditionally, synchronous programs execute tasks sequentially as visualized in Figure\ref{fig:normal_execution_flow}.
 When these functions perform an I/O operation, they are waiting for the disk or network to catch up, visualized in Figure~\ref{fig:delays_in_execution}.
 In turn, the thread these functions run on will block, see Figure~\ref{fig:normal_io_flow}.
 This means the main thread of a program will block if the I/O call happens on that thread.
-A synchronous program that performs I/O operations regularly will therefore spend much of its time blocked waiting for disk or network to catch up.
+A synchronous program that performs I/O operations regularly will therefore spend much of its time blocked.
 
 \begin{figure}[h]
 	\centering
@@ -236,8 +237,8 @@ In particular, Twisted is built around event-driven, asynchronous I/O \cite{lefk
 When programming asynchronously in Twisted, the function that is being called (callee) returns a deferred.
 A deferred is a place holder for the actual value that the callee eventually will return once its done computing.
 
-To ensure I/O operations does not block the main thread, the I/O can be moved to a separate thread, returning a deferred.
-By attaching a callback and an errback, the caller can handle the case of a success and failure respectively.
+To ensure I/O operations do not block the main thread, the I/O can be moved to a separate thread, returning a deferred \todo{leg uit waarom returnt ie een deferred? - hier verder gaan met reviewen.}.
+By attaching a callback and an errback to this deferred, the caller can handle the case of a success and failure respectively.
 These callbacks are handled by Twisted's event loop.
 This thread can then block while the main thread continues executing other scheduled task.
 Once the thread is done with its task it can invoke the callback of the deferred, notifying Twisted's event loop.

@@ -2,16 +2,16 @@
 \label{chp:problem-description}
 
 Tribler's goal is to offer a YouTube-like experience with similar performance and ease of use.
-All Tribler's features are implemented in a completely distributed manner, not relying on any centralized component.
+All Tribler's features are implemented in a completely decentralized manner, not relying on any centralized component.
 
-Numerous initiatives exist around these goals of re-decentralisation, censorship-resilience, and attack-resilient.
+Numerous initiatives exist around these goals of re-decentralisation and performance.
 However, none of them gathered any significant usage compared to the social media usage levels. 
 For instance, YouTube features one billion unique monthly users \cite{mainka2014government} and there are 1.8 billion monthly active Facebook users \cite{sharma2016strategies}.
 
 The problem is that the performance, usability, and features offered by decentralised alternatives are inferior when compared to the experience offered by central solutions.
 Creating academically pure self-organising systems such as Tribler has proven to be notoriously difficult.
 For example, the extensive list of 194 projects which all aim to create an alternative Internet experience using decentralisations shows the amount of years spent and lines of code produced \cite{redecentralize2016alternative}.
-Most of these project are abandoned and few of them have actual real-world usage.
+Most of these projects are abandoned and few of them have actual real-world usage.
 
 \begin{figure}[!h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/roadmap}}
@@ -20,7 +20,7 @@ Most of these project are abandoned and few of them have actual real-world usage
 \end{figure}
 
 The Tribler project created a roadmap -- available on its GitHub repository -- to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
-However, especially the poor performance of Tribler is hampering wide-spread adaption and usage. Figure~\ref{fig:tribler_roadmap} shows three of the six main uncompleted roadmap items.
+However, especially the poor performance of Tribler is hampering wide-spread adoption and usage. Figure~\ref{fig:tribler_roadmap} shows three of the six main uncompleted roadmap items.
 
 \section{Key performance optimizations}
 
@@ -36,7 +36,7 @@ After careful scrutiny it was decided that the most vital bottleneck to address,
 \label{sct:triblers_database_dependency}
 
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user experience. 
-Measurements dating back from 2014 indicate that Tribler's performance is I/O-bound \cite{pouwelse2014reduce}.
+Measurements dating back from 2013 indicate that Tribler's performance is I/O-bound \cite{pouwelse2014reduce}.
 Especially with slow hard disks, but also with fast SSD storage the main performance bottleneck seems to be around database access.
 With our focus on the fundamental issue we believe we can make a significant step forward in making decentralized technology able to compete with centralized solutions on large-scale usage.
 
@@ -59,10 +59,10 @@ Furthermore, Dispersy provides on-to-one and one-to-many data dissemination mech
 Eventually, all data will reach all nodes in the network, overcoming challenging network conditions.
 The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema} (Johan Pouwelse, 2013).
 
-This database is becoming a key performance bottleneck \cite{pouwelse2014reduce}.
+These databases are becoming a key performance bottleneck \cite{pouwelse2014reduce}.
 Back in May 2013 measurements indicated that Tribler read and wrote 660 Megabytes per hour to and from disk.
-Back in April 2014 this number was somewhat reduced to 623.
-In May 2014 efforts were made to reduce this enormous amount of I/O and after batching database statements the number dropped to 538 Megabytes per hour.
+The next measurement in April 2014 showed this number was somewhat reduced to 623.
+In May 2014 efforts were made to reduce this enormous amount of I/O; by batching database statements the number dropped to 538 Megabytes per hour.
 
 So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using htop\footnote{\url{http://hisham.hm/htop/}}.
 htop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014} (Johan Pouwelse, 2014).
@@ -80,18 +80,18 @@ One of the main causes of Tribler's dramatic performance can be explained by the
 Currently, Dispersy is deeply embedded into Tribler, running on the same (main) thread Tribler is running on.
 Tribler, just like Dispersy, is written in the Python programming language.
 In Python, a thread performing an I/O operation will block, causing all operations on the thread to suspend.
-This means whenever Dispersy performs I/O all functions of Tribler halt and vice versa.
-With the enormous amount of I/O Tribler is performing, this forms a huge limiting factor on the responsiveness and hence performance of Tribler.
+This means whenever Tribler or Dispersy performs I/O all functions of Tribler and Dispersy halt.
+With the enormous amount of I/O Tribler is performing, this forms a huge limiting factor on the responsiveness and therefore performance of Tribler.
 
 When a thread suspends, other threads can take over and perform operations, yet besides the main thread there are only two additional threads in Tribler: the Graphical User Interface (GUI) thread and the Dispersy endpoint thread.
 As the name implies, the GUI is running on the GUI thread as the framework Tribler currently uses requires this.
 Ironically, the Dispersy endpoint thread was introduced because of the blocking I/O behaviour.
 Under heavy load, Dispersy drops packets because it cannot keep up.
-As processing is done on the main thread and this frequently blocks because of the I/O, the buffers overflow causing packet loss.
+Processing packets is done on the main thread and as this thread frequently blocks, the buffers overflow causing packet loss.
 These two threads do not saturate the available processing time offered by the main thread blocking, leading to wasting valuable CPU cycles.
 
-In the meantime, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain like structure \cite{norberhuis2015multichain}.
-This feature heavily relies on its database to store blocks and other information about the user and other peers their chains.
+Furthermore, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain-like structure \cite{norberhuis2015multichain}.
+This feature heavily relies on its database to store blocks and other information about the user and other peers.
 Moreover, the MultiChain makes use of its own database rather than Dispersy's.
 Norberhuis points out: \enquote{The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.} \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
 This makes it hard to estimate Tribler's current I/O rates.
@@ -118,8 +118,9 @@ Code commits to fix bugs, refactor code, enhance or add functionality are pushed
 It is important that software performance engineering is a part of this process: performance should not get compromised by changes, if any it should improve.
 Naturally trade-offs can be made performance wise, but it should be done with a clear understanding of the consequences.
 
-For the past three years, attempts have been made to monitor the performance, yet all of them have failed.
+For the past three years, attempts have been made to monitor the performance, yet with little success.
 The first attempt was to create probes using Systemtap\footnote{\url{https://sourceware.org/systemtap/}}.
+System tap is a tool for \enquote{instrumenting the Linux kernel for analyzing performance and functional problems}, (Jacob et al. 2008) \cite{jacob2008systemtap}.
 While some success was reported, this system is no longer being maintained nor functional.
 After this, code was added to the Dispersy code base to track and log if a function was running longer than a fixed amount of time.
 While this implementation does provide some insight, its workings are crude and only covering some of the functions present.
@@ -131,7 +132,7 @@ Performance has never been one of the priorities in Tribler's lifetime; only 6\%
 To ensure performance will no longer degrade realistic benchmarks need to be developed which Tribler can be tested with.
 Changes can then be compared against the current codebase, tracking important performance statistics such as the amount of I/O, run time of functions, throughput and responsiveness.
 These benchmarks can then be integrated into a regression testing system which can be integrated in our Jenkins continuous integration system.
-Using Jenkins, performance regression tests can run on every proposed change and at predetermined moments, having a continuous updated overview of Tribler's performance.
+Using Jenkins, performance regression tests can run on every proposed change and at predetermined moments, having a continuous updated overview of Tribler's performance metrics.
 
 % https://github.com/Tribler/tribler/issues/15
 % https://github.com/Tribler/tribler/issues/77
@@ -255,9 +256,9 @@ This system should benchmark the current code base against proposed changes, cap
 
 \section{Objective and research questions}
 \label{chp2:sct:objectives-research-questions}
-The objective of this thesis is to improve the performance and responsiveness of Tribler and to introduce an I/O regression test system.
-The verification of the performance regression test system is done by focussing on removing bottlenecks present i.e. in parallel with improving performance.
-These improvements will be applied by means of refactoring current code, which is largely undocumented, poorly tested and unnecessary complex.
+The objective of this thesis is to improve the performance and responsiveness of Tribler and to introduce a regression test system.
+The verification of the performance regression test system is done by focussing on removing Tribler's biggest bottleneck present: blocking database I/O.
+By resolving this bottleneck, important metrics tracked by this regression test system should show positive changes, indicating improvement.
 %In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
 
 The research presented in this thesis was carried out in cooperation with the Tribler team. 
@@ -279,16 +280,17 @@ Identifying these drawbacks and deciding if the benefits outweigh the costs is n
 \noindent
 \textbf{Research Question 2:} How do we incorporate software performance engineering into Tribler to gain insight into performance statistics?\\
 
-Currently, not a single developer has insight into how well Tribler performs and what impact changes has on said performance.
-To be able to conclude performance changes do not negatively impact the performance and responsiveness of Tribler, we can apply software performance engineering.
+Currently, not a single developer has insight into how well Tribler performs and what impact changes have on Tribler in its current state.
+To be able to conclude performance changes do not negatively impact the performance of Tribler, we can apply software performance engineering.
 Software performance engineering focuses on introducing performance regression tests and benchmarks into the development cycle.
-By making use of these regression tests, Tribler finally gets insight into the impact of changes which developers desperately need.\\
+By making use of these regression tests, Tribler developers finally get insight into vital metrics which are desperately needed.\\
 
 \textbf{Research Question 3:} How do we create benchmarks which are a representative use case of Tribler?\\
 
-Ultimately the user should benefit from performance enhancements.
+Ultimately, the end user should benefit from performance enhancements.
 The key issue here is to define metrics and workloads to benchmark with.
-If the metrics do not represent a realistic use-case the benchmark may be flawed, rendering the outcome unreliable and inaccurate.
+Metrics need to properly capture changes to accurately measure the impact of any modification.
+Additionally, if the workload does not represent a realistic use-case the benchmark may be flawed, rendering the outcome unreliable and inaccurate.
 
 A second constraint is the run time of a benchmark.
 Preferably, the regression testing system should not clog the throughput of the current test architecture.
@@ -298,6 +300,6 @@ Running an one hour benchmark per change per pull request will severely strain t
 The main contributions of this thesis are as follows.
 First, we elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 We then resolve the vital I/O bottleneck currently present in Tribler using asynchrony and a multi-threaded approach.
-This is done by introducing the Storm database framework into Tribler and creating a database manager with a asynchronous, non-blocking yet serialized interface.
+This is done by introducing the Storm database framework into Tribler and creating a database manager with an asynchronous, non-blocking yet serialized interface.
 Next, we introduce software performance engineering into Tribler's development process by adding a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
 Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, performance and user experience.

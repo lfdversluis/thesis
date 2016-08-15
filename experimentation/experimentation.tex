@@ -183,6 +183,148 @@ This breakdown lists the five callers who issued queries consuming the most time
 By providing the name, file path and line number in this breakdown, developers can immediately jump to the right point in the code base, increasing the developer's productivity.
 These caller breakdowns for Tribler having an empty and filled state directory are provided Table~\ref{table:caller_breakdown_tribler_empty_state_dir} and Table~\ref{table:caller_breakdown_tribler_filled_state_dir}, respectively.
 Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table:caller_breakdown_dispersy_filled_state_dir} show the respective breakdowns for the top five most time consuming queries issued on Dispersy's database using an empty and filled state directory.
+	
+% TRIBLER TABLES
+	
+\begin{table}[!h]
+	\centering
+	\caption{The five most expensive query issuers per database function called on Tribler's database when running Tribler idle for one hour using an empty state directory.}
+	\label{table:caller_breakdown_tribler_empty_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|c|c|c|l|}
+		\hline
+		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
+		
+		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchall}} & \multicolumn{1}{c|}{234} & \multicolumn{1}{c|}{getRecentAndRandomTorrents} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1846} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{208}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{205}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{195}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{183}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{214} & \multicolumn{1}{c|}{commit\_now} & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{198}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{193}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{182}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{165}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{60} & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{55}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{52}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{50}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{49}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{update}} & \multicolumn{1}{c|}{221} & \multicolumn{1}{c|}{addExternalTorrentNoDef} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{23}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{22}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{21}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{21}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{insert\_or\_ignore}} & \multicolumn{1}{c|}{164} & \multicolumn{1}{c|}{addOrGetPeerID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{19}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchone}} & \multicolumn{1}{c|}{219} & \multicolumn{1}{c|}{getChannelIdFromDispersyCID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{172}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{157}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{141}  & \multicolumn{1}{c|}{getChannelIdFromDispersyCID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{123}  & \multicolumn{1}{c|}{getChannelIdFromDispersyCID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367}  \\ \hline 
+		
+	\end{tabular}}
+\end{table}
+		
+\begin{table}[!h]
+	\centering
+	\caption{The five most expensive query issuers per database function called on Tribler's database when running Tribler idle for one hour using a filled state directory.}
+	\label{table:caller_breakdown_tribler_filled_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|c|c|c|l|}
+		\hline
+		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
+		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchall}} & \multicolumn{1}{c|}{461} & \multicolumn{1}{c|}{\_flush\_to\_database} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{437}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{1645} & \multicolumn{1}{c|}{commit\_now} & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1588}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1465}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1434}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1188}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{25} & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{15}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{update}} & \multicolumn{1}{c|}{21} & \multicolumn{1}{c|}{addExternalTorrentNoDef} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{19}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{14}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{12}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{insert\_or\_ignore}} & \multicolumn{1}{c|}{4} & \multicolumn{1}{c|}{addOrGetPeerID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{4}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchone}} & \multicolumn{1}{c|}{969} & \multicolumn{1}{c|}{hasTorrents} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1516} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{212}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{82}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{79}  & \multicolumn{1}{c|}{hasTorrents}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1516}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{73}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \hline 
+	\end{tabular}}
+\end{table}
+	
+\begin{table}[!h]
+	\centering
+	\caption{The five most expensive query issuers per database function called on Dispersy's database when running Tribler idle for one hour using an empty state directory.}
+	\label{table:caller_breakdown_dispersy_empty_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|c|c|c|l|}
+		\hline
+		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
+		\multicolumn{1}{|c|}{\multirow{5}{*}{commit}} & \multicolumn{1}{c|}{218} & \multicolumn{1}{c|}{\_flush\_database} & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{204}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{198}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{186}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{169}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{141} & \multicolumn{1}{c|}{get\_member} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 1860} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{16}  & \multicolumn{1}{c|}{check\_undo}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3370}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{13}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 388}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{12}  & \multicolumn{1}{c|}{get\_member}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 492}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{11}  & \multicolumn{1}{c|}{get\_member}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 492}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{13} & \multicolumn{1}{c|}{on\_undo} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3476} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{9}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{3}{*}{executescript}} & \multicolumn{1}{c|}{0} & \multicolumn{1}{c|}{check\_database} & \multicolumn{1}{l|}{...persy/dispersydatabase.py line 83} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{check\_database}  & \multicolumn{1}{l|}{...ty/multichain/database.py line 297}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{check\_database}  & \multicolumn{1}{l|}{...ty/multichain/database.py line 298}  \\ \hline 
+		
+	\end{tabular}}
+\end{table}
+	
+\begin{table}[!h]
+	\centering
+	\caption{The five most expensive query issuers per database function called on Dispersy's database when running Tribler idle for one hour using a filled state directory.}
+	\label{table:caller_breakdown_dispersy_filled_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|c|c|c|l|}
+		\hline
+		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
+		\multicolumn{1}{|c|}{\multirow{5}{*}{commit}} & \multicolumn{1}{c|}{1650} & \multicolumn{1}{c|}{\_flush\_database} & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1592}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1470}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1440}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1194}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{559} & \multicolumn{1}{c|}{\_select\_and\_fix} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{548}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{545}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{542}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{527}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \hline 
+		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{0} & \multicolumn{1}{c|}{on\_undo} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3476} \\ \cline{2-4}
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
+		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \hline 
+	\end{tabular}}
+\end{table}
 
 From the results provided above we conclude what was long a hunch: Tribler is I/O bound and in desperate need of a non-blocking database solution.
 By creating an infrastructure which provides a breakdown of query execution statistics, we have solved the Tribler team latent need: insight into Tribler's database usage.
@@ -337,147 +479,4 @@ To look at the data generated by the benchmark in more detail, developers can lo
 This breakdown presents the average, minimum, maximum and standard deviation in response times as well as the throughput and amount of responses per second obtained.
 
 From these figures we conclude that the performance regression test system provides a suitable overview for developers to get a quick overview of the current state.
-
-\begin{table}[]
-	\centering
-	\caption{The five most expensive query issuers per database function called on Dispersy's database when running Tribler idle for one hour using an empty state directory.}
-	\label{table:caller_breakdown_dispersy_empty_state_dir}
-	\noindent\resizebox{\linewidth}{!}{
-	\begin{tabular}{|c|c|c|l|}
-		\hline
-		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
-		\multicolumn{1}{|c|}{\multirow{5}{*}{commit}} & \multicolumn{1}{c|}{218} & \multicolumn{1}{c|}{\_flush\_database} & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{204}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{198}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{186}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{169}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{141} & \multicolumn{1}{c|}{get\_member} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 1860} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{16}  & \multicolumn{1}{c|}{check\_undo}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3370}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{13}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 388}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{12}  & \multicolumn{1}{c|}{get\_member}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 492}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{11}  & \multicolumn{1}{c|}{get\_member}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 492}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{13} & \multicolumn{1}{c|}{on\_undo} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3476} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{9}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{3}{*}{executescript}} & \multicolumn{1}{c|}{0} & \multicolumn{1}{c|}{check\_database} & \multicolumn{1}{l|}{...persy/dispersydatabase.py line 83} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{check\_database}  & \multicolumn{1}{l|}{...ty/multichain/database.py line 297}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{check\_database}  & \multicolumn{1}{l|}{...ty/multichain/database.py line 298}  \\ \hline 
-		
-	\end{tabular}}
-\end{table}
-
-\begin{table}[]
-	\centering
-	\caption{The five most expensive query issuers per database function called on Dispersy's database when running Tribler idle for one hour using a filled state directory.}
-	\label{table:caller_breakdown_dispersy_filled_state_dir}
-	\noindent\resizebox{\linewidth}{!}{
-		\begin{tabular}{|c|c|c|l|}
-			\hline
-			\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
-			\multicolumn{1}{|c|}{\multirow{5}{*}{commit}} & \multicolumn{1}{c|}{1650} & \multicolumn{1}{c|}{\_flush\_database} & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1592}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1470}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1440}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1194}  & \multicolumn{1}{c|}{\_flush\_database}  & \multicolumn{1}{l|}{...bler/dispersy/dispersy.py line 2089}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{559} & \multicolumn{1}{c|}{\_select\_and\_fix} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{548}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{545}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{542}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{527}  & \multicolumn{1}{c|}{\_select\_and\_fix}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 888}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{0} & \multicolumn{1}{c|}{on\_undo} & \multicolumn{1}{l|}{...ler/dispersy/community.py line 3476} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{0}  & \multicolumn{1}{c|}{initialize}  & \multicolumn{1}{l|}{...ler/dispersy/community.py line 374}  \\ \hline 
-		\end{tabular}}
-	\end{table}
-
-
-% TRIBLER TABLES
-
-\begin{table}[]
-	\centering
-	\caption{The five most expensive query issuers per database function called on Tribler's database when running Tribler idle for one hour using an empty state directory.}
-	\label{table:caller_breakdown_tribler_empty_state_dir}
-	\noindent\resizebox{\linewidth}{!}{
-	\begin{tabular}{|c|c|c|l|}
-		\hline
-		\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
-		
-		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchall}} & \multicolumn{1}{c|}{234} & \multicolumn{1}{c|}{getRecentAndRandomTorrents} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1846} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{208}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{205}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{195}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{183}  & \multicolumn{1}{c|}{getPeerIDS}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 101}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{214} & \multicolumn{1}{c|}{commit\_now} & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{198}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{193}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{182}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{165}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{60} & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{55}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{52}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{50}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{49}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{update}} & \multicolumn{1}{c|}{221} & \multicolumn{1}{c|}{addExternalTorrentNoDef} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{23}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{22}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{21}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{21}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{insert\_or\_ignore}} & \multicolumn{1}{c|}{164} & \multicolumn{1}{c|}{addOrGetPeerID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{19}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \hline 
-		\multicolumn{1}{|c|}{\multirow{5}{*}{fetchone}} & \multicolumn{1}{c|}{219} & \multicolumn{1}{c|}{getChannelIdFromDispersyCID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367} \\ \cline{2-4}
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{172}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{157}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{141}  & \multicolumn{1}{c|}{getChannelIdFromDispersyCID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367}  \\ \cline{2-4} 
-		\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{123}  & \multicolumn{1}{c|}{getChannelIdFromDispersyCID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1367}  \\ \hline 
-		
-	\end{tabular}}
-\end{table}
-
-\begin{table}[]
-	\centering
-	\caption{The five most expensive query issuers per database function called on Tribler's database when running Tribler idle for one hour using a filled state directory.}
-	\label{table:caller_breakdown_tribler_filled_state_dir}
-	\noindent\resizebox{\linewidth}{!}{
-		\begin{tabular}{|c|c|c|l|}
-			\hline
-			\textbf{DB. function}  & \textbf{Duration (ms)} & \textbf{Caller} & \textbf{Caller location} \\ \hline
-			\multicolumn{1}{|c|}{\multirow{5}{*}{fetchall}} & \multicolumn{1}{c|}{461} & \multicolumn{1}{c|}{\_flush\_to\_database} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{437}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{436}  & \multicolumn{1}{c|}{\_flush\_to\_database}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1206}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{execute}} & \multicolumn{1}{c|}{1645} & \multicolumn{1}{c|}{commit\_now} & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1588}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1465}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1434}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{1188}  & \multicolumn{1}{c|}{commit\_now}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 228}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{executemany}} & \multicolumn{1}{c|}{25} & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{18}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{15}  & \multicolumn{1}{c|}{on\_remove\_votes\_from\_dispersy}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1188}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{update}} & \multicolumn{1}{c|}{21} & \multicolumn{1}{c|}{addExternalTorrentNoDef} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{19}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{17}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{14}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{12}  & \multicolumn{1}{c|}{addExternalTorrentNoDef}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 338}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{insert\_or\_ignore}} & \multicolumn{1}{c|}{4} & \multicolumn{1}{c|}{addOrGetPeerID} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{4}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{3}  & \multicolumn{1}{c|}{addOrGetPeerID}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 116}  \\ \hline 
-			\multicolumn{1}{|c|}{\multirow{5}{*}{fetchone}} & \multicolumn{1}{c|}{969} & \multicolumn{1}{c|}{hasTorrents} & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1516} \\ \cline{2-4}
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{212}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{82}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{79}  & \multicolumn{1}{c|}{hasTorrents}  & \multicolumn{1}{l|}{...B/SqliteCacheDBHandler.py line 1516}  \\ \cline{2-4} 
-			\multicolumn{1}{|c|}{} & \multicolumn{1}{c|}{73}  & \multicolumn{1}{c|}{getOne}  & \multicolumn{1}{l|}{.../CacheDB/sqlitecachedb.py line 490}  \\ \hline 
-		\end{tabular}}
-	\end{table}
 		

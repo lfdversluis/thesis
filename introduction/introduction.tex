@@ -13,7 +13,7 @@
 
 Performance is a make-or-break quality for software.
 In today's society we expect manufacturers to progress in their expertise and their products to advance.
-We take for granted that new cars have a larger radius, are more powerful, less pollute and more safe with each iteration of design.
+We take for granted that new cars have a larger range, are more powerful, less pollute and more safe with each iteration of design.
 In contrast, software does not has this image; software updates breaking functionalities, adding severe performance issues or increasing the complexity of the user interface are common.
 The Facebook mobile Android application is a prime example of this, having more than one billion installs and being in development for years by a complete development department still receives updates which causes performance issues for users, see Figure~\ref{fig:facebook_bad_reviews}.
 Just as with their cars users expect software performance to advance or at least not become \emph{worse} in terms of performance. 
@@ -43,7 +43,7 @@ To inspect if one of these two dimensions has decreased when changes are made, p
 Using this method, the system is tested for performance regression under various loads \cite{woodside2007future}.
 Traditional software development focusses on correctness, causing regression testing to be deferred to a late stage in the development cycle, if applied at all.
 %This approach is often called the \enquote{fix-it-later} approach.
-To illustrate the varying amounts of regression testing appliances, Huang et al. mention the performing testing interval of MySQL, Linux and Chrome.
+To illustrate the varying amounts of regression testing appliances, Huang et al. mention the performance testing intervals of MySQL, Linux and Chrome.
 These projects apply performance tests every release, every week and every four revisions, respectively.
 Once performance regression is detected, developers have to spend extra efforts determining what causes said regression, especially when a lot of changes have been applied to the code base since the last measurement \cite{huang2014performance}.
 Performance tests should be executed as frequently as possible, ideally per change made by developers.
@@ -65,7 +65,7 @@ Using this approach, performance models are created at the early stages of devel
 
 Tribler is the result of ten years of scientific research in the field of decentralized systems and online cooperation.
 Over 100 scientific publications have Tribler in their foundation.
-Tribler is completely open-source and can be downloaded from the Tribler website\footnote{\url{https://www.tribler.org}}.
+Tribler is completely open-source and can be downloaded from the organisation's website\footnote{\url{https://www.tribler.org}}.
 Tribler's interface is visible in Figure~\ref{fig:tribler_screenshot}.\\
 Over the course of more than a decade Tribler has gained a tremendous amount of attention in both media and academia.
 It has been downloaded approximately 1.8 million times \cite{github2016releases} and has more than two thousand monthly active users.
@@ -93,6 +93,8 @@ The focus of this thesis is to improve Tribler's performance by making use of so
 
 The rest of this thesis is structured as follows.
 Chapter~\ref{chp:problem-description} provides the problem description and the research questions this thesis attempts to answer.
-Chapter~\ref{cpt:pythons_thread_model} explains the python threading model and why we observe performance issues with Tribler.
-Chapter~\ref{cpt:experiments} presents experimental results of this work.
+Chapter~\ref{cpt:pythons_thread_model} explains the Python threading model and why we observe performance issues with Tribler.
+Chapter~\ref{cpt:design_implementation} presents the design and implementation of a new database manager that will solve Tribler's disk operation issues.
+Chapter~\ref{cpt:software_performance_engineering} presents how we incorporate software performance engineering into Tribler's development cycle by adding a software regression test system.
+Chapter~\ref{cpt:experiments} presents experimental results showing Tribler's performance has improved and validates the software regression test system introduced.
 Finally, Chapter~\ref{cpt:conclusion_and_future_work} concludes this thesis and provides future work.
