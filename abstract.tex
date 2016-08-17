@@ -2,10 +2,9 @@
 Performance is a make-or-break quality for software.
 When making changes it is essential to ensure no \emph{performance regression} has occurred i.e. the program performs more slowly or consumes more resources than previous versions.
 Tribler is the result of ten years scientific research in complex distributed systems.
-Over the course of years Tribler's performance has fallen below acceptable user experience levels.
-All past attempts to gain insight into key performance indicators have failed.
+Over the course of years Tribler's performance has fallen below acceptable user experience levels, mainly because there is a lack of \emph{software performance engineering}.
 
-By making use of \emph{software performance engineering}, we address Tribler's dramatic performance.
-We resolve Tribler's blocking synchronous I/O, the main bottleneck, by introducing asynchrony and show that we improve the performance i.e. responsiveness significantly.
-Additionally we implement a regression testing system to prevent the deterioration of performance in the future, making Tribler ready for large scale usage and another decade of research.
+In this work, we lay the foundations for a regression testing systems that allows developers to continuously monitor the metrics that are having the most impact on the performance of Tribler. 
+Utilization of this system gave us a deep insight in the greatest bottleneck of the performance of Tribler: synchronous disk operations. Resolution of this bottleneck includes a major refactoring effort of the message synchronization system Dispersy. 
+Implementation of a novel, non-blocking disk operation framework allowed us to increase the responsiveness of Tribler with 200\%.
 \end{abstract}

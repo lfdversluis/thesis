@@ -1,22 +1,30 @@
 \chapter{Conclusion and future work}
 \label{cpt:conclusion_and_future_work}
 
-In this thesis we have improved Tribler's performance significantly by making use of software performance engineering.
+This thesis aims to contribute to the goal of re-decentralisation of systems such as Tribler, in particular with a focus on providing a YouTube-like performance.
 We have addressed Tribler's blocking database I/O, its main performance bottleneck, by integrating the Storm database framework into a new database manager: \enquote{StormDBManager}.
 StormDBManager features a complete asynchronous, non-blocking interface for database access while still maintaining a serialized query execution strategy.
-Additionally we have created a regression test system and added this to our Jenkins continuous integration system to adopt software performance engineering in the development cycle, further maturing the project.
+Additionally we have created a regression test system and prepared it to be integrated in our Jenkins continuous integration system to adopt software performance engineering in the development cycle, further maturing the project.
 We have verified both the regression test system and the resolving of the bottlenecks by providing experimental results.
-We believe that with this performance boost and software engineering focus, we have prepared Tribler for further years of research and strengthened Tribler's chances on becoming a decentralized alternative for YouTube-like streaming.
+We believe that with this performance boost and software performance engineering focus, we have contributed to Tribler's further years of research and strengthened Tribler's chances on becoming a decentralized alternative for YouTube-like streaming.
 
+While we believe we made a significant step forward in both performance and software performance engineering, there are items left for future work.
+The first item marked as future work is deploying the regression test system on all platforms Tribler supports.
+Currently the system is deployed on a Linux build server, yet as different platforms and operating systems may influence the performance of a program, it is useful to run regression tests on all platforms Tribler supports.
 
-Future work
+A second item for future work is moving Tribler's and Dispersy's queries to an object-relational mapping approach, requiring extensive refactoring of Tribler and Dispersy's code base.
+This will remove the \enquote{raw queries} from all code bases which reduces the complexity of the system.
+Moreover, as all data will be contain in objects which are generally easier to modify and read from.
 
-\begin{itemize}
-	\item Move storage to a per-community level. This will mean less flushing of data when sending items. In Tribler one only sends messages in the allchannel and to the channelcommunity (if you own a channel).
-	\item A threadpool with sqlite3 multithreaded enabled? 
-	\item Move database stuff into classes and use Storm's ORM. That auto-caches items, doesn't commit immediately.
-	\item Extend the regression test system with more metrics? Memory, network etc. ?
-	\item Scan for commits that look scary \cite{huang2014performance} and tests those. Will reduce amount of regression testing needed. Or use Jenkins pipeline to only run experiment when a value is set to true or tests pass?
-	\item Benchmarks not dependent on the internet, such as seeders for a torrent.
-	\item As discussed in Chapter 5, add regression testing to all operating systems with Jenkins.
-\end{itemize}
+A third item for future work is leveraging Jenkins' new pipeline plug-in.
+This pipeline plug-in allows to enable/disable specific stages or items of the continuous integration procedure.
+This comes in handy when a developer is only interested in experimental results, skipping the eight minute testing stage.
+Additionally, additional functionality can be added on a pull request basis where now an update to the continuous integrating procedure will be applied to all pull requests.
+
+A fourth item that could be done in future work is investigating if we can use SQLite's multithreaded support to increase the speed of processing database queries, resulting in an even higher responsiveness of Tribler.
+While SQLite developers themselves admit SQLite has minimal multithreaded support, it can still be investigated to what extent we can leverage its support.
+
+The final item left as future work is running the benchmark in a closed environment, disconnected from the internet.
+When running Tribler and Dispersy, it will connect to the Internet which may influence performance metrics such as I/O rates.
+Creating a closed environment with local peers will ensure that only those peers can communicate to one another.
+This will increase the both the reliability and accuracy of the measurements made.

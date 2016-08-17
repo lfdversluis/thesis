@@ -9,19 +9,23 @@
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
 		OS   				& Ubuntu 15.10 \\
 		Python version		& 2.7.10 \\
-		CPU					& 1 core with 4x Intel Xeon E5-2450 v2 @2.50GHz \\ 
-		HDD					& 25 GB  \\ 
+		CPU					& 4x Intel Xeon E5-2450 v2 @2.50GHz \\ 
+		HDD					& 50 GB  \\ 
 		RAM					& 8 GB 1000 MHz  \\
 	\end{tabular}
 \end{table}
 
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
 In this chapter we elaborate on these experiments and discuss the results. 
+Section~\ref{sct:tribler_io_past} and \ref{sct:db_performance_analysis} present experiments done on past and the current version of Tribler.
+Section~\ref{sct:tribler_performance_regression} provides experimental results on comparing the current version of Dispersy with our work.
 All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table\ref{table:virtual_machine_specs}.
+This setup was chosen to stay as close as possible to a 
 
 \section{Tribler's I/O over the years}
+\label{sct:tribler_io_past}
 As explained in Section~\ref{sct:triblers_database_dependency}, Tribler's I/O has been a problem for years.
-To observe if and how the amount of I/O has changed over time, we have performed measurements on four different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
+To observe if and how the amount of I/O has changed over time, we have performed a quick assessment on four different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
 The versions and their release dates are shown in Table~\ref{table:tribler_version_dates}.
 
 As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
@@ -57,7 +61,7 @@ After one hour, the amount of read and write I/O is noted down and Tribler is sh
 The results of this experiment are visible in Figure~\ref{fig:io_history}.
 From this figure we observe that Tribler's I/O has been reduced significantly in version 6.5.2.
 This decrease was the result of batching multiple database queries and periodically flush them to disk, an effective optimization technique also applied in other work \cite{ouyang2011beyond, lin2009database}. 
-Furthermore we observe the amount of I/O is increasing again in the latest 6.6.0-exp1 release due to the MultiChain feature added. 
+Furthermore we observe the amount of I/O is increasing again in the latest 6.6.0-exp1 release possibly due to the MultiChain feature added. 
 
 Peculiarly, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
 We believe there are two reasons that contribute to these numbers.
@@ -95,7 +99,8 @@ Interestingly, the numbers of the latest 6.6.0-exp1 version are similar to that 
 
 In conclusion, we believe that the I/O rate of Tribler does not show a correlation with the amount of packets synchronized. As the I/O rate of Tribler rises again in the latest version, possibly because of the MultiChain feature requiring additional computations, it shows the urgency of the I/O to become asynchronous and non-blocking.
 
-\section{I/O breakdown}
+\section{Detailed database performance analysis}
+\label{sct:db_performance_analysis}
 
 \begin{table}[h]
 	\centering
@@ -145,7 +150,7 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[h]
 	\centering
-	\caption{The breakdown of Dispersy's queries when running Tribler idle for one hour using an empty state directory.}
+	\caption{The breakdown of Dispersy's queries when running Tribler idle for one hour using a filled state directory.}
 	\label{table:query_breakdown_dispersy_filled_state_dir}
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -326,13 +331,88 @@ Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table
 	\end{tabular}}
 \end{table}
 
-From the results provided above we conclude what was long a hunch: Tribler is I/O bound and in desperate need of a non-blocking database solution.
+In addition to creating a breakdown of the most expensive queries, we also investigated which lines contribute the most to the total amount of time spent on I/O.
+By creating this breakdown we are able to identify queries that cause a lot of I/O, yet may not show up in the breakdowns above because of their low run-time.
+For each of the four runs mentioned above, we have computed the top five most time consuming lines and express their contribution to the total amount of time spent on I/O in percentages.
+Table \ref{table:line_breakdown_tribler_empty_state_dir} and \ref{table:line_breakdown_tribler_filled_state_dir} show the top five lines which contribute the most to Tribler's database I/O time when run with an empty, respectively filled state directory.
+Table \ref{table:line_breakdown_dispersy_empty_state_dir} and \ref{table:line_breakdown_dispersy_filled_state_dir} show the same breakdowns but for Dispersy's database time.
+From these tables we observe that the top five lines are responsible for at least 59.9\% of all database I/O time.
+Focusing on reducing these queries by applying query optimization may reduce the run times significantly \cite{jarke1984query}.
+
+\begin{table}[!h]
+	\centering
+	\caption{The top five lines which contribute the most to Tribler's database I/O time using an empty state directory.}
+	\label{table:line_breakdown_tribler_empty_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|l|c|}
+		\hline
+		\textbf{Line} & \textbf{Contribution} \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 101 & 26.1\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 1367 & 24.4\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 262 & 8.0\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 116 & 7.8\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/sqlitecachedb.py line 490 & 7.0\% \\ \hline
+	\end{tabular}}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\caption{The top five lines which contribute the most to Tribler's database I/O time using a filled state directory.}
+	\label{table:line_breakdown_tribler_filled_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|l|c|}
+		\hline
+		\textbf{Line} & \textbf{Contribution} \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/sqlitecachedb.py line 335 & 22.9\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 1831 & 10.6\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 1820 & 10.1\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/SqliteCacheDBHandler.py line 262 & 8.3\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/Core/CacheDB/sqlitecachedb.py line 490 & 8.0\% \\ \hline
+	\end{tabular}}
+\end{table}
+
+
+\begin{table}[!h]
+	\centering
+	\caption{The top five lines which contribute the most to Dispersy's database I/O time using an empty state directory.}
+	\label{table:line_breakdown_dispersy_empty_state_dir}
+	\noindent\resizebox{\linewidth}{!}{
+	\begin{tabular}{|l|c|}
+		\hline
+		\textbf{Line} & \textbf{Contribution} \\ \hline
+		/home/tribler/Documents/tribler/Tribler/dispersy/dispersy.py line 1550 & 18.7\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/dispersy/dispersy.py line 888 & 13.9\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/dispersy/dispersy.py line 978 & 11.9\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/dispersy/dispersy.py line 492 & 9.6\% \\ \hline
+		/home/tribler/Documents/tribler/Tribler/dispersy/community.py line 3370 & 8.9\% \\ \hline
+	\end{tabular}}
+\end{table}
+
+\begin{table}[!h]
+\centering
+\caption{The top five lines which contribute the most to Dispersy's database I/O time using a filled state directory.}
+\label{table:line_breakdown_dispersy_filled_state_dir}
+\noindent\resizebox{\linewidth}{!}{
+\begin{tabular}{|l|c|}
+	\hline
+	\textbf{Line} & \textbf{Contribution} \\ \hline
+	/home/tribler/Documents/tribler/Tribler/dispersy/community.py line 888 & 49.8\% \\ \hline
+	/home/tribler/Documents/tribler/Tribler/dispersy/community.py line 885 & 29.7\% \\ \hline
+	/home/tribler/Documents/tribler/Tribler/dispersy/dispersy.py line 2089 & 13.6\% \\ \hline
+	/home/tribler/Documents/tribler/Tribler/dispersy/community.py line 914 & 5.0\% \\ \hline
+	/home/tribler/Documents/tribler/Tribler/dispersy/database.py line 109 & 0.5\% \\ \hline
+\end{tabular}}
+\end{table}
+
+
+From the results provided above we conclude what was long a hunch: Tribler is I/O bound and in desperate need of a non-blocking database I/O solution.
 By creating an infrastructure which provides a breakdown of query execution statistics, we have solved the Tribler team latent need: insight into Tribler's database usage.
 Using this infrastructure, developers can now focus on the queries which require optimization to adhere to the 80/20 rule: targeting the vital few, not the trivial many.
 
-\section{Tribler's performance}
+\section{Tribler's performance test regression}
+\label{sct:tribler_performance_regression}
 
-To measure the performance gain of Tribler, we have conducted two sets of experiments where two instances of Tribler, one with a synchronous, blocking Dispersy implementation and one with the asynchronous, non-blocking version of Dispersy, are compared.
+To measure the performance gain of Tribler using our work, we have conducted two sets of experiments where two instances of Tribler, one with the current synchronous, blocking Dispersy implementation and one with our asynchronous, non-blocking version of Dispersy, are compared.
 
 In the first experiment we have ran Tribler idle for one hour while querying the Twisted event loop every 100 milliseconds for delayed calls.
 By doing so we can observe if certain tasks have been delayed past their set time of execution i.e. measure the latency in the system.
@@ -441,7 +521,6 @@ If we plot the theoretical, asynchronous and the synchronous throughput we obtai
 As we can see the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
 At this point Tribler starts to show signs of being overloaded, which is also visible in the table when looking at the amount of responses received per second.
 
-At ten requests per second both the asynchronous and the synchronous version cannot keep up.
 If we look at the responses per second for fifteen and twenty requests per second, we observe that the gap between requests and responses grows percentage wise.
 The question that arises here is why Tribler can't provide 13.4 responses per second with fifteen requests per second as in the case with twenty.
 Again we believe the answer lies in the Twisted framework.

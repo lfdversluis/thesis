@@ -320,7 +320,7 @@ As a Solid State Drive (SSD) was used in this experiment, it is possible that th
 Offloading all components using asynchronous programming results in a decrease of 18.0\% run time, 4.5\% less than only offloading I/O, which can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.\\
 From these results we conclude that Tribler can benefit from asynchronous programming especially since I/O is the primary bottleneck.
 
-\section{Conclusion}
+\section{Summary}
 
 In this chapter we analysed the python threading model in detail.
 We explained why parallelism is not possible using standard Python and presented numerous initiatives that attempt to change this behaviour.\\
@@ -328,4 +328,4 @@ We investigated the performance behaviour of multi-threaded programs in Python a
 Additionally, we have shown and repeated experiments conducted by David Beazley to confirm that this performance behaviour is still present in Python 2.7.\\
 We shortly elaborated on the the new GIL introduced in Python 3.2, which could be a point of future work to improve Tribler's performance.
 Next, we presented the use case of asynchrony in the context of I/O in Python and elaborated on its drawbacks.
-Our initial experiment shows that we can indeed gain performance when using asynchrony, answering the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
+Our initial experiment shows that we can gain performance when using asynchrony, answering the first research question presented in Section~\ref{chp2:sct:objectives-research-questions}.

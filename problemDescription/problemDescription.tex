@@ -76,7 +76,7 @@ Since 2014 no work or measurements have been done related to this issue.
 \end{figure}
 
 \subsection{Blocking I/O}
-One of the main causes of Tribler's dramatic performance can be explained by the blocking behaviour of I/O.
+One of the main causes of Tribler's performance issues can be explained by the blocking behaviour of I/O.
 Currently, Dispersy is deeply embedded into Tribler, running on the same (main) thread Tribler is running on.
 Tribler, just like Dispersy, is written in the Python programming language.
 In Python, a thread performing an I/O operation will block, causing all operations on the thread to suspend.

@@ -35,14 +35,13 @@ These settings often include paths to data, variables such as how many nodes to 
 Once a configuration file has been created, it can be passed to Gumby which takes care of running the experiment specified.
 
 Scenario files allow for a carefully timed execution of functions.
-This is extremely useful in order to repeat the exact same procedure many times.
 In a scenario file, each line specifies which nodes executes which function at what time.
-An example of a scenario file is provided in Listing~ \todo{make listing and explain}.
+This is extremely useful in order to repeat the exact same procedure many times.
 
 The combination of configuration and scenario files enable a setting in which a developer can run an experiment many times with the exact same execution order and timing.
 This enables us to perform regression tests using Gumby which we will elaborate on next.
 
-Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system automatically schedules this experiment to be run.
+Whenever a push happens on a pull request on GitHub, our Jenkins continuous integration system can automatically schedule this experiment to be run. \todo{komt uit de lucht vallen}
 
 Moreover, statistics such as CPU, memory consumption and I/O are automatically tracked by Gumby.
 Any additional information that one wishes to track can be logged and parsed using auxiliary post experiment scripts.
@@ -82,7 +81,7 @@ This use case is especially important for user satisfaction as first impressions
 
 \begin{figure}[!h]
 	\centering
-	\includegraphics[width=\linewidth]{regressiontesting/diagrams/bootstrap_procedure}
+	\includegraphics[width=0.6\linewidth]{regressiontesting/diagrams/bootstrap_procedure}
 	\caption{The bootstrap procedure of Tribler.}
 	\label{fig:tribler_bootstrapping}
 \end{figure}
@@ -151,14 +150,14 @@ After these were deployed a code coverage and pylint checker job were added whic
 When either the code coverage drops or the pylint check fails, the build is marked as failed, safeguarding deterioration of the code base.
 
 To further improve Tribler's development process, we have created a performance regression job that runs the third benchmark using five requests per second.
-To merge this job into the development cycle, we have added it to the \enquote{GH\_Tribler\_PR} MultiJob.
+To merge this job into the development cycle, we have prepared it to be added to the \enquote{GH\_Tribler\_PR} MultiJob.
 This \enquote{GH\_Tribler\_PR} MultiJob runs whenever a user pushes a commit to an open pull request, forces a rerun or opens a new pull request on GitHub.
 Whenever this performance regression job fails, indicating performance regression has occurred, the \enquote{GH\_Tribler\_PR} is marked as failed.
 Upon failure, the author who proposes the changes must then investigate and adjust the code accordingly.
 
 To be able to compare old and new code, we have created a separate job that runs the current code base of Tribler daily using the same experiment.
-Next, we command Jenkins to fetch the data from this job so we can create a comparison graph and table depicting changes between the outputs of each job.
-If a pull requests gets merged into the code base, this job will automatically run again to ensure comparisons happen against the most recent version.
+Using this job, we can command Jenkins to fetch the data from this job so we can create a comparison graph and table depicting changes between the outputs of each job.
+Once this job is added to the MultiJob, whenever a pull requests gets merged into the code base, this job will automatically run again to ensure comparisons happen against the most recent version.
 
 To make sure the build server can process all jobs in parallel without running out of resources, each server has a specific amount of slots defined.
 In Jenkins, every job that is running takes up a slot on a build server.
