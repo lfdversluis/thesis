@@ -1,15 +1,15 @@
 \chapter{Design \& Implementation}
 \label{cpt:design_implementation}
 
-After the initial results and discussion of asynchrony in python, it is evident that asynchronous I/O is beneficial to Tribler's performance and capable of solving our blocking database I/O problem.
-Since almost all of Tribler's I/O operations are database operations, it is key point to focus on.
+After the initial results and discussion of asynchrony in Python, it is evident that asynchronous I/O is beneficial to Tribler's performance and capable of solving our blocking database I/O problem.
+Since almost all of Tribler's I/O operations are database operations, it is the key point to focus on.
 
 Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
 To ensure a good foundation to build upon without reinventing the wheel, it is key to search for a framework that supports both SQLite (Dispersy's and Tribler's current database system) and asynchronous I/O using Twisted.
 Using this framework, we create a database manager with a completely asynchronous, non-blocking yet serialized interface using test driven development.
 Integrating this database manager requires extensive effort, modifying 32\% of all files, 23\% of all functions and spanning more than six thousand lines of code.
 
-\section{A new Database Framework}
+\section{A New Database Framework}
 
 \begin{table}[]
 	\centering
@@ -27,7 +27,7 @@ Integrating this database manager requires extensive effort, modifying 32\% of a
 
 With the recent addition of the MultiChain there are three distinct database files with three distinct database managers in the Tribler code base.
 None these database managers are fully documented or tested.
-A proper solution is to replace these three database managers with the new asynchronous one.
+A proper solution is to replace these three database managers with a new manager featuring an asynchronous and non-blocking interface.
 This will result in less code to maintain, all logic in one place and easier to cover with proper unit tests and documentation, yielding increased stability and speed, improved maintainability and enhances the productivity of developers.
 
 After careful scrutiny, four database frameworks that offer integration with Twisted and SQLite were selected: Axiom, Storm, Alchemia and Twistar.
@@ -36,7 +36,7 @@ The results of this comparison can be found in Table~\ref{table:database_framewo
 
 From this table it is clear that Twister and Alchimia are not good fits; neither of them are available in the official repositories of Ubuntu and Debian.
 After comparing Axiom and Storm in better detail the final decision led us to choose Storm.
-The Storm database framework which is developed by Canonical and is featured in several other products such as Launchpad \cite{canonical2011storm}, showing its real world use and maturity.
+The Storm database framework has been developed by Canonical and is featured in several other products such as Launchpad \cite{canonical2011storm}, showing its real world usage and maturity.
 The Storm website features a rich tutorial and documentation section, superior to that of Axiom, where new developers joining Tribler will benefit from.
 Additionally, all table creation and updates must explicitly be handled by the developer which is Tribler's and Dispersy's current approach.
 As we favour this enforcement over automatically generated tables, Storm was chosen as the foundation of the new database manager: \enquote{StormDBManager}.
@@ -53,9 +53,8 @@ StormDBManager features a complete asynchronous, non-blocking yet serialized int
 Because Storm also features ORM support, this database manager can be the foundation for an ORM based approach in the future.
 
 Since multi-threaded support is severely limited using SQLite, we decided to leverage the Twisted thread-pool to allocate a thread for a longer period of time to run a worker on.
-This worker will be owned by the StormDBManager.
+This worker will be managed by the StormDBManager.
 Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
-Furthermore, the StormDBManager guarantees that queries will be executed in the same order as they are scheduled, guaranteeing no conflicts in database fields can occur because of race conditions.
 The system works as follows, visualized in Figure~\ref{fig:storm_db_worker}.
 Fist, a Dispersy function calls the StormDBManager to run a query (1).
 The StormDBManager generates a deferred and returns this to the caller (2).
@@ -63,29 +62,25 @@ Next, the StormDBManager queues a tuple of four elements (3):
 
 \begin{enumerate}
 	\item The function to be called, e.g. execute or fetchone.
-	\item The arguments to be passed to the function i.e. the query.
+	\item The arguments to be passed to the function e.g. the query.
 	\item The keyword arguments to be passed to the function.
 	\item A deferred to handle the response in an asynchronous way.
 \end{enumerate}
 
-Note that by using a thread-safe queue, all calls are scheduled in the same order as required, ensuring serialized behaviour.
+By using a thread-safe queue, all calls are scheduled in the same order as required, ensuring serialized behaviour.
 The worker running on the thread waits blocking for new items to come, preventing the thread from dying.
-Once it a tuple is available it fetches it (4).
+Once a tuple is available it fetches it from the queue (4).
 It then executes the function (5) and calls the deferred's callback with the result (6).
 After that, the worker proceeds to wait blocking for a new item, or executes the next tuple if present.
-To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will commit or shut down, respectively.
 
 \subsection{Test Driven Development}
 To implement StormDBManager, we have used test driven development.
 In test driven development, the programmer first writes tests which outline the basic functionality of the object to be created, forcing the developer to think about its workings \cite{janzen2005test}.
 Next, the developer implements the functions one by one, running the tests after each implemented function to observe if more tests pass.
-Using this approached turned out to be fruitful, adjusting the implementation of StormDBManager to be more consistent introduced bugs which were captured immediately, preventing long debug sessions.
-
-Unfortunately, Dispersy is not properly tested.
-The tests present in Dispersy do not cover all functions nor files.
-Throughout 
+Using this approached turned out to be fruitful: adjusting the implementation of StormDBManager to be more consistent introduced bugs which were captured immediately, preventing long debug sessions.
 
 \section{Implementing StormDBManager}
+\label{sct:implementing_stormdbmanager}
 
 As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
 Every caller of this function will need to be transitively updated as well to handle the deferreds being returned.
@@ -113,9 +108,9 @@ Twisted automatically waits for bar's deferred to fire and then continues with t
 Consequentially, because of the inlineCallbacks decorator, foo is now an asynchronous function as well, returning a deferred whenever called.
 As a result all functions that call foo needs to be updated transitively as well.
 
-In total there are 129 function calls to Dispersy's database (excluding tests)..
-These functions were spread across 414 methods which all needed to be refactored transitively as with the example provided above.
-After Dispersy was fully refactored, 52 files were modified to handle the asynchrony introduced spanning 414 out of 1784 functions present.
+In total there are 129 function calls to Dispersy's database (excluding tests).
+By implementing StormDBManager, all functions that host one or more of these 129 database calls needed to be refactored transitively as with the example provided above.
+After this was done, 414 out of 1784 were modified residing in 52 different files.
 In total these modifications spanned 4605 lines of additions and 2003 of deletion.
 
 Naturally Tribler also required modifications; in total 106 files required modifications spanning 3572 additions and 1242 deletions to the code base.
@@ -125,24 +120,24 @@ In total these modifications resulted in more than eleven thousand modified line
 \subsection{Testing StormDBManager}
 
 Unfortunately, unlike the design of StormDBManager, its implementation is a lot harder to test.
-As every caller of a function needs to be updated transitively when it becomes asynchronous, a small update can turn into a huge refactoring.
+As every caller of a function needs to be updated transitively when it becomes asynchronous, a small change can turn into a huge refactoring effort.
 At the same time the unit tests present in Dispersy do not cover the code base very well.
-This resulted in dozens bugs which were often hard to find.
-To counter this situation, some additional tests are written once a uncovered execution path was discovered.
+This resulted in several bugs which were often hard to find.
+To counter this situation, some additional tests are written once an uncovered execution path was discovered.
 Unfortunately, these tests are not enough to cover all non-covered code.
 Bringing Dispersy to a decent coverage level will require extensive effort and time and is therefore noted as future work.
  
 To test this new version of Dispersy in combination with Tribler, we have made use of the so-called \enquote{allchannel} experiment.
-In this experiment thousand instances of Tribler are created on the DAS5\footnote{\url{http://www.cs.vu.nl/das5/}} supercomputer which will connect to each other and starts synchronizing data.
+In this experiment thousand instances of Tribler are created on the DAS5\footnote{\url{http://www.cs.vu.nl/das5/}} supercomputer which will connect to each other and start synchronizing data.
 Because of these actions, most functionalities of Dispersy will be invoked, causing most, if not all bugs not captured by the tests to surface.
 Next, from the data outputted by this experiment we confirm no errors arose and that all data was correctly sent and received by all nodes.
 
 \section{Summary}
 
-In this chapter we have provided a solution for the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
+In this chapter we have answered the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
 We have introduced the Storm database framework and the database manager built with said framework: StorDBManager.
 A major refactoring has been done on Dispersy's code base to integrate StormDBManager, resulting in all I/O to become asynchronous and non-blocking.
 To validate no bugs are introduced by this major refactoring, we have made use of the tests present and by running the \enquote{allchannel} experiment.
-Furthermore, because of this intensive refactoring it became apparent that more work is needed on Dispersy's tests situation.
+Furthermore, because of this intensive refactoring it became apparent that work is needed to improve the test coverage situation in Dispersy.
 Improving this situation will require extensive effort and is noted as future work.
  

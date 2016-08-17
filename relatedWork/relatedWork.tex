@@ -4,7 +4,7 @@
 A lot of work has been done on the topics of performance, benchmarking and regression testing.
 In this chapter we highlight some of the relevant work conducted in the past decade related to parallelism and asynchrony in Python, regression testing and benchmarking, and bottleneck detection using profilers.
 
-\section{Parallelism and asynchrony in Python}
+\section{Parallelism and Asynchrony in Python}
 \label{sct:parallelism_and_asynchrony_in_python}
 Parallelize Python by removing the GIL, introducing asynchronous behaviour and other means to speed up Python are topics that regularly return in e.g. the Python mailing list and presentations at PyCon \cite{python2015global}.
 To gain performance, many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPU's.
@@ -57,7 +57,7 @@ Different processes have their own GIL, which allows for parallel processing.
 Similarly, the ``synchronized''  inserts synchronization events to automatically refactor assignments of the results of ``concurrent'' function calls to happen during synchronization events.
 However, because of the overhead of creating a new process and communicating between different processes, this approach is only viable for heavy loads that generally can run on its own.
 
-\section{Regression testing}
+\section{Regression Testing}
 Regression testing has been extensively studied both in research and industrial appliances.
 It is often seen as an important part in the software production process \cite{ghaith2013profile}.
 Performance can directly affect user experience and job efficiency \cite{huang2014performance}.

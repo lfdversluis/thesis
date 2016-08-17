@@ -22,7 +22,7 @@ Most of these projects are abandoned and few of them have actual real-world usag
 The Tribler project created a roadmap -- available on its GitHub repository -- to offer the same service, features, user experience, and performance as the YouTube video-on-demand service.
 However, especially the poor performance of Tribler is hampering wide-spread adoption and usage. Figure~\ref{fig:tribler_roadmap} shows three of the six main uncompleted roadmap items.
 
-\section{Key performance optimizations}
+\section{Key Performance Optimizations}
 
 Tribler can be seen as a large and complex distributed system.
 Metrics from OpenHUB show that Tribler, along with its components, features more than 169 thousand lines of code, received contributions from 111 unique contributors and took approximately 44 years of effort \cite{openhub2016tribler}.
@@ -32,7 +32,7 @@ J. M. Juran's Pareto principle admonishes that one should "Concentrate on the vi
 Concretely, this means that resolving the vital bottlenecks yields the best diminishing returns, even for large systems such as Tribler.
 After careful scrutiny it was decided that the most vital bottleneck to address, within the context of a nine month thesis, is Tribler's database I/O.
 
-\section{Addressing blocking I/O}
+\section{Addressing Blocking I/O}
 \label{sct:triblers_database_dependency}
 
 The problem we address within this thesis is the underlying reason for poor performance and unacceptable user experience. 
@@ -62,7 +62,7 @@ The current overview of the database structure is presented in Figure~\ref{fig:d
 These databases are becoming a key performance bottleneck \cite{pouwelse2014reduce}.
 Back in May 2013 measurements indicated that Tribler read and wrote 660 Megabytes per hour to and from disk.
 The next measurement in April 2014 showed this number was somewhat reduced to 623.
-In May 2014 efforts were made to reduce this enormous amount of I/O; by batching database statements the number dropped to 538 Megabytes per hour.
+In May 2014 efforts were made to reduce this enormous amount of I/O; by batching database statements the number dropped to 538 megabytes per hour.
 
 So far this metric has only been measured sporadically by hand, running Tribler for an arbitrarily amount of time and check the amount of I/O by using htop\footnote{\url{http://hisham.hm/htop/}}.
 htop produces an overview similar to Figure \ref{fig:iotop_tribler_april_2014} (Johan Pouwelse, 2014).
@@ -96,14 +96,14 @@ Moreover, the MultiChain makes use of its own database rather than Dispersy's.
 Norberhuis points out: \enquote{The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.} \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
 This makes it hard to estimate Tribler's current I/O rates.
 
-Furthermore, a feature called \enquote{credit mining} is currently in development that will also interact with the database of Tribler.
+What's more, a feature called \enquote{credit mining} is currently in development that will also interact with the database of Tribler.
 There are no metrics on the current situation of Tribler and it's hard if not impossible to estimate the impact of any addition to come.
 Currently, there is a lack of insight in these metrics, or a lack of \emph{software performance engineering}, causing the exact extent of the problem to be unknown.
 
 %\section{Asynchronous I/O}
 %\label{sec:async-programming}
 
-\section{A lack of software performance engineering}
+\section{A Lack of Software Performance Engineering}
 
 \begin{figure}[!h]
 	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{problemDescription/images/commits_openhub.png}}
@@ -114,7 +114,7 @@ Currently, there is a lack of insight in these metrics, or a lack of \emph{softw
 Nowadays, programs are evolving at a rapid speed and Tribler is no exception. 
 Since 2005 Tribler is under continuous development, over seventeen thousands commits have been made, spanning more than a decade \cite{openhub2016tribler}.
 The distribution of these commits can be seen in Figure~\ref{fig:commits_openhub}.
-Code commits to fix bugs, refactor code, enhance or add functionality are pushed to code repositories at a frequent rate.
+Code commits to fix bugs, refactor code, enhance or add functionality are pushed to the code repository of Tribler at a frequent rate.
 It is important that software performance engineering is a part of this process: performance should not get compromised by changes, if any it should improve.
 Naturally trade-offs can be made performance wise, but it should be done with a clear understanding of the consequences.
 
@@ -123,16 +123,16 @@ The first attempt was to create probes using Systemtap\footnote{\url{https://sou
 System tap is a tool for \enquote{instrumenting the Linux kernel for analyzing performance and functional problems}, (Jacob et al. 2008) \cite{jacob2008systemtap}.
 While some success was reported, this system is no longer being maintained nor functional.
 After this, code was added to the Dispersy code base to track and log if a function was running longer than a fixed amount of time.
-While this implementation does provide some insight, its workings are crude and only covering some of the functions present.
+While this implementation does provide some insight, its workings are crude and only covers some of the functions present.
 For instance, it cannot handle asynchronous constructions.
 Tribler did not have any observation system integrated, leaving the development team in the dark regarding its performance.
 
 It is apparent that there is a lack of software performance engineering in the development cycle of Tribler.
-Performance has never been one of the priorities in Tribler's lifetime; only 6\% of all tickets on GitHub are (indirectly) related to performance.
-To ensure performance will no longer degrade realistic benchmarks need to be developed which Tribler can be tested with.
-Changes can then be compared against the current codebase, tracking important performance statistics such as the amount of I/O, run time of functions, throughput and responsiveness.
+Performance has never been one of the priorities in Tribler's lifetime: only 6\% of all tickets on GitHub are (indirectly) related to performance.
+To ensure performance will no longer degrade, realistic benchmarks need to be developed which Tribler can be tested with.
+Changes can then be compared against the current code base, tracking important performance statistics such as the amount of I/O, run time of functions, throughput and responsiveness.
 These benchmarks can then be integrated into a regression testing system which can be integrated in our Jenkins continuous integration system.
-Using Jenkins, performance regression tests can run on every proposed change and at predetermined moments, having a continuous updated overview of Tribler's performance metrics.
+Using Jenkins, performance regression tests can run on every proposed change and at predetermined moments, allowing for a continuous updated overview of Tribler's performance metrics.
 
 % https://github.com/Tribler/tribler/issues/15
 % https://github.com/Tribler/tribler/issues/77
@@ -144,122 +144,21 @@ Using Jenkins, performance regression tests can run on every proposed change and
 % extreme cpu ticket: https://github.com/Tribler/tribler/issues/197
 % slow startup time ticket: https://github.com/Tribler/tribler/issues/255
 
-\section{Realistic benchmarks}
+\section{Realistic Benchmarks}
 Directly related to the performance problem is the benchmark problem.
 In order to improve user performance we require making assumptions about realistic use cases.
 Each user has different usage patterns, hardware and network conditions, all affecting performance.
 Creating one of more several benchmarks testing several scenario's is required to accurately tune the system for real world usage.
 At the same time, a benchmark cannot consume too much time.
-Benchmarking is by nature time consuming \cite{huang2014performance}, however running long regression tests per commit done on a pull request will severely strain the development speed.
+Benchmarking is by nature time consuming \cite{huang2014performance}, however running long regression tests per commit will severely strain the development speed.
 
 Therefore, it is important to create a reference benchmark which has a close resemblance to real world usage without consuming too much time.
 
-The next step is to introduce a solution, tracking changes in vital numbers such as CPU consumption or I/O produced.
-Any improvement indicated by this benchmark should reflect improvement for real world users.
-This system should benchmark the current code base against proposed changes, capturing any differences in performance.
-
-
-%\section{OLD TEXT}
-%Only by comparing different builds can one gain insight into performance changes.
-%Currently Tribler lacks this insight.
-%As Tribler is heavy I/O-based and likely I/O-bound, it is crucial to have these numbers.
-%A breakdown of database statements is needed and the amount of I/O that is generated.
-%Recently a block-chain like structure called the Multi-Chain was added to Tribler and soon another feature called credit mining will be introduced as well.
-%The impact and increase of I/O caused by these additions are unknown.
-
-%Ideally, we would like to run regression tests on multiple platforms powered by our Jenkins continuous integration system as visualized by Figure X \todo{make figure.}.
-%This regression test will feature average use cases and automatic graph generation to give developers an instant overview of their changes.
-%This system has to run automatically whenever a pull request is opened on GitHub.
-%Efforts can then be made to optimize the I/O output and improve the performance of Tribler.
-
-%\section{Resolving bottlenecks}
-%To improve the performance of Tribler, (I/O) bottlenecks to need to be removed.
-%The key problem here is how to identify and resolve bottlenecks in a complex system such as Tribler.
-
-%By careful inspection of the usage of I/O, we identified that Tribler's I/O is blocking the main thread.
-%Many programming languages have support for parallelization, allowing multiple functions to be executed at the same time by using threads.
-%Tribler does not have access to this paradigm as it's written in the Python programming language.
-%Python lacks this feature as only one thread can run in the Python interpreter at any time because of the Global Interpreter Lock (GIL).
-%However, a thread does release the GIL when it's performing a blocking I/O operation, allowing other threads to get a hold of the GIL and run.
-%Leveraging this trait to gain performance is a huge step forward towards solving the (I/O) bottleneck Tribler is currently facing.
-
-%\section{Tribler's code base}
-%At the same time, Tribler's current code base has a severe lack of (unit) tests, structure and documentation and contains dead code.
-%The current version has been in development for over nine months, is plagued with bugs and non-functioning on some platforms.
-%As of writing, the code is only tested on a single Unix operating system.
-%Tribler, however, is available for all three major operating systems: Windows, Mac OS and Unix distributions.
-%As users are reporting platform specific bugs, it is evidently important that automated testing on all three platforms are realized.
-%All this results in long and complex debugging processes and creates a steep learning curve for new students joining the project and might withhold members of the open-source community to start contributing.
-
-%While it's not this thesis primary goal, refactoring the code involved with the bottlenecks and properly documenting and testing %this refactored code is a secondary goal of this thesis, aiding in lowering the learning curve and improving the stability of %the Tribler code base.
-
-% \section{Connectability}
-% One of the problems Tribler faces is the connectability of its users.
-% Users can be behind e.g. firewalls that prevent incoming or outgoing connections.
-% Currently, Tribler employs NAT and Firewall Traversal [CITE], yet the success of this method is limited.
-%The Tribler team has implemented their own Distributed Hash Table (DHT) in python while existing libraries such as LibTorrent also offer these.
-% These implementations should be tested to see if changing to a library offers a significant boost in terms of exchange or speed.
-
-%When users are downloading anonymously, they are inside so-called `hidden swarms'.
-%These hidden swarms are not present in e.g. LibTorrent's DHT and therefore information from peers has to be exchanged between peers themselves by means of introducing peers to each other (PEX).
-%By making use of Dispersy, Tribler creates rendezvous points to introduce peers to each other.
-%If these rendezvous points are not connectible, PEX cannot take place.
-%Solving this may be done by always connecting to the same port (chosen by the user or a default) and ask the user to forward that port.
-%If users are not willing to do so, they can be penalized.
-%This penalty can be for example not able to download anonymously at all, receive half the amount of credits when credit mining (see [CITE]) or limited download speed.
-
-% \section{Anonymous download speed}
-% To allow for anonymous downloading, Tribler uses a Tor-like technique to create so called `anon tunnels'.
-% To increase download speed and prevent a bottleneck in the network hampering the overall download speed, several tunnels are built to download simultaneously from [CITE?].
-% Since this Tor-like technique includes cryptographic functions, having multiple tunnels running concurrently results in a lot of cryptographic calls being executed.
-% Stok et al. profiled Tribler using a gumby\footnote{Gumby is Tribler's experiment running framework.} experiment. This experiment showed that a lot of processing time is spent on encrypting and decrypting packets [CITE] as well as serializing and deserializing data.
-% Currently, the CPU power is a bottleneck when downloading using the anonymous tunnels.
-% By offloading the encryption and decryption of packets to a separate core, the workload on the core on which Tribler is running can be reduced.
-% This should yield an increased download speed and better spread of workload overall as more packets can be processed per time unit.
-
-% \section{Package serialization}
-% One of the core components of Tribler is Dispersy. 
-% Dispersy is a fully decentralized elastic database capable of communicating packets and exchanging peers.
-% Both Dispersy and Tribler make use of python' built-in serialization function.
-% The profile ran by Stok et al. [CITE] indicated that a significant amount of CPU resources is spent on serializing data when sending or receiving UDP packets.
-% As previously explained, running multiple threads at once does not result in code being executed concurrently.
-% Cap'n Proto is a serialization framework that offloads the serialization of packets to a C++ process, which bypasses the global interpreter lock.
-% This means that the other threads -- who are still affected by the global interpreter lock -- can immediately continue their work as the locks is released once the offloading to the C++ code base is done.
-
-% \section{Responsiveness}
-% Since Tribler is written in the python language, calls on any thread will cause other threads to halt their execution. % this is wrong.
-% Normally two separate threads can run code in parallel as they generally do not touch each other's state.
-% The cause of this is the Global Interpreter Lock (GIL) which states that only one function can be executed at a time.
-% In its current state, the Graphical User Interface (GUI) of Tribler will block if it's doing some CPU or I/O intensive work.
-% This yields a scenario in which the user is unable to perform any action, which is not user friendly.
-% In some cases the operating system itself will show e.g. a warning or visualisation that the process is not responding.
-% To solve this issue, heavy operations should be done on separate threads or processes which are not monitored by the GIL.
-% Several libraries that are written in C/C++ are a good example of this.
-% Once the code of such a library is invoked and the execution is offloaded to the C/C++ code, the GIl is released, allowing other python code to ran in parallel.
-% Another approach is using the python framework Twisted.
-% Twisted has implemented a thread pool that also bypasses this GIL.
-% By rewriting CPU or I/O intensive code to make use of this thread pool in an asynchronous way, the responsiveness of Tribler can be improved.
-
-% \section{Code quality and testing}
-% Tribler's current code base is in a bare state.
-% The current version that has been in development for over nine months now is plagued with bugs and is non-functioning.
-% Furthermore, there is a severe lack of unit tests, a lot of the code is undocumented and unnecessary complex and structure and flow are missing.
-% This results in long and complex debugging processes when bugs are found and raise the bar for new contributors to get familiar with the code base.
-
-% As of writing, the code is only tested on a single Unix operating system.
-% Tribler, however, is available for all three major operating systems: Windows, Mac OS and Unix distributions.
-% As users are reporting platform specific bugs, it is evidently important that automated testing on all three platforms are realized.
-
-% Refactoring the code is necessary in order to regain the structure and lower the code complexity.
-% Furthermore, proper unit tests are required to ensure Tribler's stability now and in the future.
-% These tests have to be executed on build machines that run different operating systems, preferably with various configurations e.g. 32 and 64 bit architectures or different library versions.
-
-\section{Objective and research questions}
+\section{Objective and Research Questions}
 \label{chp2:sct:objectives-research-questions}
-The objective of this thesis is to improve the performance and responsiveness of Tribler and to introduce a regression test system.
-The verification of the performance regression test system is done by focussing on removing Tribler's biggest bottleneck present: blocking database I/O.
-By resolving this bottleneck, important metrics tracked by this regression test system should show positive changes, indicating improvement.
-%In general, projects facing similar issues can adopt the practices applied when changes made to the Tribler code base.\\
+The objective of this thesis is to improve the performance and responsiveness of Tribler and to introduce a regression testing system.
+The verification of the performance regression testing system is done by focussing on removing Tribler's biggest bottleneck present: blocking database I/O.
+By resolving this bottleneck, important metrics tracked by this regression testing system should show positive changes, indicating improvement.
 
 The research presented in this thesis was carried out in cooperation with the Tribler team. 
 The Tribler team consists of both staff members of the Technical University of Delft as well as Bachelor and Master students.
@@ -282,11 +181,11 @@ Identifying these drawbacks and deciding if the benefits outweigh the costs is n
 
 As database I/O is currently the main bottleneck, we need to resolve it.
 Tribler already has a framework integrated that is especially designed to handle I/O in a non-blocking way.
-We this require an approach that prevents us from reinventing the wheel while still solve the bottleneck at hand in an adequate manner.
+We require an approach that prevents us from reinventing the wheel while still solve the bottleneck at hand in an adequate manner.
 Additionally, we need to make sure the order of database operations does not change as this may lead to inconsistencies
 
 Careful scrutiny is required to look at available solutions and their pros and cons.
-A decision can then be made on the best course of action. 
+A decision can then be made on the best course of action. \\
 
 \noindent
 \textbf{Research Question 3:} How do we incorporate software performance engineering into Tribler's development process to gain insight into performance statistics?\\
@@ -294,7 +193,7 @@ A decision can then be made on the best course of action.
 Currently, not a single developer has insight into how well Tribler performs and what impact changes have on Tribler in its current state.
 To be able to conclude performance changes do not negatively impact the performance of Tribler, we can apply software performance engineering.
 Software performance engineering focuses on introducing performance regression tests and benchmarks into the development cycle.
-By making use of these regression tests, Tribler developers finally get insight into vital metrics which are desperately needed.\\
+By making use of these regression tests, Tribler developers finally get insight into vital metrics which is desperately needed.\\
 
 
 \section{Main Contributions}
@@ -302,5 +201,5 @@ The main contributions of this thesis are as follows.
 First, we elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 We then resolve the vital I/O bottleneck currently present in Tribler using asynchrony and a multi-threaded approach.
 This is done by introducing the Storm database framework into Tribler and creating a database manager with an asynchronous, non-blocking yet serialized interface.
-Next, we introduce software performance engineering into Tribler's development process by adding a regression testing system that benchmarks different versions of the same code base to gain insight into performance metrics such as disk I/O.
-Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, performance and user experience.
+Next, we introduce software performance engineering into Tribler's development process by adding a regression testing system that benchmarks different versions of the same code base to gain insight into changes in performance metrics such as disk I/O.
+Finally, experimental results and measurements will be provided to confirm the main goal of this thesis i.e. improving responsiveness, performance and throughput.

@@ -3,7 +3,7 @@
 
 \begin{table}[h]
 	\centering
-	\caption{Specifications of the setup used during the idle iotop measurement of Tribler 6.6.0-pre-exp.}
+	\caption{Specifications of the virtual private server used for experiments.}
 	\label{table:virtual_machine_specs}
 	\begin{tabular}{l|l}
 		\textbf{Component} 	& \textbf{Specifications} \\ \hline
@@ -19,8 +19,8 @@ To evaluate Tribler's current situation and to validate our implementations are 
 In this chapter we elaborate on these experiments and discuss the results. 
 Section~\ref{sct:tribler_io_past} and \ref{sct:db_performance_analysis} present experiments done on past and the current version of Tribler.
 Section~\ref{sct:tribler_performance_regression} provides experimental results on comparing the current version of Dispersy with our work.
-All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table\ref{table:virtual_machine_specs}.
-This setup was chosen to stay as close as possible to a 
+All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table~\ref{table:virtual_machine_specs}.
+This virtual private server is connected to a 100Mbit Internet connection.
 
 \section{Tribler's I/O Throughout the Years}
 \label{sct:tribler_io_past}
@@ -30,11 +30,11 @@ The versions and their release dates are shown in Table~\ref{table:tribler_versi
 
 As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
 This will provide valuable insight in Tribler's behaviour and the extent of the problem.
-Moreover it will show us if the amount of I/O is being reduced since the creating of the ticker on GitHub.
+Moreover it will show us if the amount of I/O is being reduced since the creation of the ticket on GitHub.
 
 \begin{table}[h]
 	\centering
-	\caption{The versions of Tribler and their release dates.}
+	\caption{The four versions of Tribler and their release dates.}
 	\label{table:tribler_version_dates}
 	\begin{tabular}{l|l}
 		\textbf{Tribler version} & \textbf{Release date} \\ \hline
@@ -55,7 +55,7 @@ Moreover it will show us if the amount of I/O is being reduced since the creatin
 Each version of Tribler will run for one hour idle, using a clean state directory i.e. no prior knowledge of the network and its contents.
 During the idle run, Tribler will start discovering peers and content such as channels and torrents, storing the obtained data in the database which gets flushed to disk.
 Additionally, peers will start requesting data from this Tribler instance such as search and peer exchange requests, causing Tribler to read data from its database.
-These read and writes operations will be monitored by iotop and the amounts automatically accumulated.
+These read and write operations will be monitored by iotop and the amounts automatically accumulated.
 After one hour, the amount of read and write I/O is noted down and Tribler is shutdown.
 
 The results of this experiment are visible in Figure~\ref{fig:io_history}.
@@ -73,18 +73,18 @@ This provides ideal conditions for Tribler to spend most of its resources on dis
 	\centering
 	\caption{The packets collected for each version by Tribler when running idle for one hour using a clean state directory.}
 	\label{table:packets_collected_idle}
-	\begin{tabular}{|l|l|l|}
+	\begin{tabular}{|p{7.2cm}|l|l|}
 		\hline
 		\textbf{Packet type}                         & \textbf{Tribler version} & \textbf{Amount}  \\ \hline
-		\multirow{4}{*}{Dispersy-identity} & 6.3.5           & 20,026  \\ \cline{2-3} 
+		\multirow{4}{*}{\begin{minipage}{7.2cm}Dispersy-identity: a message containing the public key of another peer for identification purposes.\end{minipage}} & 6.3.5           & 20,026  \\ \cline{2-3} 
 		& 6.4.3           & 38,268  \\ \cline{2-3} 
 		& 6.5.2           & 46,890  \\ \cline{2-3} 
 		& 6.6.0-exp1      & 41,480  \\ \hline
-		\multirow{4}{*}{Dispersy-undo-own} & 6.3.5           & 40,594  \\ \cline{2-3} 
+		\multirow{4}{*}{\begin{minipage}{7.2cm}Dispersy-undo-own: a message that allows a member to undo his/her own messages and flags them as undone.\end{minipage}} & 6.3.5           & 40,594  \\ \cline{2-3} 
 		& 6.4.3           & 45,095  \\ \cline{2-3} 
 		& 6.5.2           & 47,409  \\ \cline{2-3} 
 		& 6.6.0-exp1      & 44,279  \\ \hline
-		\multirow{4}{*}{votecast}          & 6.3.5           & 44,990  \\ \cline{2-3} 
+		\multirow{4}{*}{\begin{minipage}{7.2cm}votecast: a message indicating a vote has been given by a user on a channel, indicating it is spam or not.\end{minipage}}          & 6.3.5           & 44,990  \\ \cline{2-3} 
 		& 6.4.3           & 90,339  \\ \cline{2-3} 
 		& 6.5.2           & 116,557 \\ \cline{2-3} 
 		& 6.6.0-exp1      & 96,509  \\ \hline
@@ -93,7 +93,7 @@ This provides ideal conditions for Tribler to spend most of its resources on dis
 
 To observe the cost versus the benefits, we have tracked the amount of packets Tribler managed to synchronize while running one hour idle using a clean state directory for each version.
 The results are visible in Table~\ref{table:packets_collected_idle}.
-From this table we conclude that while version 6.3.5 and 6.4.3 perform much more I/O, the amount of packets obtained is significantly less.
+From this table we conclude that while version 6.3.5 and 6.4.3 perform much more I/O, the amount of packets obtained is significantly less compared to version 6.5.2.
 From these numbers we this conclude that the cost of having high I/O rates is not justified by the benefits as they perform even worse. 
 Interestingly, the numbers of the latest 6.6.0-exp1 version are similar to that of 6.4.3, while we cannot explain this fully, we believe it may be caused by external network conditions or the MultiChain feature.
 
@@ -104,7 +104,7 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[h]
 	\centering
-	\caption{The breakdown of Tribler's queries when running Tribler idle for one hour using an empty state directory.}
+	\caption{The breakdown of Tribler's database queries when running Tribler idle for one hour using an empty state directory.}
 	\label{table:query_breakdown_tribler_empty_state_dir}
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -120,7 +120,7 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[h]
 	\centering
-	\caption{The breakdown of Dispersy's queries when running Tribler idle for one hour using an empty state directory.}
+	\caption{The breakdown of Dispersy's database queries when running Tribler idle for one hour using an empty state directory.}
 	\label{table:query_breakdown_dispersy_empty_state_dir}
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -134,7 +134,7 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[h]
 	\centering
-	\caption{The breakdown of Tribler's queries when running Tribler idle for one hour using a filled state directory.}
+	\caption{The breakdown of Tribler's database queries when running Tribler idle for one hour using a filled state directory.}
 	\label{table:query_breakdown_tribler_filled_state_dir}
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -150,7 +150,7 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 
 \begin{table}[h]
 	\centering
-	\caption{The breakdown of Dispersy's queries when running Tribler idle for one hour using a filled state directory.}
+	\caption{The breakdown of Dispersy's database queries when running Tribler idle for one hour using a filled state directory.}
 	\label{table:query_breakdown_dispersy_filled_state_dir}
 	\begin{tabular}{|l|l|l|l|l|l|}
 		\hline
@@ -164,30 +164,34 @@ In conclusion, we believe that the I/O rate of Tribler does not show a correlati
 To observe the impact of each query separately, an infrastructure was created that automatically provides insight into the most expensive, most executed, and longest duration queries. 
 With more than one million queries per hour, Tribler developers desperately need such a tool.
 Developers can use this information to directly dive into the relevant source code and test possible improvements.
-To get insight into Tribler's current query statistics, we have run two versions of Tribler for one hour using an empty state directly and a filled state directory containing 100,000 torrents and roughly 1200 channels discovered on which 10 are subscribed.
-Such a filled state directory is quite common for regular Tribler users as their discover the network and its contents.
-Additionally we marked 10 channels as favourite, meaning Tribler will attempt to discover all content within these channels.
-Using our tool, we generated a breakdown of the database queries performed by both Tribler and Dispersy for both runs.
-The breakdown of all queries performed by Tribler's during this experiment can be found in Table~\ref{table:query_breakdown_tribler_empty_state_dir} and Table~\ref{table:query_breakdown_tribler_filled_state_dir} , showing the breakdown of running Tribler idle for one hour with an empty and a filled state directory, respectively.
-In Table~\ref{table:query_breakdown_dispersy_empty_state_dir} and Table~\ref{table:query_breakdown_dispersy_filled_state_dir} we show the breakdown of all database queries performed by Dispersy with an empty and filled state directory, respectively.
+To get insight into Tribler's current query statistics, we have run two versions of Tribler for one hour using an empty state directly and a filled state directory.
+A state directory is a directory where Tribler stores all configuration files, databases, information about the network and other data such as checkpoints.
+The filled state directory in our experiment contains meta information on 100,000 torrents and roughly 1200 channels on which ten have been subscribed.
+Such a filled state directory is quite common for regular Tribler users as they discover the network and its contents.
+By subscribing to ten channels, Tribler will attempt to discover all content within these channels.
 
-From these breakdowns we observe that Tribler's database I/O has an enormous impact on Tribler's performance.
-In the first experiment with an empty state directory, Dispersy generated 32.368 seconds worth of I/O using 748,486 queries in total. 
+For each of the two runs, we have created breakdowns depicting the amount of queries issued on Tribler's and Dispersy's database.
+The breakdowns for Tribler's database using an empty respectively filled state directory can be found in Table~\ref{table:query_breakdown_tribler_empty_state_dir} and Table~\ref{table:query_breakdown_tribler_filled_state_dir}.
+In Table~\ref{table:query_breakdown_dispersy_empty_state_dir} and Table~\ref{table:query_breakdown_dispersy_filled_state_dir} we show the breakdown of Dispersy's database using an empty and filled state directory, respectively.
+
+From these breakdowns we observe that Tribler's database I/O has an enormous impact on Tribler's performance, in contrast what was assumed by Tribler developers (see Section~\ref{sct:triblers_database_dependency}).
+In the experiment with an empty state directory, Dispersy generated 32.368 seconds worth of I/O using 748,486 queries in total.
 Tribler's database was queried 446,099 times, generating 651.997 seconds of I/O, a \emph{twenty fold increase} compared to Dispersy.
-In total 684,365 out of 3600 seconds are spend on I/O, meaning 19\% of the time the main thread is blocked waiting for I/O.
+In total 684,365 out of 3600 seconds are spend on I/O, meaning 19\% of the time the main thread is blocked.
 
 The situation worsens when Tribler starts filling its state directory.
-Using a filled state directory, Dispersy generated 173.929 seconds worth of I/O using 49,349 queries in total.
-Moreover, the amount of queries is significantly lower as Dispersy now has discovered most of the network, resulting in a few new items to insert into the database.
+Using the filled state directory, Dispersy generated 173.929 seconds worth of I/O using 49,349 queries in total.
 Tribler's database was queried 242,023 times, generating 712.180 seconds of I/O.
-From these numbers we observe that the queries are becoming more time consuming, which can be explained by the database having more data to search through.
+The amount of queries is significantly lower as Dispersy now has discovered most of the network, resulting in less new peers to be added.
+Additionally, less new content is discovered, reducing the amounts of operations on Tribler's database.
+In general, we observe that the queries are becoming more time consuming, which can be explained by the database having more data to search through.
 In total, 886,109 seconds out of 3600 seconds is spend on I/O, meaning 24.6\% of the time the main thread is blocked.
 
 To gain insight into which functions issue the most expensive queries, we have created a breakdown of the callers for each database function.
-This breakdown lists the five callers who issued queries consuming the most time.
+This breakdown lists the five callers that issued queries consuming the most time.
 By providing the name, file path and line number in this breakdown, developers can immediately jump to the right point in the code base, increasing the developer's productivity.
-These caller breakdowns for Tribler having an empty and filled state directory are provided Table~\ref{table:caller_breakdown_tribler_empty_state_dir} and Table~\ref{table:caller_breakdown_tribler_filled_state_dir}, respectively.
-Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table:caller_breakdown_dispersy_filled_state_dir} show the respective breakdowns for the top five most time consuming queries issued on Dispersy's database using an empty and filled state directory.
+These caller breakdowns for Tribler's database when running Tribler with an empty and filled state directory are provided Table~\ref{table:caller_breakdown_tribler_empty_state_dir} and Table~\ref{table:caller_breakdown_tribler_filled_state_dir}, respectively.
+Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table:caller_breakdown_dispersy_filled_state_dir} show the respective breakdowns for Dispersy's database using an empty and filled state directory.
 	
 \begin{table}[!h]
 	\centering
@@ -330,7 +334,7 @@ Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table
 \end{table}
 
 In addition to creating a breakdown of the most expensive queries, we also investigated which lines contribute the most to the total amount of time spent on I/O.
-By creating this breakdown we are able to identify queries that cause a lot of I/O, yet may not show up in the breakdowns above because of their low run-time.
+By creating this breakdown we are able to identify queries that cause a lot of I/O, yet may not show up in the breakdowns above because of their low run time.
 For each of the four runs mentioned above, we have computed the top five most time consuming lines and express their contribution to the total amount of time spent on I/O in percentages.
 Table \ref{table:line_breakdown_tribler_empty_state_dir} and \ref{table:line_breakdown_tribler_filled_state_dir} show the top five lines which contribute the most to Tribler's database I/O time when run with an empty, respectively filled state directory.
 Table \ref{table:line_breakdown_dispersy_empty_state_dir} and \ref{table:line_breakdown_dispersy_filled_state_dir} show the same breakdowns but for Dispersy's database time.
@@ -416,13 +420,13 @@ In the first experiment we have ran Tribler idle for one hour while querying the
 By doing so we can observe if certain tasks have been delayed past their set time of execution i.e. measure the latency in the system.
 
 In the second experiment we have stress-tested Tribler's new API.
-By requesting data from an endpoint at several rates per second, we can observe the throughput, response times, variance in these response times and throughput of Tribler.
+By requesting data from an endpoint at several rates per second, we can observe the response times, variance in these response times and throughput of Tribler.
 
-\subsection{Measuring the latency of Tribler}
+\subsection{Measuring the Latency of Tribler}
 
 \begin{table}[h]
 	\centering
-	\caption{Specifications of the setup used in on hour idle run the latency experiment.}
+	\caption{Specifications of the setup used in the latency experiment.}
 	\label{table:specs_hp_elitebook}
 	\begin{tabular}{l|l}
 		\hline
@@ -438,7 +442,7 @@ By requesting data from an endpoint at several rates per second, we can observe 
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=\linewidth]{experimentation/images/ecdf_latency_idle}
-	\caption{An ECDF plot of the latency when running Tribler idle.}
+	\caption{The ECDF plot showing the latency of Tribler when running idle for one hour using Dispersy with blocking, synchronous I/O and running Dispersy with non-blocking, asynchronous I/O.}
 	\label{fig:ecdf_latency_idle}
 \end{figure} 
 
@@ -458,21 +462,21 @@ However, we believe the average may still be significant enough to prefer the as
 
 After running the experiment, we have created an empirical cumulative distribution function (ECDF) plot of the delayed calls, visible in Figure~\ref{fig:ecdf_latency_idle}.
 From this figure we observe that the asynchronous version performs better than the synchronous version.
-On average, the synchronous version has a latency of 87 milliseconds, where the asynchronous version has a latency of 66 milliseconds, a difference of 24\%.
+On average, the synchronous version has a latency of 87 milliseconds, where the asynchronous version has a latency of 66 milliseconds, a reduction of 24\%.
 Furthermore, the synchronous case has more outliers, some even touching the one second mark.
-This observations are enough to confirm the hypothesis: both on average and in maxima the latency of the asynchronous version are lower.
+This confirms the hypothesis: both on average and in maxima the latency of the asynchronous version are lower.
 
 \subsection{Measuring the Responsiveness of Tribler}
 \label{sct:measuring_responsiveness_tribler}
 
 To measure the responsiveness of Tribler while under load, we have stress tested the API of Tribler using the procedure described in Section~\ref{ssct:benchmark_3}.
 
-In this experiment we use a state directory containing around 1200 channels.
+In this experiment we use the filled state directory mentioned in Section~\ref{sct:db_performance_analysis}.
 By querying Tribler's channel API endpoint for all discovered channels, all channels in the database will be fetched and returned.
 As this is Tribler's heaviest endpoint in terms of computation, it's the best way to put Tribler under load.
 In total the experiment will be run six times, querying the channel endpoint exactly 1000 times per run using 1, 2, 5, 10, 15 and 20 requests per second respectively.
-By tracking the response times, the amount of requests per seconds and the throughput the API can offer, we can measure the gain in responsiveness and thus in performance (T) of Tribler.
-We expect that the asynchronous version will outperform the synchronous version significantly in both response times as throughput.
+By tracking the response times and the throughput (T) the API can offer, we can measure the gain in responsiveness and thus in performance of Tribler.
+We expect that the asynchronous version will outperform the synchronous version significantly in both response times and throughput.
 
 \begin{table}[!h]
 	\centering
@@ -504,21 +508,21 @@ We expect that the asynchronous version will outperform the synchronous version 
 \end{figure} 
 
 The results of the experiment can be found in Table~\ref{table:responsiveness_tribler_load}.
-From this table we observe that asynchronous version has a significant less amount of response time, both on average and in maximal duration.
+From this table we observe that asynchronous version has a significant less amount of response time, both on average and in maxima.
 The reduction in response times (on average) ranges between 32.1\% and 57.5\%.
 As the responsiveness of a program can be directly linked to its performance (see Section~\ref{ssct:benchmark_3}), this looks very promising.
 Interesting to note here is that the average response times of the synchronous version go down when the amount of requests per second goes up.
 We believe this may be due to Twisted caching responses.
 
 Another indication that the system has become more responsive is the the standard deviation.
-For every run the standard deviation of the asynchronous version is significantly less than its synchronous counterpart, indicating the response times are more stable than the synchronous version. 
+For every run the standard deviation of the asynchronous version is significantly less than its synchronous counterpart, indicating the response times are more stable. 
 This can be explained by the slicing of tasks because of asynchrony; as tasks are more interleaved, smaller tasks such as a request will be processed in between bigger tasks, yielding a higher and more stable responsivity.
 
 A third promising statistic is the throughput.
-As the response is 613 kilobytes (KB) in size, the theoretical maximum throughput will be 613, 1226, 3065, 6130, 9195 and 12260 KB/s, respectively.
+As the response is 613 kilobytes (KB) in size, the theoretical maximum throughput will be 613, 1226, 3065, 6130, 9195 and 12260 KB/s for 1, 2, 5, 10, 15 and 20 requests per second, respectively.
 If we plot the theoretical, asynchronous and the synchronous throughput we obtain Figure~\ref{fig:throughput_requests}.
 As we can see the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
-At this point Tribler starts to show signs of being overloaded, which is also visible in the table when looking at the amount of responses received per second.
+At this point Tribler starts to show signs of being overloaded, which is also visible in Table~\ref{table:responsiveness_tribler_load} when looking at the amount of responses received per second.
 
 If we look at the responses per second for fifteen and twenty requests per second, we observe that the gap between requests and responses grows percentage wise.
 The question that arises here is why Tribler can't provide 13.4 responses per second with fifteen requests per second as in the case with twenty.
@@ -528,25 +532,24 @@ As more tasks are scheduled on the event loop of Twisted, it will process each o
 Since there are now more requests pending, it will spend more computation power on the requests.
 Even though this means that more responses per second can be provided, percentage wise the amount of replies per request drops: for fifteen requests this percentage is 73\% where for twenty requests per second this percentage is 67\%.
 
-All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput up to 150\%.
+All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput by up to 150\%.
 
 \subsection{Longtail Latencies}
 \label{longtail_latencies}
 
 Another important measurement that can be made is longtail latencies.
 As Hsu explains \enquote{Longtail latencies affect members every day and improving the response times of systems even at the 99th percentile is critical to the member's experience.}, (Hsu, 2015) \cite{hsu2015who}.
-Longtail latencies are latencies that occur at high percentiles when measuring.
-These latencies often are orders of magnitude larger than the average or median latencies.
-Hsu explains that longtail latencies impact users quite frequently.
-If a high latency occurs with a probability $\rho$ and a user performs $n$ requests, the probability that a user will observe this high latency is 
+Longtail latencies are latencies at high percentiles which are often orders of magnitude larger than the median latencies.
+Hsu explains that longtail latencies impact users quite frequently even when the chance of one occurring is low.
+If a longtail latency occurs with a probability $\rho$ and a user performs $n$ requests, the probability that a user will observe a longtail latency is 
 
 \begin{equation}
 	\label{eq:probability_high_latency}
-	1 - (\rho)^{n}
+	1 - (1 - \rho)^{n}
 \end{equation}
 
-If we take $\rho = 0.99$ and $n = 20$, the probability of a user observing high latency will be 18.2\%.
-As the new API will be queried quite often, it is apparent that longtail latencies are also of importance to Tribler.
+If we take $\rho = 0.01$ and $n = 20$, the probability of a user observing a longtail latency response will be 18.2\%, a significant chance.
+As the new API introduced in Tribler will be queried frequently, it is apparent that longtail latencies are also of importance to Tribler.
 
 \begin{figure}[h]
 	\begin{subfigure}[b]{.5\linewidth}
@@ -559,11 +562,11 @@ As the new API will be queried quite often, it is apparent that longtail latenci
 		\caption{The response times per percentile when running Dispersy with our work.}
 		\label{fig:response_times_percentiles_async}
 	\end{subfigure}
-	\caption{The response times per percentile of Dispersy running with existing code and our work.}
+	\caption{The response times per percentile when running Dispersy with the existing code and our work.}
 	\label{fig:resposne_times_percentiles}
 \end{figure}
 
-To observe if the longtail latency problem has been reduced by our work, we have inspected the data generated by the experiment run conducted in Section~\ref{sct:validation_performance_regression_testing_system}.
+To observe if the longtail latency problem exists in Tribler and if it has been reduced by our work, we have inspected the data generated by the experiment run conducted in Section~\ref{sct:validation_performance_regression_testing_system}.
 The results are visible in Figure~\ref{fig:resposne_times_percentiles}.
 From these two figures we observe that the existing code has a lot of long tail latencies, starting at the 90th percentile.
 Our work starts showing long tail latencies from the 99.9th percentile, which is a huge improvement over the existing code.
@@ -595,7 +598,7 @@ It is immediately clear that the proposed changes have a positive impact on the 
 	\label{fig:compare_table}
 \end{figure} 
 
-To look at the data generated by the benchmark in more detail, developers can look at the table generated by the regression test system, an example of this table is visible in Figure~\ref{fig:compare_table}.
+To look at the data generated by the benchmark in more detail, developers can look at the table generated by the regression testing system, an example of this table is visible in Figure~\ref{fig:compare_table}.
 This breakdown presents the average, minimum, maximum and standard deviation in response times as well as the throughput and amount of responses per second achieved.
 
 From these figures we observe that the performance regression testing system provides a suitable overview for developers to get a quick overview of the changes caused by the proposed code.
