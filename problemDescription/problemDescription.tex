@@ -278,25 +278,26 @@ One of these drawbacks is that it requires a different mindset for the programme
 Identifying these drawbacks and deciding if the benefits outweigh the costs is necessary to prevent the current state from worsening. \\
 
 \noindent
-\textbf{Research Question 2:} How do we incorporate software performance engineering into Tribler to gain insight into performance statistics?\\
+\textbf{Research Question 2:} How do we resolve Tribler's blocking database I/O problem?\\
+
+As database I/O is currently the main bottleneck, we need to resolve it.
+Tribler already has a framework integrated that is especially designed to handle I/O in a non-blocking way.
+We this require an approach that prevents us from reinventing the wheel while still solve the bottleneck at hand in an adequate manner.
+Additionally, we need to make sure the order of database operations does not change as this may lead to inconsistencies
+
+Careful scrutiny is required to look at available solutions and their pros and cons.
+A decision can then be made on the best course of action. 
+
+\noindent
+\textbf{Research Question 3:} How do we incorporate software performance engineering into Tribler's development process to gain insight into performance statistics?\\
 
 Currently, not a single developer has insight into how well Tribler performs and what impact changes have on Tribler in its current state.
 To be able to conclude performance changes do not negatively impact the performance of Tribler, we can apply software performance engineering.
 Software performance engineering focuses on introducing performance regression tests and benchmarks into the development cycle.
 By making use of these regression tests, Tribler developers finally get insight into vital metrics which are desperately needed.\\
 
-\textbf{Research Question 3:} How do we create benchmarks which are a representative use case of Tribler?\\
 
-Ultimately, the end user should benefit from performance enhancements.
-The key issue here is to define metrics and workloads to benchmark with.
-Metrics need to properly capture changes to accurately measure the impact of any modification.
-Additionally, if the workload does not represent a realistic use-case the benchmark may be flawed, rendering the outcome unreliable and inaccurate.
-
-A second constraint is the run time of a benchmark.
-Preferably, the regression testing system should not clog the throughput of the current test architecture.
-Running an one hour benchmark per change per pull request will severely strain the development speed.
-
-\section{Main contributions}
+\section{Main Contributions}
 The main contributions of this thesis are as follows.
 First, we elaborate on the subject of multitasking and parallelization in the context of the Python programming language and provide arguments where asynchronous programming is preferred over synchronous programming, using Tribler as a case study.
 We then resolve the vital I/O bottleneck currently present in Tribler using asynchrony and a multi-threaded approach.

@@ -253,6 +253,9 @@ Especially when working with databases one needs to make sure that the order of 
 A second point of attention is the overhead generated when creating multiple threads.
 As pointed out by the previous sections, offloading work to multiple threads may actually have a negative impact on performance.
 
+Finally, asynchronous programming requires a different mindset as the software is now event-based and makes use of callbacks.
+This mindset may require new developers joining the Tribler team to study this paradigm, however we do not believe this is a significant drawback.
+
 \subsection{Initial measurements}
 
 \begin{table}[h]

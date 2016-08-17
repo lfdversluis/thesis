@@ -8,14 +8,9 @@ Moreover, this performance regression test system should force developers to kee
 
 \section{Introduction to Gumby}
 \label{sct:gumby_introduction}
-%\begin{figure}[h]
-%	\makebox[\textwidth][c]{\includegraphics[width=\linewidth]{experimentation/images/send.png}}
-%	\caption{An example of a side by side comparison of two \enquote{allchannel} experiment runs. Left the current code base, right asynchronous Dispersy with blocking I/O.}
-%	\label{fig:side_by_side_send}
-%\end{figure} 
 
 Gumby is an experiment runner framework for Dispersy and Tribler.
-It is being used by Tribler developers to run experiments on local computers as well as remote servers such as the DAS5 super computer\footnote{\url{http://www.cs.vu.nl/das5/}}.
+It is being used by Tribler developers to run experiments on local computers as well as remote servers such as the DAS5 supercomputer.
 Gumby takes care of most of the steps required in order to run an experiment, including:
 
 \begin{itemize}
@@ -54,7 +49,7 @@ Once this experiment is done, we can compare this data with the data generated b
 To create a comparison that requires little effort to interpret, graphs and tables will be generated and presented to the developer.
 By creating a side-by-side plot of two graphs using the same scales, developers can immediately see any big changes, for a more in-depth view the developer can refer to the table which presents the results in a more fine grained fashion.
 
-\section{Performance regression using Gumby}
+\section{Performance Regression using Gumby}
 
 By using configuration files and scenario files, we can create experiments which run Tribler and perform certain actions such as downloading content.
 These experiments can in turn be used to compare different versions of Tribler which allows us to test for performance regression. 
@@ -68,11 +63,16 @@ While the experiment is running, Gumby tracks statistics such as memory usage or
 At the end of each experiment, all (relevant) data is fetched from the nodes and combined into a dataset.
 Using post-experiments scripts we can then compare the data from the two obtained datasets and check if there are changes in e.g. resource usage or response times.
 
-\section{Representative benchmarks}
+\section{Representative Benchmarks}
 
 One of the challenges of regression testing using benchmarks is that there should be benchmarks present which feature representative, real-world usage scenarios \cite{ferre2001usability}.
-While it is intriguing to put a system to the limit of its capabilities and review if it performs better with made modifications, eventually real users should also profit from said modifications, improving the user experience of the software.
-To provide developers with adequate scenarios, we have devised three benchmarks which feature a realistic use-case of Tribler.
+While it is intriguing to put a system to the limit of its capabilities and review if it performs better with made modifications, eventually real users should also profit from said modifications.
+
+To create representative benchmarks, both general use cases as well as user-traces can be used.
+The latter has once been employed by Meulpoler et al. using BarterCast \cite{meulpolder2009bartercast}.
+Using BarterCast, traces were recorded of users to get insight into their usage of Tribler.
+These traces can be converted into realistic benchmarks.
+However, as this is outside the scope of this thesis we have devised three benchmarks which feature a more generic yet realistic use-case of Tribler.
 
 \subsection{Benchmark 1}
 
@@ -137,16 +137,16 @@ By running this benchmark on two different versions of Tribler, we can observe i
 Since the responsiveness is directly related to the performance of a program, this will provide a good indication.
 
 
-\section{Continuous regression testing using Jenkins}
+\section{Continuous Regression Testing using Jenkins}
 
 To include software performance engineering in Tribler's development cycle, it was decided to include regression testing in our Jenkins continuous integration system.
 Using Jenkins, one can create jobs to run specific tasks.
-Examples of this is checking out the current version of Tribler using git and running the unit tests on this version.
+An examples of such a task is to run all unit tests on the current version of Tribler.
 Additionally, Jenkins can automatically run jobs on defined events such as commits pushed to a pull request or a new pull request being opened on the GitHub repository.
 
-At the start of this thesis, Jenkins would only run unit tests on a Linux server.
+At the start of this thesis, Jenkins only ran the unit tests on a Linux server.
 To be able to run tests on all major platforms Tribler supports, three additional servers were set up running Windows 32-bit, Windows 64-bit and OS X Yosemite, respectively.
-After these were deployed a code coverage and pylint checker job were added which track how much of the code has been tested and if the code adheres the PEP8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} code style, respectively.
+After these were deployed, a code coverage and pylint checker job were added which track how much of the code has been covered by the tests and if the code adheres the PEP8\footnote{\url{https://www.python.org/dev/peps/pep-0008/}} code style, respectively.
 When either the code coverage drops or the pylint check fails, the build is marked as failed, safeguarding deterioration of the code base.
 
 To further improve Tribler's development process, we have created a performance regression job that runs the third benchmark using five requests per second.
@@ -179,7 +179,7 @@ To avoid allocating too many slots at once, the \enquote{GH\_Tribler\_PR} MultiJ
 As our benchmark can be categorized as experiment, we decided to add our job to the third phase.
 Figure~\ref{fig:three_stages_of_testing} visualizes the three phases of the \enquote{GH\_Tribler\_PR} MultiJob.
 
-\subsection{Multiple platforms}
+\subsection{Multiple Platforms}
 
 \begin{figure}[!h]
 	\centering
@@ -196,3 +196,10 @@ Using Jenkins, we can schedule benchmarks automatically on all available servers
 By doing so, we can observe if Tribler performs the same on all operating systems.
 In case a specific operation system does not match the signature of the others, developers can look into the inner workers of this operating system to better understand the situation.
 As this item was not feasible to implement giving the time left of this thesis, it is noted down as future work.
+
+\section{Summary}
+
+In this chapter we have introduced Gumby and elaborated on how we extended Gumby to create a regression testing system.
+Furthermore, we elaborated on the need of representative benchmarks and provided three benchmarks which represent possible use real-world use cases of Tribler.
+Next, we depicted the current testing infrastructure and elaborated on how to integrate this regression testing system into our continuous integration system Jenkins, answering the third research question.
+Finally, we have marked the option to employ this regression testing system on all platforms Tribler supports as future work.

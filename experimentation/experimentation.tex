@@ -22,7 +22,7 @@ Section~\ref{sct:tribler_performance_regression} provides experimental results o
 All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table\ref{table:virtual_machine_specs}.
 This setup was chosen to stay as close as possible to a 
 
-\section{Tribler's I/O over the years}
+\section{Tribler's I/O Throughout the Years}
 \label{sct:tribler_io_past}
 As explained in Section~\ref{sct:triblers_database_dependency}, Tribler's I/O has been a problem for years.
 To observe if and how the amount of I/O has changed over time, we have performed a quick assessment on four different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
@@ -99,7 +99,7 @@ Interestingly, the numbers of the latest 6.6.0-exp1 version are similar to that 
 
 In conclusion, we believe that the I/O rate of Tribler does not show a correlation with the amount of packets synchronized. As the I/O rate of Tribler rises again in the latest version, possibly because of the MultiChain feature requiring additional computations, it shows the urgency of the I/O to become asynchronous and non-blocking.
 
-\section{Detailed database performance analysis}
+\section{Detailed Database Performance Analysis}
 \label{sct:db_performance_analysis}
 
 \begin{table}[h]
@@ -188,8 +188,6 @@ This breakdown lists the five callers who issued queries consuming the most time
 By providing the name, file path and line number in this breakdown, developers can immediately jump to the right point in the code base, increasing the developer's productivity.
 These caller breakdowns for Tribler having an empty and filled state directory are provided Table~\ref{table:caller_breakdown_tribler_empty_state_dir} and Table~\ref{table:caller_breakdown_tribler_filled_state_dir}, respectively.
 Table~\ref{table:caller_breakdown_dispersy_empty_state_dir} and Table~\ref{table:caller_breakdown_dispersy_filled_state_dir} show the respective breakdowns for the top five most time consuming queries issued on Dispersy's database using an empty and filled state directory.
-	
-% TRIBLER TABLES
 	
 \begin{table}[!h]
 	\centering
@@ -409,7 +407,7 @@ From the results provided above we conclude what was long a hunch: Tribler is I/
 By creating an infrastructure which provides a breakdown of query execution statistics, we have solved the Tribler team latent need: insight into Tribler's database usage.
 Using this infrastructure, developers can now focus on the queries which require optimization to adhere to the 80/20 rule: targeting the vital few, not the trivial many.
 
-\section{Tribler's performance test regression}
+\section{Tribler's Performance Test Regression}
 \label{sct:tribler_performance_regression}
 
 To measure the performance gain of Tribler using our work, we have conducted two sets of experiments where two instances of Tribler, one with the current synchronous, blocking Dispersy implementation and one with our asynchronous, non-blocking version of Dispersy, are compared.
@@ -464,7 +462,8 @@ On average, the synchronous version has a latency of 87 milliseconds, where the 
 Furthermore, the synchronous case has more outliers, some even touching the one second mark.
 This observations are enough to confirm the hypothesis: both on average and in maxima the latency of the asynchronous version are lower.
 
-\subsection{Measuring the responsiveness of Tribler}
+\subsection{Measuring the Responsiveness of Tribler}
+\label{sct:measuring_responsiveness_tribler}
 
 To measure the responsiveness of Tribler while under load, we have stress tested the API of Tribler using the procedure described in Section~\ref{ssct:benchmark_3}.
 
@@ -531,7 +530,49 @@ Even though this means that more responses per second can be provided, percentag
 
 All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput up to 150\%.
 
-\subsection{Validating the performance regression test system}
+\subsection{Longtail Latencies}
+\label{longtail_latencies}
+
+Another important measurement that can be made is longtail latencies.
+As Hsu explains \enquote{Longtail latencies affect members every day and improving the response times of systems even at the 99th percentile is critical to the member's experience.}, (Hsu, 2015) \cite{hsu2015who}.
+Longtail latencies are latencies that occur at high percentiles when measuring.
+These latencies often are orders of magnitude larger than the average or median latencies.
+Hsu explains that longtail latencies impact users quite frequently.
+If a high latency occurs with a probability $\rho$ and a user performs $n$ requests, the probability that a user will observe this high latency is 
+
+\begin{equation}
+	\label{eq:probability_high_latency}
+	1 - (\rho)^{n}
+\end{equation}
+
+If we take $\rho = 0.99$ and $n = 20$, the probability of a user observing high latency will be 18.2\%.
+As the new API will be queried quite often, it is apparent that longtail latencies are also of importance to Tribler.
+
+\begin{figure}[h]
+	\begin{subfigure}[b]{.5\linewidth}
+		\includegraphics[width=\textwidth]{experimentation/images/response_time_percentiles_sync}
+		\caption{The response times per percentile when running Dispersy with existing code.}
+		\label{fig:response_times_percentiles_sync}
+	\end{subfigure}
+	\begin{subfigure}[b]{.5\linewidth}
+		\includegraphics[width=\textwidth]{experimentation/images/response_time_percentiles_async}
+		\caption{The response times per percentile when running Dispersy with our work.}
+		\label{fig:response_times_percentiles_async}
+	\end{subfigure}
+	\caption{The response times per percentile of Dispersy running with existing code and our work.}
+	\label{fig:resposne_times_percentiles}
+\end{figure}
+
+To observe if the longtail latency problem has been reduced by our work, we have inspected the data generated by the experiment run conducted in Section~\ref{sct:validation_performance_regression_testing_system}.
+The results are visible in Figure~\ref{fig:resposne_times_percentiles}.
+From these two figures we observe that the existing code has a lot of long tail latencies, starting at the 90th percentile.
+Our work starts showing long tail latencies from the 99.9th percentile, which is a huge improvement over the existing code.
+However, even though we have reduced the 99.9th percentile from 1799 milliseconds in the existing code to 828 milliseconds in our work, it still indicates that work can be done to reduce this number.
+As Hsu indicates, finding the root cause of these long tail percentiles can be hard and due to time constraints it is not feasible for this work to resolve.
+It is therefore marked as future work.
+
+\section{Validating the Performance Regression Testing System}
+\label{sct:validation_performance_regression_testing_system}
 
 \begin{figure}[!h]
 	\centering
@@ -540,12 +581,12 @@ All in all, this experiment demonstrates that the asynchronous system has superi
 	\label{fig:tribler_response_times_comparison}
 \end{figure} 
 
-To validate the performance regression system, we run the experiment above with 5 requests per second.
-From the results, Gumby creates a side-by-side comparison graph and a table with an overview of the differences in the data obtained.
+To validate the performance regression testing system, we run the experiment described in Section~\ref{sct:measuring_responsiveness_tribler} again with five requests per second.
+From the results, our regression testing system creates a side-by-side comparison graph and a table with an overview of the differences in the data obtained.
 
 Figure~\ref{fig:tribler_response_times_comparison} shows the comparison graph generated.
-From this figure, it is clear that the left hand side -- showing the current code base -- has higher response times than the right side.
-From this graph it is immediately clear that the proposed changes have a positive impact on the responsiveness of the API.
+From this figure, it is clear that the left hand side -- showing the existing code -- has higher response times than the right side (our work).
+It is immediately clear that the proposed changes have a positive impact on the responsiveness of the API.
 
 \begin{figure}[!h]
 	\centering
@@ -555,7 +596,19 @@ From this graph it is immediately clear that the proposed changes have a positiv
 \end{figure} 
 
 To look at the data generated by the benchmark in more detail, developers can look at the table generated by the regression test system, an example of this table is visible in Figure~\ref{fig:compare_table}.
-This breakdown presents the average, minimum, maximum and standard deviation in response times as well as the throughput and amount of responses per second obtained.
+This breakdown presents the average, minimum, maximum and standard deviation in response times as well as the throughput and amount of responses per second achieved.
 
-From these figures we conclude that the performance regression test system provides a suitable overview for developers to get a quick overview of the current state.
-		
+From these figures we observe that the performance regression testing system provides a suitable overview for developers to get a quick overview of the changes caused by the proposed code.
+
+\section{Summary}
+
+From the results provided in this chapter we can conclude that Tribler is I/O bound.
+By implementing a non-blocking database solution we have reduced Tribler's API response times by up to 57.5\%, improved the throughput by up to 150\% and reduced the long tail latencies considerably.
+Furthermore we have finally gained insight into Tribler's database usage.
+By providing a breakdown per database function and on the level of source code lines, we can now accurately pinpoint which lines are responsible for the most I/O time and which database queries might need optimization.
+Finally, we have shown that our regression testing system performs well and once integrated into Tribler's development cycle, will provide detailed metrics and insights, allowing developer to pinpoint bottlenecks faster and more accurate.
+
+Unfortunately, due to time constraints Tribler's I/O is not refactored to become asynchronous and non-blocking.
+However, the foundation for Tribler's I/O to become asynchronous has been created and the insights provided are good starting points for future work.
+
+All in all we believe we have contributed to the goal of decentralized systems such as Tribler to become as performant as centralized solutions. 

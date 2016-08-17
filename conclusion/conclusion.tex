@@ -16,7 +16,7 @@ A second item for future work is moving Tribler's and Dispersy's queries to an o
 This will remove the \enquote{raw queries} from all code bases which reduces the complexity of the system.
 Moreover, as all data will be contain in objects which are generally easier to modify and read from.
 
-A third item for future work is leveraging Jenkins' new pipeline plug-in.
+Another item is leveraging Jenkins' new pipeline plug-in.
 This pipeline plug-in allows to enable/disable specific stages or items of the continuous integration procedure.
 This comes in handy when a developer is only interested in experimental results, skipping the eight minute testing stage.
 Additionally, additional functionality can be added on a pull request basis where now an update to the continuous integrating procedure will be applied to all pull requests.
@@ -24,7 +24,12 @@ Additionally, additional functionality can be added on a pull request basis wher
 A fourth item that could be done in future work is investigating if we can use SQLite's multithreaded support to increase the speed of processing database queries, resulting in an even higher responsiveness of Tribler.
 While SQLite developers themselves admit SQLite has minimal multithreaded support, it can still be investigated to what extent we can leverage its support.
 
-The final item left as future work is running the benchmark in a closed environment, disconnected from the internet.
-When running Tribler and Dispersy, it will connect to the Internet which may influence performance metrics such as I/O rates.
+Improving the code quality of Dispersy is another item that was mentioned in this thesis.
+It was found that passing all tests in Dispersy does provide any grantees beyond a basic level of correctness.
+Improving and adding tests is required to increase the stability, maintainability and correctness of Dispersy.
+
+A final item that we would like to highlight as future work is running benchmarks in a closed environment, disconnected from the Internet.
+When running Tribler and Dispersy, it will connect to the Internet which may influence performance metrics such as I/O rates and amount of packets obtained.
 Creating a closed environment with local peers will ensure that only those peers can communicate to one another.
-This will increase the both the reliability and accuracy of the measurements made.
+These peers can then be instrumented to behave in a predetermined manner.
+This will increase both the reliability and accuracy of the measurements made.

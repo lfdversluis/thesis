@@ -1,14 +1,15 @@
 \chapter{Design \& Implementation}
 \label{cpt:design_implementation}
 
-After the initial results and discussion of asynchrony in python, it is evident that asynchronous I/O is beneficial to Tribler's performance.
+After the initial results and discussion of asynchrony in python, it is evident that asynchronous I/O is beneficial to Tribler's performance and capable of solving our blocking database I/O problem.
 Since almost all of Tribler's I/O operations are database operations, it is key point to focus on.
-This translates itself into making Dispersy's database I/O asynchronous and non-blocking.
-Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
-To ensure a good foundation to build upon without reinventing the wheel, it is key to search for a framework that supports both SQLite (Dispersy's current database system) and asynchronous I/O using Twisted.
-This framework will then become the basis of a new database manager.
 
-\section{A new database framework}
+Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
+To ensure a good foundation to build upon without reinventing the wheel, it is key to search for a framework that supports both SQLite (Dispersy's and Tribler's current database system) and asynchronous I/O using Twisted.
+Using this framework, we create a database manager with a completely asynchronous, non-blocking yet serialized interface using test driven development.
+Integrating this database manager requires extensive effort, modifying 32\% of all files, 23\% of all functions and spanning more than six thousand lines of code.
+
+\section{A new Database Framework}
 
 \begin{table}[]
 	\centering
@@ -74,6 +75,16 @@ It then executes the function (5) and calls the deferred's callback with the res
 After that, the worker proceeds to wait blocking for a new item, or executes the next tuple if present.
 To make sure the worker can still commit or release the thread, two predetermined values can be queued upon which the worker will commit or shut down, respectively.
 
+\subsection{Test Driven Development}
+To implement StormDBManager, we have used test driven development.
+In test driven development, the programmer first writes tests which outline the basic functionality of the object to be created, forcing the developer to think about its workings \cite{janzen2005test}.
+Next, the developer implements the functions one by one, running the tests after each implemented function to observe if more tests pass.
+Using this approached turned out to be fruitful, adjusting the implementation of StormDBManager to be more consistent introduced bugs which were captured immediately, preventing long debug sessions.
+
+Unfortunately, Dispersy is not properly tested.
+The tests present in Dispersy do not cover all functions nor files.
+Throughout 
+
 \section{Implementing StormDBManager}
 
 As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
@@ -93,6 +104,7 @@ To keep the amount of changes to a minimum we have made extensive use of the \en
 The inlineCallbacks decorator allows programmers to write asynchronous code in a synchronized manner.
 To illustrate this in an example, consider the two code samples of the same function called \enquote{foo} in Listings \ref{lst:foo_sync} and \ref{lst:foo_async}.
 The left listing shows the synchronous version of foo calling a function \enquote{bar} which for example performs a database query.
+
 After refactoring bar to make use of the \enquote{StormDBManager} it will become asynchronous, returning a deferred.
 To handle this, we can need to update foo to cope with this.
 The right listing shows the refactored version of foo; it is decorated with the inlineCallbacks decorator and has now a \enquote{yield} statement in front of the bar function call.
@@ -101,13 +113,36 @@ Twisted automatically waits for bar's deferred to fire and then continues with t
 Consequentially, because of the inlineCallbacks decorator, foo is now an asynchronous function as well, returning a deferred whenever called.
 As a result all functions that call foo needs to be updated transitively as well.
 
-In total there are 129 function calls to Dispersy's database (excluding tests): 26 fetchall, 29 execute, 53 fetchone, 2 insert, 9 executescript, 10 executemany.
-There functions were spread across X methods which all needed to be refactored transitively as with the example provided previously.
-After Dispersy was fully refactored, 47 files were modified with 4605 lines of additions and 2003 of deletion.
-To express the extent of this refactoring, approximately 90\% of all Dispersy functions were updated to handle the asynchrony introduced.
+In total there are 129 function calls to Dispersy's database (excluding tests)..
+These functions were spread across 414 methods which all needed to be refactored transitively as with the example provided above.
+After Dispersy was fully refactored, 52 files were modified to handle the asynchrony introduced spanning 414 out of 1784 functions present.
+In total these modifications spanned 4605 lines of additions and 2003 of deletion.
+
 Naturally Tribler also required modifications; in total 106 files required modifications spanning 3572 additions and 1242 deletions to the code base.
-Finally, an experiment framework called Gumby (see Section~\ref{sct:gumby_introduction}) required modifications as well, resulting more than eleven thousand modified lines of code spanning more than six months of work.
+Finally, an experiment framework called Gumby (see Section~\ref{sct:gumby_introduction}) required minor modifications.
+In total these modifications resulted in more than eleven thousand modified lines of code applied over a period of six months.
 
+\subsection{Testing StormDBManager}
 
+Unfortunately, unlike the design of StormDBManager, its implementation is a lot harder to test.
+As every caller of a function needs to be updated transitively when it becomes asynchronous, a small update can turn into a huge refactoring.
+At the same time the unit tests present in Dispersy do not cover the code base very well.
+This resulted in dozens bugs which were often hard to find.
+To counter this situation, some additional tests are written once a uncovered execution path was discovered.
+Unfortunately, these tests are not enough to cover all non-covered code.
+Bringing Dispersy to a decent coverage level will require extensive effort and time and is therefore noted as future work.
+ 
+To test this new version of Dispersy in combination with Tribler, we have made use of the so-called \enquote{allchannel} experiment.
+In this experiment thousand instances of Tribler are created on the DAS5\footnote{\url{http://www.cs.vu.nl/das5/}} supercomputer which will connect to each other and starts synchronizing data.
+Because of these actions, most functionalities of Dispersy will be invoked, causing most, if not all bugs not captured by the tests to surface.
+Next, from the data outputted by this experiment we confirm no errors arose and that all data was correctly sent and received by all nodes.
 
-\todo{Replace 90\% with actual number.}
+\section{Summary}
+
+In this chapter we have provided a solution for the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
+We have introduced the Storm database framework and the database manager built with said framework: StorDBManager.
+A major refactoring has been done on Dispersy's code base to integrate StormDBManager, resulting in all I/O to become asynchronous and non-blocking.
+To validate no bugs are introduced by this major refactoring, we have made use of the tests present and by running the \enquote{allchannel} experiment.
+Furthermore, because of this intensive refactoring it became apparent that more work is needed on Dispersy's tests situation.
+Improving this situation will require extensive effort and is noted as future work.
+ 
