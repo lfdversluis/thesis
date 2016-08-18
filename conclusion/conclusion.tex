@@ -1,11 +1,13 @@
 \chapter{Conclusion and Future Work}
 \label{cpt:conclusion_and_future_work}
 
-This thesis aims to contribute to the goal of re-decentralisation of systems such as Tribler, in particular with a focus on providing a YouTube-like performance.
+This thesis aims to contribute to the goal of re-decentralisation of systems such as Tribler to become as performant and as accessible as centralized solutions such as YouTube.
 We have addressed Tribler's blocking database I/O, its main performance bottleneck, by integrating the Storm database framework into a new database manager: \enquote{StormDBManager}.
 StormDBManager features a complete asynchronous, non-blocking interface for database access while still maintaining a serialized query execution strategy.
 Furthermore we have provided deep insight into Tribler's and Dispersy's database usage, pinpointing functions that could be reviewed for query optimization.
-Additionally we have created a regression testing system and prepared it to be integrated in our Jenkins continuous integration system to adopt software performance engineering in the development cycle, further maturing the project.
+By making Dispersy's database I/O asynchronous and non-blocking, we have improved Tribler's API throughput by up to 150\%, reduced its response times by up to 57.5\% and moved its longtail latencies to the 99th percentile up from the 90th percentile.
+
+Additionally, we have created a regression testing system and prepared it to be integrated in our Jenkins continuous integration system to adopt software performance engineering in the development cycle, further maturing the project.
 We have verified both the regression testing system and the resolving of the bottlenecks by providing experimental results.
 We believe that with this performance boost and software performance engineering focus, we have contributed to Tribler's further years of research and strengthened Tribler's chances on becoming a decentralized alternative for YouTube-like streaming.
 
@@ -18,13 +20,16 @@ To remove the \enquote{raw queries} from all code bases, an object-relational ma
 This will reduce the complexity of the system as all data will be contained in objects which are generally easier to modify and read from.
 This will require extensive refactoring of Tribler and Dispersy's code bases.
 
+While we have managed to move the longtail latencies to the 99th percentile and reduce the size of these latencies, there is still room for improvement.
+Removing them completely by buffering or other means can lead to further improvements which could be investigated.
+
 To improve performance further, moving Tribler from Python2 to Python3 is another possibility.
 As we have seen, the Global Interpreter Lock in Python 3.2 and onwards has been updated to handle I/O-bound threads better.
 
 To increase the speed of processing database queries, it can be investigated if we can use SQLite's multi-threaded support to process more queries.
 While SQLite developers themselves admit SQLite has minimal multithreaded support, it can still be investigated to what extent we can leverage its support.
 
-Improving the code quality of Dispersy is another item that was mentioned in this thesis.
+Improving the quality of Dispersy's tests is another item that was mentioned in this thesis.
 It was found that passing all tests in Dispersy does not provide any guarantees beyond a basic level of correctness.
 Improving and adding tests is required to increase the stability, maintainability and correctness of Dispersy.
 

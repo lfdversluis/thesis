@@ -55,7 +55,7 @@ Dispersy is fully decentralized with the exception of bootstrap servers.
 It can run on systems with a large number of nodes, without any sever architecture needed \cite{dispersy2016dispersy, zeilemaker2013dispersy}.
 All nodes perform the same algorithmic procedures and tasks and do not differentiate between any node i.e. all nodes are equal.
 
-Furthermore, Dispersy provides on-to-one and one-to-many data dissemination mechanisms to forward data to nodes.
+Furthermore, Dispersy provides one-to-one and one-to-many data dissemination mechanisms to forward data to nodes.
 Eventually, all data will reach all nodes in the network, overcoming challenging network conditions.
 The current overview of the database structure is presented in Figure~\ref{fig:dispersy_database_schema} (Johan Pouwelse, 2013).
 
@@ -93,7 +93,7 @@ These two threads do not saturate the available processing time offered by the m
 Furthermore, Tribler has seen several changes to its code base including the addition of the MultiChain: Tribler's own Blockchain-like structure \cite{norberhuis2015multichain}.
 This feature heavily relies on its database to store blocks and other information about the user and other peers.
 Moreover, the MultiChain makes use of its own database rather than Dispersy's.
-Norberhuis points out: \enquote{The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions are a problem according to Tribler maintainers.} \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
+Norberhuis points out: \enquote{The information is stored in two places within Tribler and this could be eliminated. It would reduce the disk footprint and the amount of read/write transactions as only one database would have to be maintained. The I/O ineractions[sic] are a problem according to Tribler maintainers.} \cite{norberhuis2015multichain}, yet numbers on how much I/O the MultiChain generates are not presented.
 This makes it hard to estimate Tribler's current I/O rates.
 
 What's more, a feature called \enquote{credit mining} is currently in development that will also interact with the database of Tribler.
@@ -128,7 +128,7 @@ For instance, it cannot handle asynchronous constructions.
 Tribler did not have any observation system integrated, leaving the development team in the dark regarding its performance.
 
 It is apparent that there is a lack of software performance engineering in the development cycle of Tribler.
-Performance has never been one of the priorities in Tribler's lifetime: only 6\% of all tickets on GitHub are (indirectly) related to performance.
+Performance has never been one of the priorities in Tribler's lifetime: only 6\% of all tickets on GitHub are (indirectly) related to performance based on their content.
 To ensure performance will no longer degrade, realistic benchmarks need to be developed which Tribler can be tested with.
 Changes can then be compared against the current code base, tracking important performance statistics such as the amount of I/O, run time of functions, throughput and responsiveness.
 These benchmarks can then be integrated into a regression testing system which can be integrated in our Jenkins continuous integration system.

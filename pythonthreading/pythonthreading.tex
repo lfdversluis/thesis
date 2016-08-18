@@ -153,7 +153,7 @@ To date, no one has succeeded in removing the GIL and meet the (hard) requiremen
 One of the most well-known alternative implementations of Python is PyPy.
 It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
 By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a high compatibility with existing Python code \cite{pypy2016pypy}.
-PyPy's geometric average is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
+PyPy's geometric average on run time is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
 While it has many popular libraries ported to be used with PyPy, it still lacks some common used packages.
 Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian, rendering PyPy unusable for the Tribler project as publishing Tribler on said repositories requires the dependencies to be available on them as well.
 
@@ -265,12 +265,12 @@ This mindset may require new developers joining the Tribler team to study this p
 	\caption{Specifications of the setup used in the initial CPU/IO/Network experiment.}
 	\label{table:setup_initial_experiment}
 	\begin{tabular}{l|l}
-		\textbf{Component} 		& \textbf{Specifications} \\ \hline
-		Operating System   		& Ubuntu 15.10 \\
-		Python version			& 2.7.11 \\
-		CPU						& Intel Core i7-2630QM \\ 
-		Hard disk				& Samsung 850 EVO 500GB  \\ 
-		Memory					& 8 GB DDR3 1600MHz \\
+		\textbf{Component} 	& \textbf{Specifications} \\ \hline
+		Operating System   	& Ubuntu 15.10 \\
+		Python version		& 2.7.11 \\
+		Processor			& Intel Core i7-2630QM \\ 
+		Storage				& Samsung 850 EVO 500GB  \\ 
+		Memory				& 8 GB DDR3 1600MHz \\
 	\end{tabular}
 \end{table}
 
@@ -323,7 +323,7 @@ The result of this experiment is visible in Figure~\ref{fig:initial_results}.
 From this figure we conclude that offloading tasks to separate threads asynchronously yields superior performance over the synchronous case. Solely offloading I/O offers the best result: the time required to perform all requests decreased by 22.5\%.
 As a Solid State Drive (SSD) was used in this experiment, it is possible that the performance gain when using a hard disk with moving parts is bigger as read and write operations are slower on such disks.\\
 Offloading all components using asynchronous programming results in a decrease of 18.0\% in run time, 4.5\% less compared to solely offloading I/O.
-This can be explained by the fact that the main thread is now mostly idle as all operations are offloaded to separate threads.\\
+This can be explained by the fact that offloading all operations to multiple threads will cause more overhead.\\
 From these results we conclude that Tribler can benefit from asynchronous programming especially since I/O is the primary bottleneck.
 
 \section{Summary}

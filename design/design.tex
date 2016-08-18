@@ -77,6 +77,8 @@ After that, the worker proceeds to wait blocking for a new item, or executes the
 To implement StormDBManager, we have used test driven development.
 In test driven development, the programmer first writes tests which outline the basic functionality of the object to be created, forcing the developer to think about its workings \cite{janzen2005test}.
 Next, the developer implements the functions one by one, running the tests after each implemented function to observe if more tests pass.
+In our case we have implemented eleven tests, containing 23 assertions targeting all functions StormDBManager will offer.
+After StormDBManager was fully implemented, the tests covered all functions and branches with a total coverage level of 80\%.
 Using this approached turned out to be fruitful: adjusting the implementation of StormDBManager to be more consistent introduced bugs which were captured immediately, preventing long debug sessions.
 
 \section{Implementing StormDBManager}
@@ -117,9 +119,9 @@ Naturally Tribler also required modifications; in total 106 files required modif
 Finally, an experiment framework called Gumby (see Section~\ref{sct:gumby_introduction}) required minor modifications.
 In total these modifications resulted in more than eleven thousand modified lines of code applied over a period of six months.
 
-\subsection{Testing StormDBManager}
+\subsection{Testing StormDBManager in Dispersy}
 
-Unfortunately, unlike the design of StormDBManager, its implementation is a lot harder to test.
+Unfortunately, unlike the implementation of StormDBManager, its integration into Dispersy is a lot harder to test.
 As every caller of a function needs to be updated transitively when it becomes asynchronous, a small change can turn into a huge refactoring effort.
 At the same time the unit tests present in Dispersy do not cover the code base very well.
 This resulted in several bugs which were often hard to find.
