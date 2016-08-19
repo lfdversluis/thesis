@@ -10,7 +10,7 @@
 		Operating System   		& Ubuntu 15.10 \\
 		Python version			& 2.7.10 \\
 		Processor				& Intel Xeon E5-2450 v2 @2.50GHz \\ 
-		Storage					& 50 GB  \\ 
+		Storage					& 500 GB SSD Raid0  \\ 
 		Memory					& 8 GB 1000 MHz  \\
 	\end{tabular}
 \end{table}
@@ -19,6 +19,8 @@ To evaluate Tribler's current situation and to validate our implementations are 
 In this chapter we elaborate on these experiments and discuss the results. 
 Section~\ref{sct:tribler_io_past} and \ref{sct:db_performance_analysis} present experiments done on past and the current version of Tribler.
 Section~\ref{sct:tribler_performance_regression} provides experimental results on comparing the current version of Dispersy with our work.
+Section~\ref{sct:validation_performance_regression_testing_system} shows that the output of the regression testing system can be quickly assessed by developers to observe changes in performance.
+
 All experiments with the exception of one have been conduction on a virtual private server whose specifications can be found in Table~\ref{table:virtual_machine_specs}.
 This virtual private server is connected to a 100Mbit Internet connection.
 
@@ -185,7 +187,7 @@ Tribler's database was queried 242,023 times, generating 712.180 seconds of I/O.
 The amount of queries is significantly lower as Dispersy now has discovered most of the network, resulting in less new peers to be added.
 Additionally, less new content is discovered, reducing the amounts of operations on Tribler's database.
 In general, we observe that the queries are becoming more time consuming, which can be explained by the database having more data to search through.
-In total, 886,109 seconds out of 3600 seconds is spend on I/O, meaning 24.6\% of the time the main thread is blocked.
+In total, 886,109 seconds out of 3600 seconds are spend on I/O, meaning 24.6\% of the time the main thread is blocked.
 
 To gain insight into which functions issue the most expensive queries, we have created a breakdown of the callers for each database function.
 This breakdown lists the five callers that issued queries consuming the most time.
@@ -433,7 +435,7 @@ In theory, making functions asynchronous slices them into smaller \enquote{chunk
 
 In this experiment the hypothesis is that the latency of the asynchronous version will be lower than its synchronous counterpart.
 Since Tribler is running idle it has more resources i.e. CPU time available to tend to Dispersy which is running in the background, which most likely will cause the difference to be smaller than when Tribler is experiencing additional load.
-However, we believe the average may still be significant enough to prefer the asynchronous implementation.
+However, we believe the difference on average may still be significant enough to prefer the asynchronous implementation.
 
 After running the experiment, we have created an empirical cumulative distribution function (ECDF) plot of the delayed calls, visible in Figure~\ref{fig:ecdf_latency_idle}.
 From this figure we observe that the asynchronous version performs better than the synchronous version.
@@ -507,7 +509,7 @@ As more tasks are scheduled on the event loop of Twisted, it will process each o
 Since there are now more requests pending, it will spend more computation power on the requests.
 Even though this means that more responses per second can be provided, percentage wise the amount of replies per request drops: for fifteen requests this percentage is 73\% where for twenty requests per second this percentage is 67\%.
 
-All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput by up to 150\%.
+All in all, this experiment demonstrates that the asynchronous system has superior performance over the synchronous case, increasing the throughput by up to 150\% and reducing response times by up to 57.5\%.
 
 \subsection{Longtail Latencies}
 \label{longtail_latencies}

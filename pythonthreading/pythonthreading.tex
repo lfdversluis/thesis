@@ -22,7 +22,7 @@ This means there cannot be any parallel execution.
 Once a thread is done executing or needs to block it releases the GIL.
 This gives way for cooperative multitasking as other threads that are ready to execute can try to acquire the GIL, visualized in Figure \ref{fig:python_threads_release_gil}.
 
-To make sure Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built-in that \enquote{checks} every thread once per 100 ticks.
+To make sure threads running a Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built-in that \enquote{checks} every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
 Listing \ref{lst:one_tick} contains two code samples that only take one tick each, but require a different amount of time to compute.
 
@@ -161,12 +161,12 @@ Two other popular implementations are JPython and IronPython.
 Both these projects have removed the GIL and can fully exploit multiprocessor systems \cite{python2015global}.
 
 JPython is a Python interpreter implemented in Java. It can be integrated in Java applications and allows Python applications to be compiled into Java classes.
-Using JPython, Python after compiled to Java bytecode will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
+Using JPython, Python -- after compiled to Java bytecode -- will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
 
 IronPython does basically the same as JPython, compiling the source to in-memory bytecode and runs it on the Dynamic Language Runtime \cite{ironpython2014}.
 It allows developers to run Python using the .NET framework.
 
-To illustrate the attempts to remove the GIL are still on going, Larry Hastings presented \enquote{The Gilectomy} at PyCon 2016.
+To illustrate the attempts to remove the GIL are still ongoing, Larry Hastings presented \enquote{The Gilectomy} at PyCon 2016.
 He showed that removing the GIL is fairly easy, but has a huge negative impact on CPython's performance, cache misses being the main reason.
 Additionally, Hastings names some methods that may make The Gilectomy a viable alternative to CPython.\\
 
@@ -181,7 +181,7 @@ Similarly, the \enquote{synchronized} decorator  inserts synchronization events 
 However, this approach is only viable for heavy loads that generally can run on their own as constructing a new process and communicating between different processes generate overhead.
 The authors mention that a function should at least have an execution time of one millisecond for this method to be beneficial.
 
-\section{Asynchronous programming}
+\section{Asynchronous Programming}
 
 \begin{figure}[!h]
 	\makebox[\textwidth][c]{\includegraphics[width=0.6\linewidth]{pythonthreading/diagrams/normal_execution_flow}}

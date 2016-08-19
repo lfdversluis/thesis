@@ -79,7 +79,7 @@ After the bootstrap client provides this information, the client will connect to
 This process is visualized in Figure~\ref{fig:tribler_bootstrapping}.
 Over time, this new peer will learn of all content in the network.
 
-By running a Tribler client with no prior knowledge idle for a fixed amount of time, measurements on Tribler's resource usage such as CPU and I/O rates can be tracked.
+By running a Tribler client with no prior knowledge idle for a fixed amount of time, measurements on Tribler's resource usage such as CPU and I/O rates can be made.
 As Dispersy facilitates Tribler's peer and content discovery, all data will be written to a SQLite database which generates I/O.
 Meanwhile incoming messages are processed which creates CPU load.
 
@@ -110,7 +110,7 @@ This GUI will instead run in a separate process, communicating through a socket 
 Somewhat related to the first benchmark, the response times of this API are equally important.
 Hassenzahl et al. show that web designers have 50 milliseconds to make a good first impression \cite{lindgaard2006attention}.
 Just like most websites, Tribler's user interface will receive data from an API, rendering response times of this API an important factor.
-Especially when the GUI has just been opened on a fresh install, various requests will be send to API requesting channels, torrents, upload and download rates, the amount of free space on the machine, etc.
+Especially when the GUI has just been opened on a fresh install, various requests will be send to the API requesting channels, torrents, upload and download rates, the amount of free space on the machine, etc.
 Meanwhile Tribler's core will also be busy connecting to the bootstrap servers as previously discussed.
 To still deliver good response times, Tribler's core should be as responsive as possible to process incoming requests to this API as fast as possible.
 
@@ -167,6 +167,7 @@ As our benchmark can be categorized as experiment, we decided to add our job to 
 Figure~\ref{fig:three_stages_of_testing} visualizes the three phases of the \enquote{GH\_Tribler\_PR} MultiJob.
 
 \subsection{Multiple Platforms}
+\label{sct:multiple_platforms}
 
 \begin{figure}[!h]
 	\centering
@@ -188,5 +189,5 @@ As this item was not feasible to implement due to time constraints, it is noted 
 
 In this chapter we have introduced Gumby and elaborated on how we extended Gumby to create a regression testing system.
 Furthermore, we elaborated on the need of representative benchmarks and provided three benchmarks which represent possible real-world use cases of Tribler.
-Next, we depicted the current testing infrastructure and elaborated on how to integrate this regression testing system into our continuous integration system Jenkins, answering the third research question.
+Next, we depicted the current testing infrastructure and elaborated on how to integrate this regression testing system into our continuous integration system Jenkins, answering the third research question \enquote{How do we incorporate software performance engineering into Tribler's development process to gain insight into performance statistics?}.
 Finally, we have marked the option to employ this regression testing system on all platforms Tribler supports as future work.

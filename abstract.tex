@@ -5,6 +5,6 @@ Tribler is the result of ten years scientific research in complex distributed sy
 Over the course of years Tribler's performance has fallen below acceptable user experience levels, mainly because there is a lack of \emph{software performance engineering}.
 
 In this work, we lay the foundations for a regression testing systems that allows developers to continuously monitor the metrics that are having the most impact on the performance of Tribler. 
-Utilization of this system gave us a deep insight in the greatest bottleneck of the performance of Tribler: synchronous, blocking disk operations. Resolution of this bottleneck includes a major refactoring effort of the message synchronization system Dispersy. 
+Applying this system gave us a deep insight in the greatest bottleneck of the performance of Tribler: synchronous, blocking disk operations. Resolution of this bottleneck includes a major refactoring effort of the message synchronization system Dispersy. 
 Implementation of a novel, non-blocking disk operation framework allowed us to increase the throughput of Tribler's API by up to 150\% and reduce its response times by up to 57.5\%.
 \end{abstract}

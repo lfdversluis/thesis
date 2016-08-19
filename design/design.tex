@@ -56,7 +56,7 @@ Since multi-threaded support is severely limited using SQLite, we decided to lev
 This worker will be managed by the StormDBManager.
 Using this approach, all database operations happen on the same thread but outside the Twisted main thread, guaranteeing I/O does not block it.
 The system works as follows, visualized in Figure~\ref{fig:storm_db_worker}.
-Fist, a Dispersy function calls the StormDBManager to run a query (1).
+First, a Dispersy function calls the StormDBManager to run a query (1).
 The StormDBManager generates a deferred and returns this to the caller (2).
 Next, the StormDBManager queues a tuple of four elements (3):
 
@@ -103,15 +103,15 @@ To illustrate this in an example, consider the two code samples of the same func
 The left listing shows the synchronous version of foo calling a function \enquote{bar} which for example performs a database query.
 
 After refactoring bar to make use of the \enquote{StormDBManager} it will become asynchronous, returning a deferred.
-To handle this, we can need to update foo to cope with this.
-The right listing shows the refactored version of foo; it is decorated with the inlineCallbacks decorator and has now a \enquote{yield} statement in front of the bar function call.
+To handle this, we need to update foo to cope with this.
+Listing~\ref{lst:foo_async} shows the refactored version of foo; it is decorated with the inlineCallbacks decorator and has now a \enquote{yield} statement in front of the bar function call.
 Twisted automatically waits for bar's deferred to fire and then continues with the execution.
 
 Consequentially, because of the inlineCallbacks decorator, foo is now an asynchronous function as well, returning a deferred whenever called.
 As a result all functions that call foo needs to be updated transitively as well.
 
 In total there are 129 function calls to Dispersy's database (excluding tests).
-By implementing StormDBManager, all functions that host one or more of these 129 database calls needed to be refactored transitively as with the example provided above.
+By implementing StormDBManager in Dispersy, all functions that host one or more of these 129 database calls needed to be refactored transitively as with the example provided above.
 After this was done, 414 out of 1784 were modified residing in 52 different files.
 In total these modifications spanned 4605 lines of additions and 2003 of deletion.
 
@@ -136,7 +136,7 @@ Next, from the data outputted by this experiment we confirm no errors arose and 
 
 \section{Summary}
 
-In this chapter we have answered the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}.
+In this chapter we have answered the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}: \enquote{How do we resolve Tribler's blocking database I/O problem?}.
 We have introduced the Storm database framework and the database manager built with said framework: StorDBManager.
 A major refactoring has been done on Dispersy's code base to integrate StormDBManager, resulting in all I/O to become asynchronous and non-blocking.
 To validate no bugs are introduced by this major refactoring, we have made use of the tests present and by running the \enquote{allchannel} experiment.
