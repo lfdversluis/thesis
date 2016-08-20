@@ -86,7 +86,7 @@ With the enormous amount of I/O Tribler is performing, this forms a huge limitin
 When a thread suspends, other threads can take over and perform operations, yet besides the main thread there are only two additional threads in Tribler: the Graphical User Interface (GUI) thread and the Dispersy endpoint thread.
 As the name implies, the GUI is running on the GUI thread as the framework Tribler currently uses requires this.
 Ironically, the Dispersy endpoint thread was introduced because of the blocking I/O behaviour.
-Under heavy load, Dispersy drops packets because it cannot keep up.
+Under heavy load, Dispersy drops incoming packets because it cannot keep up.
 Processing packets is done on the main thread and as this thread frequently blocks, the buffers overflow causing packet loss.
 These two threads do not saturate the available processing time offered by the main thread blocking, leading to wasting valuable CPU cycles.
 
@@ -148,7 +148,7 @@ Using Jenkins, performance regression tests can run on every proposed change and
 Directly related to the performance problem is the benchmark problem.
 In order to improve user performance we require making assumptions about realistic use cases.
 Each user has different usage patterns, hardware and network conditions, all affecting performance.
-Creating one of more several benchmarks testing several scenario's is required to accurately tune the system for real world usage.
+Creating several benchmarks testing realistic scenario's is required to accurately tune the system for real world usage.
 At the same time, a benchmark cannot consume too much time.
 Benchmarking is by nature time consuming \cite{huang2014performance}, however running long regression tests per commit will severely strain the development speed.
 

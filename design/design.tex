@@ -84,7 +84,7 @@ Using this approached turned out to be fruitful: adjusting the implementation of
 \section{Implementing StormDBManager}
 \label{sct:implementing_stormdbmanager}
 
-As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to coop with this new paradigm.
+As the new StormDBManager will start retuning deferreds, functions of Dispersy need to be able to cope with this new paradigm.
 Every caller of this function will need to be transitively updated as well to handle the deferreds being returned.
 
 \begin{figure}[h]
@@ -99,7 +99,7 @@ Every caller of this function will need to be transitively updated as well to ha
 
 To keep the amount of changes to a minimum we have made extensive use of the \enquote{inlineCallbacks}\footnote{\url{http://twistedmatrix.com/documents/current/api/twisted.internet.defer.inlineCallbacks.html}} decorator.
 The inlineCallbacks decorator allows programmers to write asynchronous code in a synchronized manner.
-To illustrate this in an example, consider the two code samples of the same function called \enquote{foo} in Listings \ref{lst:foo_sync} and \ref{lst:foo_async}.
+To illustrate this in an example, consider the two code samples of the same function \enquote{foo} in Listings \ref{lst:foo_sync} and \ref{lst:foo_async}.
 The left listing shows the synchronous version of foo calling a function \enquote{bar} which for example performs a database query.
 
 After refactoring bar to make use of the \enquote{StormDBManager} it will become asynchronous, returning a deferred.

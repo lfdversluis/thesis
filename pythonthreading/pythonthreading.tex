@@ -19,10 +19,10 @@ Python does not feature a thread scheduler; threads are fully managed by the ope
 To control thread execution Python features a construct called the Global Interpreter Lock (GIL).
 This GIL ensures that only one thread can run in the Python interpreter at any time, i.e. a thread needs to hold the GIL in order to execute.
 This means there cannot be any parallel execution.
-Once a thread is done executing or needs to block it releases the GIL.
+Once a thread is done executing or needs to block, it releases the GIL.
 This gives way for cooperative multitasking as other threads that are ready to execute can try to acquire the GIL, visualized in Figure \ref{fig:python_threads_release_gil}.
 
-To make sure threads running a Central Processing Unit (CPU) bound tasks do not hold the GIL indefinitely a simple check mechanism is built-in that \enquote{checks} every thread once per 100 ticks.
+To prevent threads running a Central Processing Unit (CPU) bound tasks holding the GIL indefinitely, a simple check mechanism is built-in that \enquote{checks} every thread once per 100 ticks.
 Ticks are loosely mapped to interpreter instructions and do not define a time unit.
 Listing \ref{lst:one_tick} contains two code samples that only take one tick each, but require a different amount of time to compute.
 
@@ -100,7 +100,7 @@ Whenever a thread releases the GIL because of the 100 tick \enquote{check}, it i
 Another thread will also try to acquire the GIL upon this signal, but as this signal arrives with a delay it will most likely fail.
 This processes is visualized by Figure~\ref{fig:gil_battle_threads} (David Beazley, 2009).
 Beazley argues that here two competing goals are clashing.
-On the one hand Python wants to only run one thread at a time where on the other hand the OS wants to schedule as many processes/threads to take advantage of its multiple core architecture.
+On the one hand Python wants to only run one thread at a time where on the other hand the OS wants to schedule as many processes/threads as possible to take advantage of its multiple core architecture.
 This clash raises a lot of overhead, which results in a severe performance penalty.
 
 Even running threads on one core result in these GIL acquisition battles.
@@ -230,7 +230,7 @@ In asynchronous programming, tasks are split into multiple chunks and executed i
 The fundamental idea behind this approach is that when faced with a task that would normally block waiting for I/O, it will instead execute some other task that can still make progress, saving valuable time.
 By leveraging this trait, an asynchronous system can outperform a synchronous program considerably.
 
-Support for asynchrony in Python 2.7 is poor so the use of a framework is required.
+Support for asynchrony in Python 2.7 is poor, so the use of a framework is required.
 Tribler makes use of Twisted, an event-driven networking engine written in Python which allows for event-driven and asynchronous programming \cite{kinder2005event}.
 In particular, Twisted is built around event-driven, asynchronous I/O \cite{lefkowitz2003network}.
 
@@ -250,7 +250,7 @@ The event loop will then schedule the continuation of the task that issued the I
 
 The main drawback of asynchronous programming is that it makes the structure and execution of a program more complex.
 As any task can run while another task is blocking, one must be careful that the current task does not modify information the blocking task is dependent on.
-Especially when working with databases one needs to make sure that the order of database queries is not different.
+Especially when working with databases, one needs to make sure that the order of database queries is not different.
 
 A second point of attention is the overhead generated when creating multiple threads.
 As pointed out by the previous sections, offloading work to multiple threads may actually have a negative impact on performance.
@@ -324,7 +324,7 @@ From this figure we conclude that offloading tasks to separate threads asynchron
 As a Solid State Drive (SSD) was used in this experiment, it is possible that the performance gain when using a hard disk with moving parts is bigger as read and write operations are slower on such disks.\\
 Offloading all components using asynchronous programming results in a decrease of 18.0\% in run time, 4.5\% less compared to solely offloading I/O.
 This can be explained by the fact that offloading all operations to multiple threads will cause more overhead.\\
-From these results we conclude that Tribler can benefit from asynchronous programming especially since I/O is the primary bottleneck.
+From these results we conclude that Tribler can benefit from asynchronous programming, especially since I/O is the primary bottleneck.
 
 \section{Summary}
 

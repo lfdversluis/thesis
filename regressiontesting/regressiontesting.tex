@@ -27,7 +27,7 @@ To run an experiment one can specify configurations and scenario files to be exe
 
 Configuration files specify which experiment to run and define all the settings needed in order to run this experiment using Gumby.
 These settings often include paths to data, variables such as how many nodes to create and how long the experiment has to run.
-Once a configuration file has been created, it can be passed to Gumby which takes care of running the experiment.
+Once a configuration file has been created, it can be passed to Gumby, which takes care of running the experiment.
 
 Scenario files allow for a carefully timed execution of functions.
 In a scenario file, each line specifies which nodes executes which function at what time.
@@ -142,7 +142,7 @@ This \enquote{GH\_Tribler\_PR} MultiJob runs whenever a user pushes a commit to 
 Whenever this performance regression job fails, indicating performance regression has occurred, the \enquote{GH\_Tribler\_PR} is marked as failed.
 Upon failure, the author who proposes the changes must then investigate and adjust the code accordingly.
 
-To be able to compare old and new code, we have created a separate job that runs the current code base of Tribler daily using the same experiment.
+To be able to compare old and new code, we have created a separate job that runs the current code base of Tribler daily, using the same experiment.
 Using this job, we can command Jenkins to fetch the data from this job so we can create a comparison graph and table depicting changes between the output of each job.
 Once this job is added to the MultiJob, whenever a pull requests gets merged into the code base, this job will automatically run again to ensure comparisons happen against the most recent code.
 
@@ -178,7 +178,7 @@ Figure~\ref{fig:three_stages_of_testing} visualizes the three phases of the \enq
 
 As each of these operating systems could influence performance \cite{gupta1991impact}, it is evident regression testing should be performed on these operating systems.
 Currently, the build servers are used to package Tribler for official releases and to run unit tests on.
-Soon a build server running the Android operating system will be added as there is an official Android Tribler app in development.
+Soon, a build server running the Android operating system will be added, as there is an official Android Tribler app in development.
 
 Using Jenkins, we can schedule benchmarks automatically on all available servers, visualized in Figure~\ref{fig:jenkins_multiple_os}.
 By doing so, we can observe if Tribler performs the same on all operating systems.

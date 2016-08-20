@@ -423,7 +423,7 @@ By requesting data from an endpoint at several rates, we can observe the respons
 	\label{fig:ecdf_latency_idle}
 \end{figure} 
 
-In this experiment we have compared two versions of Tribler, one with Dispersy having blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
+In this experiment, we have compared two versions of Tribler; one with Dispersy having blocking, synchronous I/O and one with Dispersy running StormDBManager and thus having non-blocking, asynchronous I/O.
 This experiment was run on a machine whose specifications can be found in Table~\ref{table:specs_hp_elitebook}.
 Each instance of Tribler was run one hour idle where every 100 milliseconds the event loop of Twisted was queried for delayed calls.
 By observing if scheduled calls are past their set time of execution, we can measure the amount of delay or \emph{latency} in the system.
@@ -498,7 +498,7 @@ This can be explained by the slicing of tasks because of asynchrony; as tasks ar
 A third promising statistic is the throughput.
 As the response is 613 kilobytes (KB) in size, the theoretical maximum throughput will be 613, 1226, 3065, 6130, 9195 and 12260 KB/s for 1, 2, 5, 10, 15 and 20 requests per second, respectively.
 If we plot the theoretical, asynchronous and the synchronous throughput we obtain Figure~\ref{fig:throughput_requests}.
-As we can see the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
+As we can see, the throughput of the asynchronous case lies close to the theoretical maximum until around the ten requests per second.
 At this point Tribler starts to show signs of being overloaded, which is also visible in Table~\ref{table:responsiveness_tribler_load} when looking at the amount of responses received per second.
 
 If we look at the responses per second for fifteen and twenty requests per second, we observe that the gap between requests and responses grows percentage wise.
@@ -589,11 +589,11 @@ From these figures we observe that the performance regression testing system pro
 
 From the results provided in this chapter we can conclude that Tribler is I/O bound.
 By implementing a non-blocking database solution we have reduced Tribler's API response times by up to 57.5\%, improved the throughput by up to 150\% and reduced the long tail latencies considerably.
-Furthermore we have finally gained insight into Tribler's database usage.
+Furthermore, we have finally gained insight into Tribler's database usage.
 By providing a breakdown per database function and on the level of source code lines, we can now accurately pinpoint which lines are responsible for the most I/O time and which database queries might need optimization.
 Finally, we have shown that our regression testing system performs well and once integrated into Tribler's development cycle, will provide detailed metrics and insights, allowing developer to pinpoint bottlenecks faster and more accurate.
 
 Unfortunately, due to time constraints we only managed to make Dispersy's database I/O asynchronous.
 However, the foundation for Tribler's database I/O to become asynchronous has been created and the insights provided are good starting points for future work.
 
-All in all we believe we have contributed to the goal of decentralized systems such as Tribler to become as performant as centralized solutions. 
+All in all, we believe we have contributed to the goal of decentralized systems such as Tribler to become as performant as centralized solutions. 
