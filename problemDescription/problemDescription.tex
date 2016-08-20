@@ -27,7 +27,7 @@ However, especially the poor performance of Tribler is hampering wide-spread ado
 Tribler can be seen as a large and complex distributed system.
 Metrics from OpenHUB show that Tribler, along with its components, features more than 169 thousand lines of code, received contributions from 111 unique contributors and took approximately 44 years of effort \cite{openhub2016tribler}.
 
-In large and complex systems there are likely to be many performance issue present, often referred to as \emph{bottlenecks}.
+In large and complex systems there are likely to be many performance issues present, often referred to as \emph{bottlenecks}.
 J. M. Juran's Pareto principle admonishes that one should "Concentrate on the vital few, not the trivial many" \cite{ammons2004finding}. This principle is also known as the 80/20 rule.
 Concretely, this means that resolving the vital bottlenecks yields the best diminishing returns, even for large systems such as Tribler.
 After careful scrutiny it was decided that the most vital bottleneck to address, within the context of a nine month thesis, is Tribler's database I/O.
@@ -181,7 +181,7 @@ Identifying these drawbacks and deciding if the benefits outweigh the costs is n
 
 As database I/O is currently the main bottleneck, we need to resolve it.
 Tribler already has a framework integrated that is especially designed to handle I/O in a non-blocking way.
-We require an approach that prevents us from reinventing the wheel while still solve the bottleneck at hand in an adequate manner.
+We require an approach that prevents us from reinventing the wheel while still solving the bottleneck at hand in an adequate manner.
 Additionally, we need to make sure the order of database operations does not change as this may lead to inconsistencies.
 
 Careful scrutiny is required to look at available solutions and their pros and cons.
