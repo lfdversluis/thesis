@@ -17,7 +17,7 @@
 
 To evaluate Tribler's current situation and to validate our implementations are working correctly, experiments have been conducted.
 In this chapter we elaborate on these experiments and discuss the results. 
-Section~\ref{sct:tribler_io_past} and \ref{sct:db_performance_analysis} present experiments done on past and the current version of Tribler.
+Section~\ref{sct:tribler_io_past} and \ref{sct:db_performance_analysis} present experiments done on the past and current versions of Tribler.
 Section~\ref{sct:tribler_performance_regression} provides experimental results on comparing the current version of Dispersy with our work.
 Section~\ref{sct:validation_performance_regression_testing_system} shows that the output of the regression testing system can be quickly assessed by developers to observe changes in performance.
 
@@ -30,7 +30,7 @@ As explained in Section~\ref{sct:triblers_database_dependency}, Tribler's I/O ha
 To observe if and how the amount of I/O has changed over time, we have performed a quick assessment on four different versions of Tribler using iotop\footnote{\url{http://guichaz.free.fr/iotop/}}.
 The versions and their release dates are shown in Table~\ref{table:tribler_version_dates}.
 
-As these measurements were never performed systematically, it is vital to perform these measurement now to observe if any changes have occurred between releases and document them.
+As these measurements were never performed systematically, it is vital to perform these measurements now to observe if any changes have occurred between releases and document them.
 This will provide valuable insight in Tribler's behaviour and the extent of the problem.
 Moreover it will show us if the amount of I/O is being reduced since the creation of the ticket on GitHub.
 
@@ -63,7 +63,7 @@ After one hour, the amount of read and write I/O is noted down and Tribler is sh
 
 The results of this experiment are visible in Figure~\ref{fig:io_history}.
 From this figure we observe that Tribler's I/O has been reduced significantly in version 6.5.2.
-This decrease was the result of batching multiple database queries and periodically flush them to disk, an effective optimization technique also applied in other work \cite{ouyang2011beyond, lin2009database}. 
+This decrease was the result of batching multiple database queries and periodically flushing them to disk, an effective optimization technique also applied in other work \cite{ouyang2011beyond, lin2009database}. 
 Furthermore we observe the amount of I/O is increasing again in the latest 6.6.0-exp1 release possibly due to the MultiChain feature added. 
 
 Peculiarly, the numbers observed in this experiment are significantly higher than the numbers reported in the original ticket.
@@ -179,7 +179,7 @@ In Table~\ref{table:query_breakdown_dispersy_empty_state_dir} and Table~\ref{tab
 From these breakdowns we observe that Tribler's database I/O has an enormous impact on Tribler's performance, in contrast what was assumed by Tribler developers (see Section~\ref{sct:triblers_database_dependency}).
 In the experiment with an empty state directory, Dispersy generated 32.368 seconds worth of I/O using 748,486 queries in total.
 Tribler's database was queried 446,099 times, generating 651.997 seconds of I/O, a \emph{twenty fold increase} compared to Dispersy.
-In total 684,365 out of 3600 seconds are spend on I/O, meaning 19\% of the time the main thread is blocked.
+In total 684,365 out of 3600 seconds are spent on I/O, meaning 19\% of the time the main thread is blocked.
 
 The situation worsens when Tribler starts filling its state directory.
 Using the filled state directory, Dispersy generated 173.929 seconds worth of I/O using 49,349 queries in total.
@@ -187,7 +187,7 @@ Tribler's database was queried 242,023 times, generating 712.180 seconds of I/O.
 The amount of queries is significantly lower as Dispersy now has discovered most of the network, resulting in less new peers to be added.
 Additionally, less new content is discovered, reducing the amounts of operations on Tribler's database.
 In general, we observe that the queries are becoming more time consuming, which can be explained by the database having more data to search through.
-In total, 886,109 seconds out of 3600 seconds are spend on I/O, meaning 24.6\% of the time the main thread is blocked.
+In total, 886,109 seconds out of 3600 seconds are spent on I/O, meaning 24.6\% of the time the main thread is blocked.
 
 To gain insight into which functions issue the most expensive queries, we have created a breakdown of the callers for each database function.
 This breakdown lists the five callers that issued queries consuming the most time.
@@ -394,7 +394,7 @@ Using this infrastructure, developers can now focus on the queries which require
 
 To measure the performance gain of Tribler using our work, we have conducted two sets of experiments where two instances of Tribler, one with the current synchronous, blocking Dispersy implementation and one with our asynchronous, non-blocking version of Dispersy, are compared.
 
-In the first experiment we have ran Tribler idle for one hour while querying the Twisted event loop every 100 milliseconds for delayed calls.
+In the first experiment we ran Tribler idle for one hour while querying the Twisted event loop every 100 milliseconds for delayed calls.
 By doing so we can observe if certain tasks have been delayed past their set time of execution i.e. measure the latency in the system.
 
 In the second experiment we have stress-tested Tribler's new API.
@@ -485,7 +485,7 @@ We expect that the asynchronous version will outperform the synchronous version 
 \end{figure} 
 
 The results of the experiment can be found in Table~\ref{table:responsiveness_tribler_load}.
-From this table we observe that asynchronous version has a significant less amount of response time, both on average and in maxima.
+From this table we observe that asynchronous version has a significantly lower response time, both on average and in maxima.
 The reduction in response times (on average) ranges between 32.1\% and 57.5\%.
 As the responsiveness of a program can be directly linked to its performance (see Section~\ref{ssct:benchmark_3}), this looks very promising.
 Interesting to note here is that the average response times of the synchronous version go down when the amount of requests per second goes up.
