@@ -4,7 +4,7 @@
 After the initial results and discussion of asynchrony in Python, it is evident that asynchronous I/O is beneficial to Tribler's performance and capable of solving our blocking database I/O problem.
 Since almost all of Tribler's I/O operations are database operations, it is the key point to focus on.
 
-Tribler has Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
+Tribler has had Twisted integrated for years, yet Dispersy has not seen any integration despite the decision to do so in 2014 \cite{pouwelse2013consider}.
 To ensure a good foundation to build upon without reinventing the wheel, it is key to search for a framework that supports both SQLite (Dispersy's and Tribler's current database system) and asynchronous I/O using Twisted.
 Using this framework, we create a database manager with a completely asynchronous, non-blocking yet serialized interface using test driven development.
 Integrating this database manager requires extensive effort, modifying 32\% of all files, 23\% of all functions and spanning more than six thousand lines of code.
@@ -130,7 +130,7 @@ Unfortunately, these tests are not enough to cover all non-covered code.
 Bringing Dispersy to a decent coverage level will require extensive effort and time and is therefore noted as future work.
  
 To test this new version of Dispersy in combination with Tribler, we have made use of the so-called \enquote{allchannel} experiment.
-In this experiment thousand instances of Tribler are created on the DAS5\footnote{\url{http://www.cs.vu.nl/das5/}} supercomputer which will connect to each other and start synchronizing data.
+In this experiment a thousand instances of Tribler are created on the DAS5\footnote{\url{http://www.cs.vu.nl/das5/}} supercomputer which will connect to each other and start synchronizing data.
 Because of these actions, most functionalities of Dispersy will be invoked, causing most, if not all bugs not captured by the tests to surface.
 Next, from the data outputted by this experiment we confirm no errors arose and that all data was correctly sent and received by all nodes.
 
@@ -138,7 +138,7 @@ Next, from the data outputted by this experiment we confirm no errors arose and 
 
 In this chapter we have answered the second research question presented in Section~\ref{chp2:sct:objectives-research-questions}: \enquote{How do we resolve Tribler's blocking database I/O problem?}.
 We have introduced the Storm database framework and the database manager built with said framework: StorDBManager.
-A major refactoring has been done on Dispersy's code base to integrate StormDBManager, resulting in all I/O to become asynchronous and non-blocking.
+A major refactoring has been done on Dispersy's code base to integrate StormDBManager, resulting in all I/O to becoming asynchronous and non-blocking.
 To validate no bugs are introduced by this major refactoring, we have made use of the tests present and by running the \enquote{allchannel} experiment.
 Furthermore, because of this intensive refactoring it became apparent that work is needed to improve the test coverage situation in Dispersy.
 Improving this situation will require extensive effort and is noted as future work.

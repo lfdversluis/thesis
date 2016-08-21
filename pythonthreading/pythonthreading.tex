@@ -61,7 +61,7 @@ David Beazly presented his findings in his Python Concurrency Workshop (2009) \c
 By running a trivial CPU-bound function using two threads on a dual-core MacBook, processing time increased from 24.6 to 45.5 seconds; an increase of 185\%.
 Disabling one of his CPU cores yielded a run time of 38.0 seconds, an increase of 154\%.
 
-To confirm this behaviour still exists in the latest version of Python2, we rerun Beazly's experiment.
+To confirm this behaviour still exists in the latest version of Python2, we reran Beazly's experiment.
 The setup used in this experiment can be found in Table~\ref{table:rerun_beazily}.
 Running it sequentially gives us a run time of 8.17 seconds, whereas running it using two threads provides us with a run time of 14.49 seconds; an increase of 177\% which is in range of Beazley's observations.
 
@@ -72,7 +72,7 @@ The OS then propagates this signal to other threads which then can attempt to ac
 The time or \emph{lag} between thread switching and execution may be significant depending on the OS, according Beazley.
 Most operating systems make use of a priority system for threads: the thread with the highest priority will be scheduled by the OS.
 Often, CPU-bound threads have a low priority and I/O-bound threads a high priority.
-If a signal is send to a low priority thread and all CPUs are currently busy processing other, high priority threads, it won't be run until one of the CPUs becomes available.
+If a signal is sent to a low priority thread and all CPUs are currently busy processing other high priority threads, it won't be run until one of the CPUs becomes available.
 
 As it turns out, the GIL signalling is the source of the performance loss.
 Whenever the periodic \enquote{check} runs, the following happens:
@@ -123,7 +123,7 @@ I/O-bound threads which are high priority may fail to acquire the GIL when a CPU
 
 To solve the excessive amount of GIL signalling, a new GIL has been introduced in Python 3.2 \cite{beazley2010understanding}.
 Instead of having the 100 ticks \enquote{check}, there is now a global variable.
-A thread will continue running until this variable is set to one (1), indicating another thread requests to acquire the GIL at which the running thread must release the GIL.
+When another thread requests to acquire the GIL, this variable is set to one (1), at which the running thread must release the GIL.
 This means whenever only one thread is running, the variable will never be set (there is no competing thread) and no signalling takes place.
 Whenever another thread is present, it will be in a suspended state as it does not hold the GIL, and starts a five millisecond timeout.
 From here two things can happen: the running thread releases the GIL voluntarily within the timeout (e.g. an I/O operation is performed) at which the other thread can immediately acquire it, or the timeout expires.
@@ -148,25 +148,25 @@ However, as the new GIL does look promising with respect to blocking I/O it can 
 Parallelize Python by removing the GIL and other means to speed up Python are topics that regularly return in the Python mailing list and at PyCon \cite{python2015global}.
 Throughout the years many attempts have been made to alter Python or remove the GIL to fully benefit from multiple CPUs.
 While many attempts are software related, some alternative implementations have been applied to hardware \cite{tabba2010adding}.
-To date, no one has succeeded in removing the GIL and meet the (hard) requirements for replacement \cite{python2015global}.
+To date, no one has succeeded in removing the GIL and met the (hard) requirements for replacement \cite{python2015global}.
 
 One of the most well-known alternative implementations of Python is PyPy.
 It makes use of a tracing Just-in-Time compiler to produce optimized code \cite{bolz2009tracing}.
 By doing so, PyPy offers increased speed, reduced memory usage and support for stackless mode while providing a high compatibility with existing Python code \cite{pypy2016pypy}.
 PyPy's geometric average on run time is 7.6 times faster than CPython (normal Python) \cite{pypy2016speed}.
-While it has many popular libraries ported to be used with PyPy, it still lacks some common used packages.
+While it has many popular libraries ported to be used with PyPy, it still lacks some commonly used packages.
 Moreover, most of these libraries are not available on the official packaging repositories of Ubuntu and/or Debian, rendering PyPy unusable for the Tribler project as publishing Tribler on said repositories requires the dependencies to be available on them as well.
 
 Two other popular implementations are JPython and IronPython.
 Both these projects have removed the GIL and can fully exploit multiprocessor systems \cite{python2015global}.
 
 JPython is a Python interpreter implemented in Java. It can be integrated in Java applications and allows Python applications to be compiled into Java classes.
-Using JPython, Python -- after compiled to Java bytecode -- will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
+Using JPython, Python -- after being compiled to Java bytecode -- will run in the Jython virtual machine, giving full access to all Java APIs and classes \cite{jython2016why}.
 
 IronPython does basically the same as JPython, compiling the source to in-memory bytecode and runs it on the Dynamic Language Runtime \cite{ironpython2014}.
 It allows developers to run Python using the .NET framework.
 
-To illustrate the attempts to remove the GIL are still ongoing, Larry Hastings presented \enquote{The Gilectomy} at PyCon 2016.
+To illustrate that the attempts to remove the GIL are still ongoing, Larry Hastings presented \enquote{The Gilectomy} at PyCon 2016.
 He showed that removing the GIL is fairly easy, but has a huge negative impact on CPython's performance, cache misses being the main reason.
 Additionally, Hastings names some methods that may make The Gilectomy a viable alternative to CPython.\\
 
@@ -178,7 +178,7 @@ Decorated Concurrency (DECO) uses the multiprocessing package of Python to paral
 Different processes have their own Python interpreter which in turn has its own GIL, allowing for parallel processing.
 Using the \enquote{concurrent} decorator, a function will be wrapped and executed on a new process.
 Similarly, the \enquote{synchronized} decorator  inserts synchronization events to automatically refactor assignments of the results of \enquote{concurrent} function calls to happen during synchronization events.
-However, this approach is only viable for heavy loads that generally can run on their own as constructing a new process and communicating between different processes generate overhead.
+However, this approach is only viable for heavy loads that generally can run on their own as constructing a new process and communicating between different processes generates overhead.
 The authors mention that a function should at least have an execution time of one millisecond for this method to be beneficial.
 
 \section{Asynchronous Programming}

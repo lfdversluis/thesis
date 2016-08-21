@@ -2,7 +2,7 @@
 \label{cpt:software_performance_engineering}
 
 In this chapter we look into the topic of introducing software performance engineering (SPE) into Tribler by adding a performance regression testing system into the Tribler development cycle.
-By looking at the tools already available and prior work, we come up with a system that is both extensible and has minimal impact in Tribler's current architecture.
+By looking at the tools already available and prior work, we have come up with a system that is both extensible and has minimal impact in Tribler's current architecture.
 By comparing two version of Tribler, one with the asynchronous I/O rework done presented in Section~\ref{sct:implementing_stormdbmanager} and Tribler's current code base, we show that this performance regression testing system is an asset to Tribler from which many future developers can benefit.
 Moreover, this performance regression testing system should force developers to keep an eye on performance when making code changes, gradually improving Tribler performance over time.
 
@@ -91,7 +91,7 @@ By updating this experiment, it is now functional again and can be run using the
 \subsection{Benchmark 2}
 
 The second benchmark represents a user downloading content by opening a magnet link or torrent file using Tribler, closing it as soon as it's finished downloading.
-This benchmarks represents the free-riding problem: users downloading content without uploading it back to the network i.e. seeding \cite{adar2000free}.
+This benchmark represents the free-riding problem: users downloading content without uploading it back to the network i.e. seeding \cite{adar2000free}.
 To mimic this behaviour, we start Tribler and immediately start downloading a file using a magnet link, as if someone opened a magnet link from a third party website.
 By periodically checking the download status, Tribler can be shutdown when the download is complete.
 
